@@ -1,0 +1,47 @@
+sylius_grid:
+  grids:
+    app_admin_alarm:
+      driver:
+        name: doctrine/orm
+        options:
+          class: App\Entity\Alarm
+      sorting:
+        id: desc
+
+      filters:
+        name:
+          type: string
+          label: Название
+          options:
+            fields: [name]
+        price:
+          type: money
+          label: Цена
+          options:
+            fields: [price]
+            currency: 'RUB'   # любая, для формы
+            scale: 2
+            # Если цена хранится в копейках:
+            divisor: 100      # чтобы вводить рубли, а фильтрация шла по копейкам
+
+      fields:
+        id:
+          type: string
+          label: ID
+          sortable: ~
+        name:
+          type: string
+          label: Название
+          sortable: ~
+        price:
+          type: twig
+          label: Цена
+          options:
+            template: 'admin/field/money.html.twig'
+
+      actions:
+        main:
+          create: { type: create }
+        item:
+          update: { type: update }
+          delete: { type: delete }

@@ -1,0 +1,14 @@
+app_admin_alarm:
+  resource: |
+    alias: app.alarm
+    section: admin
+    templates: "admin/crud"
+    grid: app_admin_alarm
+    redirect: update
+    permission: true
+    except: [show]
+    vars:
+      all:
+        subheader: 'Сигнализации'
+  type: sylius.resource
+  prefix: /admin

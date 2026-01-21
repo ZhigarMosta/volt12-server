@@ -1,0 +1,4 @@
+services:
+  App\Menu\AlarmMenuListener:
+    tags:
+      - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }

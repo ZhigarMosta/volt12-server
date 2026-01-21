@@ -1,0 +1,46 @@
+# 1) Явный маршрут создания (попадёт раньше show)
+app_admin_alarm_create:
+  path: /admin/alarms/new
+  methods: [GET, POST]
+  defaults:
+    _controller: app.controller.alarm:createAction
+    _sylius:
+      section: admin
+      template: admin/crud/create.html.twig
+      permission: true
+
+# 2) Явные маршруты с ограничением id только цифры
+app_admin_alarm_update:
+  path: /admin/alarms/{id}/edit
+  methods: [GET, PUT, PATCH]
+  requirements:
+    id: \d+
+  defaults:
+    _controller: app.controller.alarm:updateAction
+    _sylius:
+      section: admin
+      template: admin/crud/update.html.twig
+      permission: true
+
+app_admin_alarm_delete:
+  path: /admin/alarms/{id}
+  methods: [DELETE]
+  requirements:
+    id: \d+
+  defaults:
+    _controller: app.controller.alarm:deleteAction
+    _sylius:
+      section: admin
+      permission: true
+
+# 3) Ресурс Sylius — оставляем только индекс (исключаем create/show/update/delete)
+app_admin_alarm:
+  resource: |
+    alias: app.alarm
+    section: admin
+    templates: "admin/crud"
+    grid: app_admin_alarm
+    path: /admin/alarms
+    permission: true
+    except: [show]
+  type: sylius.resource

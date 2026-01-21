@@ -1,0 +1,8 @@
+{% extends '@SyliusAdmin/layout.html.twig' %}
+{% block title %}Редактировать сигнализацию{% endblock %}
+{% block content %}
+  {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="ui primary button" type="submit">Сохранить</button>
+  {{ form_end(form) }}
+{% endblock %}

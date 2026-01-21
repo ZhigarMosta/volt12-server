@@ -1,0 +1,15 @@
+app_admin_alarm:
+    resource: |
+        alias: app.alarm
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_alarm
+        vars:
+            all:
+                subheader: app.ui.alarm
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin
