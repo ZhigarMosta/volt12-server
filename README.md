@@ -10,6 +10,11 @@ APP_ENV=prod php bin/console debug:router | grep -E 'app_admin_alarm_(create|ind
 # Убедитесь, что есть app_admin_alarm_create и у show/update/delete есть requirements id: \d+
 php -S 127.0.0.1:8002 -t public
 
+
+
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'password';"
+sudo service postgresql start
+
 <p align="center">
     <a href="https://sylius.com" target="_blank">
         <picture>

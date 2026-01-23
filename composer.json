@@ -25,6 +25,7 @@
     ],
     "require": {
         "php": "^8.2",
+        "nelmio/cors-bundle": "^2.6",
         "sylius/mollie-plugin": "^3.0",
         "sylius/paypal-plugin": "^2.0",
         "sylius/sylius": "^2.1",

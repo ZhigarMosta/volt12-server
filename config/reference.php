@@ -3440,6 +3440,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     logging?: array{
  *         increased?: bool|Param, // Default: false
  *     },
+ *     supported_locales?: list<scalar|null|Param>,
  * }
  * @psalm-type BazingaJsTranslationConfig = array{
  *     locale_fallback?: scalar|null|Param, // Default: "en"
@@ -3450,6 +3451,34 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type SyliusMollieConfig = array{
  *     migrations?: array<string, list<scalar|null|Param>>,
+ * }
+ * @psalm-type NelmioCorsConfig = array{
+ *     defaults?: array{
+ *         allow_credentials?: bool|Param, // Default: false
+ *         allow_origin?: list<scalar|null|Param>,
+ *         allow_headers?: list<scalar|null|Param>,
+ *         allow_methods?: list<scalar|null|Param>,
+ *         allow_private_network?: bool|Param, // Default: false
+ *         expose_headers?: list<scalar|null|Param>,
+ *         max_age?: scalar|null|Param, // Default: 0
+ *         hosts?: list<scalar|null|Param>,
+ *         origin_regex?: bool|Param, // Default: false
+ *         forced_allow_origin_value?: scalar|null|Param, // Default: null
+ *         skip_same_as_origin?: bool|Param, // Default: true
+ *     },
+ *     paths?: array<string, array{ // Default: []
+ *         allow_credentials?: bool|Param,
+ *         allow_origin?: list<scalar|null|Param>,
+ *         allow_headers?: list<scalar|null|Param>,
+ *         allow_methods?: list<scalar|null|Param>,
+ *         allow_private_network?: bool|Param,
+ *         expose_headers?: list<scalar|null|Param>,
+ *         max_age?: scalar|null|Param, // Default: 0
+ *         hosts?: list<scalar|null|Param>,
+ *         origin_regex?: bool|Param,
+ *         forced_allow_origin_value?: scalar|null|Param, // Default: null
+ *         skip_same_as_origin?: bool|Param,
+ *     }>,
  * }
  * @psalm-type WhiteOctoberPagerfantaConfig = array{ // Deprecated: The "white_october_pagerfanta" configuration node is deprecated, migrate your configuration to the "babdev_pagerfanta" configuration node.
  *     exceptions_strategy?: array{
@@ -3518,6 +3547,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     sylius_paypal?: SyliusPaypalConfig,
  *     bazinga_js_translation?: BazingaJsTranslationConfig,
  *     sylius_mollie?: SyliusMollieConfig,
+ *     nelmio_cors?: NelmioCorsConfig,
  *     white_october_pagerfanta?: WhiteOctoberPagerfantaConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
@@ -3583,6 +3613,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         sylius_paypal?: SyliusPaypalConfig,
  *         bazinga_js_translation?: BazingaJsTranslationConfig,
  *         sylius_mollie?: SyliusMollieConfig,
+ *         nelmio_cors?: NelmioCorsConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -3644,6 +3675,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         sylius_paypal?: SyliusPaypalConfig,
  *         bazinga_js_translation?: BazingaJsTranslationConfig,
  *         sylius_mollie?: SyliusMollieConfig,
+ *         nelmio_cors?: NelmioCorsConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -3709,6 +3741,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         sylius_paypal?: SyliusPaypalConfig,
  *         bazinga_js_translation?: BazingaJsTranslationConfig,
  *         sylius_mollie?: SyliusMollieConfig,
+ *         nelmio_cors?: NelmioCorsConfig,
  *     },
  *     "when@test_cached"?: array{
  *         imports?: ImportsConfig,
@@ -3774,6 +3807,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         sylius_paypal?: SyliusPaypalConfig,
  *         bazinga_js_translation?: BazingaJsTranslationConfig,
  *         sylius_mollie?: SyliusMollieConfig,
+ *         nelmio_cors?: NelmioCorsConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
