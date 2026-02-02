@@ -8,10 +8,35 @@ composer dump-autoload -o
 APP_ENV=prod php bin/console debug:router | grep -E 'app_admin_alarm_(create|index|show|update|delete)'
 
 
-
-
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'password';"
 sudo service postgresql start
+
+
+миграции
+php bin/console doctrine:migrations:diff #выбераем 0
+php bin/console doctrine:migrations:migrate #применяем миграции
+
+Настройка ресурсов, чтобы админка работала
+в config/packages/sylius_resource.yaml
+Вывести в админку
+в config/packages/sylius_grid.yaml
+Добавить файл по типу config/routes/zz_app_admin_catalog_item.yaml
+Добавить файл по типу config/routes/admin/catalog_item.yaml
+
+
+
+
+
+скачать adminer        
+wget https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1.php -O public/adminer.php
+
+Запустить http://127.0.0.1:8000/adminer.php
+
+psql
+127.0.0.1
+postgres
+password
+app
 
 <p align="center">
     <a href="https://sylius.com" target="_blank">

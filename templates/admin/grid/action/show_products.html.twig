@@ -1,0 +1,6 @@
+{% set catalog_id = resource.id|default(data.id|default(null)) %}
+{% if catalog_id is not null %}
+    <a href="{{ path(options.route_to_item, {'criteria': {'catalog': catalog_id}}) }}"
+       class="btn">Товары
+    </a>
+{% endif %}

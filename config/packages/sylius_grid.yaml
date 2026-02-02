@@ -1,47 +1,95 @@
 sylius_grid:
-  grids:
-    app_admin_alarm:
-      driver:
-        name: doctrine/orm
-        options:
-          class: App\Entity\Alarm
-      sorting:
-        id: desc
+    grids:
+        app_admin_catalog_item:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\CatalogItem
+            sorting:
+                position: asc
+            filters:
+                name:
+                    type: string
+                    label: Название
+                price:
+                    type: money
+                    label: Цена
+                    options: { currency: 'RUB'}
+                catalog:
+                    type: entity
+                    label: Каталог
+                    options:
+                        fields: [ catalog ]
+                    form_options:
+                        class: App\Entity\Catalog
+                        choice_label: name
+            fields:
+                image:
+                    type: twig
+                    label: Изобр.
+                    path: .
+                    sortable: ~
+                    options:
+                        template: "admin/grid/field/image.html.twig"
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
+                name:
+                    type: string
+                    label: Название
+                    sortable: ~
+                price:
+                    type: twig
+                    label: Цена
+                    options:
+                        template: 'admin/field/money.html.twig'
+                catalog:
+                    type: twig
+                    label: Каталог
+                    path: .
+                    sortable: catalog.name
+                    options:
+                        template: 'admin/grid/field/catalog.html.twig'
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+                    
 
-      filters:
-        name:
-          type: string
-          label: Название
-          options:
-            fields: [name]
-        price:
-          type: money
-          label: Цена
-          options:
-            fields: [price]
-            currency: 'RUB'   # любая, для формы
-            scale: 2
-            # Если цена хранится в копейках:
-            divisor: 100      # чтобы вводить рубли, а фильтрация шла по копейкам
-
-      fields:
-        id:
-          type: string
-          label: ID
-          sortable: ~
-        name:
-          type: string
-          label: Название
-          sortable: ~
-        price:
-          type: twig
-          label: Цена
-          options:
-            template: 'admin/field/money.html.twig'
-
-      actions:
-        main:
-          create: { type: create }
-        item:
-          update: { type: update }
-          delete: { type: delete }
+        app_admin_catalog:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\Catalog
+            filters:
+                name:
+                    type: string
+                    label: Название
+                product_code:
+                    type: string
+                    label: Код продукта
+            fields:
+                name:
+                    type: string
+                    label: Название
+                    sortable: ~
+                product_code:
+                    type: string
+                    label: Код продукта
+                    sortable: ~
+            
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+                    show_products:
+                        type: default
+                        label: Товары
+                        template: "admin/grid/action/show_products.html.twig"
+                        options:
+                            route_to_item: app_admin_catalog_item_index

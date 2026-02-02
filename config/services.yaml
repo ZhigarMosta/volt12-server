@@ -1,4 +1,23 @@
+parameters:
+    catalog_items_directory: '%kernel.project_dir%/public/uploads/items'
+
 services:
-  App\Menu\AlarmMenuListener:
-    tags:
-      - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+    _defaults:
+        autowire: true
+        autoconfigure: true
+    
+    App\Menu\CatalogItemMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\Menu\CatalogMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\Service\ImageUploader:
+        arguments:
+            $targetDirectory: '%catalog_items_directory%'
+
+    App\EventListener\CatalogItemListener:
+        tags:
+            - { name: doctrine.orm.entity_listener }

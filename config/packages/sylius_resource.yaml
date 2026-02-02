@@ -1,8 +1,12 @@
 sylius_resource:
-  resources:
-    app.alarm:
-      driver: doctrine/orm
-      classes:
-        model: App\Entity\Alarm
-        repository: App\Repository\AlarmRepository
-        form: App\Form\Type\AlarmType
+    resources:
+        app.catalog_item:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\CatalogItem
+                form:  App\Form\Type\CatalogItemType
+        app.catalog:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\Catalog
+                form:  App\Form\Type\CatalogType

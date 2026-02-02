@@ -4,7 +4,7 @@ namespace App\Menu;
 
 use Sylius\Bundle\UiBundle\Menu\Event\MenuBuilderEvent;
 
-final class AlarmMenuListener
+final class CatalogMenuListener
 {
     public function addToMain(MenuBuilderEvent $event): void
     {
@@ -12,8 +12,8 @@ final class AlarmMenuListener
 
         if (null !== $catalog = $menu->getChild('catalog')) {
             $catalog
-                ->addChild('alarms', ['route' => 'app_admin_alarm_index'])
-                ->setLabel('Сигнализации')
+                ->addChild('catalog', ['route' => 'app_admin_catalog_index'])
+                ->setLabel('Каталог')
                 ->setLabelAttribute('icon', 'bell outline')
                 ->setExtra('priority', 0);
         }

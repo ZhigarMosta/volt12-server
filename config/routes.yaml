@@ -1,14 +1,30 @@
-app_admin_alarm:
+app_admin_catalog_item:
     resource: |
-        alias: app.alarm
+        alias: app.catalog_item
         section: admin
         templates: "@SyliusAdmin\\shared\\crud"
         except: ['show']
         redirect: update
-        grid: app_admin_alarm
+        grid: app_admin_catalog_item
         vars:
             all:
-                subheader: app.ui.alarm
+                subheader: app.ui.catalog_item
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin
+
+app_admin_catalog:
+    resource: |
+        alias: app.catalog
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_catalog
+        vars:
+            all:
+                subheader: app.ui.catalog
             index:
                 icon: 'file image outline'
     type: sylius.resource
