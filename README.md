@@ -38,6 +38,15 @@ postgres
 password
 app
 
+
+
+SELECT t0.*
+FROM catalog_items t0
+INNER JOIN catalog_item_characteristics t1 ON t1.catalog_item_id = t0.id
+WHERE t0.catalog_id = 1
+AND t1.catalog_characteristic_id = 1
+
+
 <p align="center">
     <a href="https://sylius.com" target="_blank">
         <picture>

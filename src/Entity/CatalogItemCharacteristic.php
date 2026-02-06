@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Component\Resource\Model\TimestampableInterface;
+use Sylius\Component\Resource\Model\TimestampableTrait;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'catalog_item_characteristics')]
+class CatalogItemCharacteristic implements ResourceInterface, TimestampableInterface
+{
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+    }
+
+    use TimestampableTrait;
+
+    #[ORM\Column(name: 'created_at', type: 'datetime')]
+    protected $createdAt;
+
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
+    protected $updatedAt;
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: CatalogItem::class)]
+    #[ORM\JoinColumn(name: 'catalog_item_id', referencedColumnName: 'id', nullable: false, onDelete: 'SET NULL')]
+    private ?CatalogItem $catalogItem = null;
+
+    #[ORM\ManyToOne(targetEntity: CatalogCharacteristic::class)]
+    #[ORM\JoinColumn(name: 'catalog_characteristic_id', referencedColumnName: 'id', nullable: false, onDelete: 'SET NULL')]
+    private ?CatalogCharacteristic $catalogCharacteristic = null;
+
+    public function getId(): ?int { return $this->id; }
+
+    public function getCatalogItem(): ?CatalogItem {
+        return $this->catalogItem;
+    }
+    public function setCatalogItem(?CatalogItem $catalogItem): void { $this->catalogItem = $catalogItem; }
+
+    public function getCatalogCharacteristic(): ?CatalogCharacteristic {
+        return $this->catalogCharacteristic;
+    }
+    public function setCatalogCharacteristic(?CatalogCharacteristic $catalogCharacteristic): void { $this->catalogCharacteristic = $catalogCharacteristic; }
+}

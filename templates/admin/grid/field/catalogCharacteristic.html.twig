@@ -1,0 +1,7 @@
+{% if data.catalogCharacteristic is not null %}
+    <a href="{{ path('app_admin_catalog_characteristic_update', {'id': data.catalogCharacteristic.id}) }}"
+       style="text-decoration: none;">{{ data.catalogCharacteristic.name }}
+    </a>
+{% else %}
+    <span style="color: grey">-</span>
+{% endif %}

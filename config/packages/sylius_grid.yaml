@@ -87,9 +87,138 @@ sylius_grid:
                 item:
                     update: { type: update }
                     delete: { type: delete }
-                    show_products:
+                    show_catalog_items:
                         type: default
                         label: Товары
-                        template: "admin/grid/action/show_products.html.twig"
+                        template: "admin/grid/action/show_catalog_items.html.twig"
                         options:
                             route_to_item: app_admin_catalog_item_index
+
+
+        app_admin_catalog_characteristic:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\CatalogCharacteristic
+            filters:
+                name:
+                    type: string
+                    label: Название
+                catalog:
+                    type: entity
+                    label: Каталог
+                    options:
+                        fields: [ catalog ]
+                    form_options:
+                        class: App\Entity\Catalog
+                        choice_label: name
+            fields:
+                name:
+                    type: string
+                    label: Название
+                    sortable: ~
+                catalog:
+                    type: twig
+                    label: Каталог
+                    path: .
+                    sortable: catalog.name
+                    options:
+                        template: 'admin/grid/field/catalog.html.twig'
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+
+        app_admin_catalog_item_characteristic:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\CatalogItemCharacteristic
+            filters:
+                catalog:
+                    type: entity
+                    label: Продукт
+                    options:
+                        fields: [ catalog_item ]
+                    form_options:
+                        class: App\Entity\CatalogItem
+                        choice_label: name
+                catalog_characteristic:
+                    type: entity
+                    label: Характеристика продукта
+                    options:
+                        fields: [ catalog_characteristic ]
+                    form_options:
+                        class: App\Entity\CatalogCharacteristic
+                        choice_label: name
+            fields:
+                catalog:
+                    type: twig
+                    label: Продукт
+                    path: .
+                    sortable: catalog_item.name
+                    options:
+                        template: 'admin/grid/field/catalogItem.html.twig'
+                catalog_characteristic:
+                    type: twig
+                    label: Характеристика каталога
+                    path: .
+                    sortable: catalog_characteristic.name
+                    options:
+                        template: 'admin/grid/field/catalogCharacteristic.html.twig'
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+        
+        app_admin_group_characteristic:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\GroupCharacteristic
+            filters:
+                catalog:
+                    type: entity
+                    label: Каталог
+                    options:
+                        fields: [ catalog ]
+                    form_options:
+                        class: App\Entity\Catalog
+                        choice_label: name
+                catalog_characteristic:
+                    type: entity
+                    label: Характеристика каталога
+                    options:
+                        fields: [ catalog_characteristic ]
+                    form_options:
+                        class: App\Entity\CatalogCharacteristic
+                        choice_label: name
+            fields:
+                name:
+                    type: string
+                    label: Название
+                    sortable: ~
+                catalog:
+                    type: twig
+                    label: Каталог
+                    path: .
+                    sortable: catalog.name
+                    options:
+                        template: 'admin/grid/field/catalog.html.twig'
+                catalog_characteristic:
+                    type: twig
+                    label: Характеристика каталога
+                    path: .
+                    sortable: catalog_characteristic.name
+                    options:
+                        template: 'admin/grid/field/catalogCharacteristic.html.twig'
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }

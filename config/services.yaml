@@ -14,6 +14,18 @@ services:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
+    App\Menu\CatalogCharacteristicMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\Menu\CatalogItemCharacteristicMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\Menu\GroupCharacteristicMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
     App\Service\ImageUploader:
         arguments:
             $targetDirectory: '%catalog_items_directory%'

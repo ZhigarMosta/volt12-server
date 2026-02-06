@@ -29,3 +29,52 @@ app_admin_catalog:
                 icon: 'file image outline'
     type: sylius.resource
     prefix: /admin
+    
+app_admin_catalog_characteristic:
+    resource: |
+        alias: app.catalog_characteristic
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_catalog_characteristic
+        vars:
+            all:
+                subheader: app.ui.catalog_characteristic
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin
+
+
+app_admin_catalog_item_characteristic:
+    resource: |
+        alias: app.catalog_item_characteristic
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_catalog_item_characteristic
+        vars:
+            all:
+                subheader: app.ui.catalog_item_characteristic
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin
+
+app_admin_group_characteristic:
+    resource: |
+        alias: app.group_characteristic
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_group_characteristic
+        vars:
+            all:
+                subheader: app.ui.group_characteristic
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin

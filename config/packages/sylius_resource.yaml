@@ -10,3 +10,18 @@ sylius_resource:
             classes:
                 model: App\Entity\Catalog
                 form:  App\Form\Type\CatalogType
+        app.catalog_characteristic:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\CatalogCharacteristic
+                form: App\Form\Type\CatalogCharacteristicType
+        app.catalog_item_characteristic:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\CatalogItemCharacteristic
+                form: App\Form\Type\CatalogItemCharacteristicType
+        app.group_characteristic:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\GroupCharacteristic
+                form: App\Form\Type\GroupCharacteristicType

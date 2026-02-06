@@ -45,24 +45,16 @@ class CatalogItemListener
             throw new Exception('Допускаются только изображения формата WebP');
         }
 
-        // 1. Загружаем файл на диск
         $filename = $this->uploader->upload($file);
         $newPath = 'uploads/items/' . $filename;
 
-        // 2. Устанавливаем путь в объект
         $item->setImgLink($newPath);
 
-        // 3. ОБНОВЛЕНИЕ ChangeSet
         if ($event instanceof PreUpdateEventArgs) {
-            // Удаляем setNewValue, он здесь лишний и может работать неправильно с 3 аргументами.
-
-            // Используем ТОЛЬКО этот метод. Он принудительно скажет Doctrine:
-            // "Пересмотри эту сущность, в ней что-то изменилось (наш img_link)"
             $em = $event->getObjectManager();
             $uow = $em->getUnitOfWork();
             $meta = $em->getClassMetadata(get_class($item));
 
-            // Пересчитываем изменения
             $uow->recomputeSingleEntityChangeSet($meta, $item);
         }
     }
