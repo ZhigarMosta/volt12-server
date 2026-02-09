@@ -5,6 +5,7 @@ sylius_resource:
             classes:
                 model: App\Entity\CatalogItem
                 form:  App\Form\Type\CatalogItemType
+                repository: App\Repository\CatalogRepository
         app.catalog:
             driver: doctrine/orm
             classes:

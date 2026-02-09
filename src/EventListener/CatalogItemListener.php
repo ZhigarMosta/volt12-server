@@ -28,7 +28,6 @@ class CatalogItemListener
     public function preUpdate(CatalogItem $item, PreUpdateEventArgs $event): void
     {
         var_dump($item->getFile());
-//        die();
         $this->uploadFile($item, $event);
         $this->checkPosition($item, $event->getObjectManager());
     }
