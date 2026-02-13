@@ -5,24 +5,26 @@ sylius_resource:
             classes:
                 model: App\Entity\CatalogItem
                 form:  App\Form\Type\CatalogItemType
-                repository: App\Repository\CatalogRepository
+                repository: App\Repository\CatalogItemRepository
         app.catalog:
             driver: doctrine/orm
             classes:
                 model: App\Entity\Catalog
                 form:  App\Form\Type\CatalogType
+                repository: App\Repository\CatalogRepository
         app.catalog_characteristic:
             driver: doctrine/orm
             classes:
                 model: App\Entity\CatalogCharacteristic
                 form: App\Form\Type\CatalogCharacteristicType
+                repository: App\Repository\CatalogCharacteristicRepository
         app.catalog_item_characteristic:
             driver: doctrine/orm
             classes:
                 model: App\Entity\CatalogItemCharacteristic
                 form: App\Form\Type\CatalogItemCharacteristicType
-        app.group_characteristic:
+        app.catalog_group:
             driver: doctrine/orm
             classes:
-                model: App\Entity\GroupCharacteristic
-                form: App\Form\Type\GroupCharacteristicType
+                model: App\Entity\CatalogGroup
+                form: App\Form\Type\CatalogGroupType

@@ -1,43 +1,43 @@
-app_admin_group_characteristic_create:
-    path: /admin/group_characteristics/new
+app_admin_catalog_group_create:
+    path: /admin/catalog_groups/new
     methods: [GET, POST]
     defaults:
-        _controller: app.controller.group_characteristics:createAction
+        _controller: app.controller.catalog_groups:createAction
         _sylius:
             section: admin
             template: admin/crud/create.html.twig
             permission: true
 
-app_admin_group_characteristic_update:
-    path: /admin/group_characteristics/{id}/edit
+app_admin_catalog_group_update:
+    path: /admin/catalog_groups/{id}/edit
     methods: [GET, PUT, PATCH]
     requirements:
         id: \d+
     defaults:
-        _controller: app.controller.group_characteristic:updateAction
+        _controller: app.controller.catalog_group:updateAction
         _sylius:
             section: admin
             template: admin/crud/update.html.twig
             permission: true
 
-app_admin_group_characteristics_delete:
-    path: /admin/group_characteristics/{id}
+app_admin_catalog_groups_delete:
+    path: /admin/catalog_groups/{id}
     methods: [DELETE]
     requirements:
         id: \d+
     defaults:
-        _controller: app.controller.group_characteristics:deleteAction
+        _controller: app.controller.catalog_groups:deleteAction
         _sylius:
             section: admin
             permission: true
 
-app_admin_group_characteristic:
+app_admin_catalog_group:
     resource: |
-        alias: app.group_characteristics
+        alias: app.catalog_groups
         section: admin
         templates: "admin/crud"
-        grid: app_admin_group_characteristic
-        path: /admin/group_characteristics
+        grid: app_admin_catalog_group
+        path: /admin/catalog_groups
         permission: true
         except: [show]
     type: sylius.resource

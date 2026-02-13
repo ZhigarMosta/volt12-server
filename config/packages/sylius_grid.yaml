@@ -175,11 +175,11 @@ sylius_grid:
                     update: { type: update }
                     delete: { type: delete }
         
-        app_admin_group_characteristic:
+        app_admin_catalog_group:
             driver:
                 name: doctrine/orm
                 options:
-                    class: App\Entity\GroupCharacteristic
+                    class: App\Entity\CatalogGroup
             filters:
                 catalog:
                     type: entity
@@ -188,14 +188,6 @@ sylius_grid:
                         fields: [ catalog ]
                     form_options:
                         class: App\Entity\Catalog
-                        choice_label: name
-                catalog_characteristic:
-                    type: entity
-                    label: Характеристика каталога
-                    options:
-                        fields: [ catalog_characteristic ]
-                    form_options:
-                        class: App\Entity\CatalogCharacteristic
                         choice_label: name
             fields:
                 name:
@@ -209,13 +201,6 @@ sylius_grid:
                     sortable: catalog.name
                     options:
                         template: 'admin/grid/field/catalog.html.twig'
-                catalog_characteristic:
-                    type: twig
-                    label: Характеристика каталога
-                    path: .
-                    sortable: catalog_characteristic.name
-                    options:
-                        template: 'admin/grid/field/catalogCharacteristic.html.twig'
             actions:
                 main:
                     create: { type: create }

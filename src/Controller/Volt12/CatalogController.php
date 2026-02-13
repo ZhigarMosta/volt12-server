@@ -15,7 +15,7 @@ class CatalogController extends AbstractController
     ) {}
 
     #[Route('/catalogs', name: 'volt12_list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function catalogs(): JsonResponse
     {
         $data = $this->catalogService->getAllCatalogsData();
 

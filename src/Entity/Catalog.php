@@ -2,17 +2,21 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
-
+use Doctrine\Common\Collections\ArrayCollection;
 #[ORM\Entity]
 #[ORM\Table(name: 'catalogs')]
 class Catalog implements ResourceInterface, TimestampableInterface
 {
     use TimestampableTrait;
-
+    public function __construct()
+    {
+        $this->characteristics = new ArrayCollection();
+    }
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -31,6 +35,13 @@ class Catalog implements ResourceInterface, TimestampableInterface
 
     public function getProductCode(): string { return $this->product_code; }
     public function setProductCode(string $product_code): void { $this->product_code = $product_code; }
+
+    #[ORM\OneToMany(mappedBy: 'catalog', targetEntity: CatalogCharacteristic::class)]
+    private Collection $characteristics;
+    public function getCharacteristics(): Collection
+    {
+        return $this->characteristics;
+    }
 
     public function __toString(): string {
         return $this->name;

@@ -8,7 +8,8 @@ use App\EventListener\CatalogItemListener;
 use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
 use Symfony\Component\HttpFoundation\File\File;
-
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 #[ORM\Entity]
 #[ORM\Table(name: 'catalog_items')]
 #[ORM\EntityListeners([CatalogItemListener::class])]

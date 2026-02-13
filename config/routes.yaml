@@ -63,17 +63,17 @@ app_admin_catalog_item_characteristic:
     type: sylius.resource
     prefix: /admin
 
-app_admin_group_characteristic:
+app_admin_catalog_group:
     resource: |
-        alias: app.group_characteristic
+        alias: app.catalog_group
         section: admin
         templates: "@SyliusAdmin\\shared\\crud"
         except: ['show']
         redirect: update
-        grid: app_admin_group_characteristic
+        grid: app_admin_catalog_group
         vars:
             all:
-                subheader: app.ui.group_characteristic
+                subheader: app.ui.catalog_group
             index:
                 icon: 'file image outline'
     type: sylius.resource

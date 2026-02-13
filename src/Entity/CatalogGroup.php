@@ -8,8 +8,8 @@ use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'group_characteristics')]
-class GroupCharacteristic implements ResourceInterface, TimestampableInterface
+#[ORM\Table(name: 'catalog_groups')] //catalog_group_characteristic
+class CatalogGroup implements ResourceInterface, TimestampableInterface
 {
     public function __construct()
     {
@@ -38,10 +38,6 @@ class GroupCharacteristic implements ResourceInterface, TimestampableInterface
     #[ORM\JoinColumn(name: 'catalog_id', referencedColumnName: 'id', nullable: false, onDelete: 'SET NULL')]
     private ?Catalog $catalog = null;
 
-    #[ORM\ManyToOne(targetEntity: CatalogCharacteristic::class)]
-    #[ORM\JoinColumn(name: 'catalog_characteristic_id', referencedColumnName: 'id', nullable: false, onDelete: 'SET NULL')]
-    private ?CatalogCharacteristic $catalogCharacteristic = null;
-
     public function getId(): ?int { return $this->id; }
 
     public function getName(): string { return $this->name; }
@@ -51,11 +47,6 @@ class GroupCharacteristic implements ResourceInterface, TimestampableInterface
         return $this->catalog;
     }
     public function setCatalog(?Catalog $catalog): void { $this->catalog = $catalog; }
-
-    public function getCatalogCharacteristic(): ?CatalogCharacteristic {
-        return $this->catalogCharacteristic;
-    }
-    public function setCatalogCharacteristic(?CatalogCharacteristic $catalogCharacteristic): void { $this->catalogCharacteristic = $catalogCharacteristic; }
 
     public function __toString(): string {
         return $this->name;

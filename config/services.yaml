@@ -6,6 +6,9 @@ services:
         autowire: true
         autoconfigure: true
     
+    App\Controller\Admin\CatalogItemCharacteristicController:
+        tags: [ 'controller.service_arguments' ]
+    
     App\Service\Volt12\CatalogService:
         autowire: true
 
@@ -13,6 +16,22 @@ services:
         tags: [ 'controller.service_arguments' ]
         arguments:
             $catalogService: '@App\Service\Volt12\CatalogService'
+    
+    App\Service\Volt12\CatalogItemService:
+        autowire: true
+
+    App\Controller\Volt12\CatalogItemController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $catalogItemService: '@App\Service\Volt12\CatalogItemService'
+        
+    App\Service\Volt12\CatalogCharacteristicService:
+        autowire: true
+    
+    App\Controller\Volt12\CatalogCharacteristicController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $catalogCharacteristicService: '@App\Service\Volt12\CatalogCharacteristicService'
     
     App\Menu\CatalogItemMenuListener:
         tags:
@@ -30,7 +49,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
-    App\Menu\GroupCharacteristicMenuListener:
+    App\Menu\CatalogGroupMenuListener:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
@@ -41,3 +60,8 @@ services:
     App\EventListener\CatalogItemListener:
         tags:
             - { name: doctrine.orm.entity_listener }
+
+
+    App\Form\Type\CatalogItemCharacteristicType:
+        tags: [ 'form.type' ]
+        autowire: true
