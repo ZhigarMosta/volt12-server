@@ -31,11 +31,11 @@ class CatalogItemCharacteristic implements ResourceInterface, TimestampableInter
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: CatalogItem::class)]
-    #[ORM\JoinColumn(name: 'catalog_item_id', referencedColumnName: 'id', nullable: false, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'catalog_item_id', referencedColumnName: 'id', nullable: false)]
     private ?CatalogItem $catalogItem = null;
 
     #[ORM\ManyToOne(targetEntity: CatalogCharacteristic::class)]
-    #[ORM\JoinColumn(name: 'catalog_characteristic_id', referencedColumnName: 'id', nullable: false, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'catalog_characteristic_id', referencedColumnName: 'id', nullable: false)]
     private ?CatalogCharacteristic $catalogCharacteristic = null;
 
     public function getId(): ?int { return $this->id; }

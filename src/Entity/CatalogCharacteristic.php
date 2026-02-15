@@ -34,7 +34,7 @@ class CatalogCharacteristic implements ResourceInterface, TimestampableInterface
     private string $name = '';
 
     #[ORM\ManyToOne(targetEntity: Catalog::class)]
-    #[ORM\JoinColumn(name: 'catalog_id', referencedColumnName: 'id', nullable: false, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'catalog_id', referencedColumnName: 'id', nullable: false)]
     private ?Catalog $catalog = null;
 
 

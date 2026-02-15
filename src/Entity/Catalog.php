@@ -16,6 +16,7 @@ class Catalog implements ResourceInterface, TimestampableInterface
     public function __construct()
     {
         $this->characteristics = new ArrayCollection();
+        $this->catalogItems = new ArrayCollection();
     }
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -38,9 +39,17 @@ class Catalog implements ResourceInterface, TimestampableInterface
 
     #[ORM\OneToMany(mappedBy: 'catalog', targetEntity: CatalogCharacteristic::class)]
     private Collection $characteristics;
+
+    #[ORM\OneToMany(mappedBy: 'catalog', targetEntity: CatalogItem::class)]
+    private Collection $catalogItems;
     public function getCharacteristics(): Collection
     {
         return $this->characteristics;
+    }
+
+    public function getCatalogItems(): Collection
+    {
+        return $this->catalogItems;
     }
 
     public function __toString(): string {

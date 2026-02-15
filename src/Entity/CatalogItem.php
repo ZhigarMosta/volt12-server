@@ -44,7 +44,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     private ?int $position = null;
 
     #[ORM\ManyToOne(targetEntity: Catalog::class)]
-    #[ORM\JoinColumn(name: 'catalog_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'catalog_id', referencedColumnName: 'id', nullable: null)]
     private ?Catalog $catalog = null;
 
     #[ORM\Column(type: 'string', length: 2048, nullable: false)]

@@ -20,6 +20,6 @@ class CatalogCharacteristicController extends AbstractController
     {
         $data = $request->toArray();
         $catalogId = $data['catalogId'];
-        return $this->json($this->catalogCharacteristicService->getCatalogCharacteristics($catalogId));
+        return $this->json($this->catalogCharacteristicService->getCatalogCharacteristicsByCatalogId($catalogId));
     }
 }

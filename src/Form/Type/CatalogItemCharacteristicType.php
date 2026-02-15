@@ -5,122 +5,160 @@ namespace App\Form\Type;
 use App\Entity\CatalogCharacteristic;
 use App\Entity\CatalogItem;
 use App\Entity\CatalogItemCharacteristic;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class CatalogItemCharacteristicType extends AbstractType
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private RouterInterface        $router
+        private RouterInterface $router
     )
     {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $ajaxUrl = $this->router->generate('admin_crud_catalog_characteristics_by_catalog', ['id' => 0]);
-        $builder->add('catalogItem', EntityType::class, [
-            'class' => CatalogItem::class,
-            'label' => 'Продукт',
-            'choice_label' => 'name',
-            'placeholder' => 'Выберите продукт...',
+        $urlProductsByChar = $this->router->generate('admin_crud_products_by_characteristic', ['id' => 0]);
+        $urlCharsByProduct = $this->router->generate('admin_crud_catalog_characteristics_by_catalog', ['id' => 0]);
+        $urlAllProducts = $this->router->generate('admin_crud_all_products');
+        $urlAllCategoryCharacteristic = $this->router->generate('admin_crud_all_catalog_characteristic');
+        $urlCheckCatalogMatch = $this->router->generate('admin_crud_check_catalog_match');
+        $builder->add('info_block', TextType::class, [
+            'mapped' => false,
+            'required' => false,
+            'disabled' => true,
+            'label' => false,
+            'data' => '',
             'attr' => [
-                'class' => 'js-product-select',
-                'data-url' => $ajaxUrl
+                'class' => 'ui warning message js-info-block',
+                'readonly' => true,
+                'style' => 'border:none; background: #fffbe6; display: none;',
             ],
-            'constraints' => [new NotBlank(['message' => 'Выберите продукт'])],
         ]);
 
-        $formModifier = function (FormInterface $form, ?CatalogItem $product = null) {
-            $catalogId = $product?->getCatalog()?->getId();
-            $form->add('catalogCharacteristic', EntityType::class, [
-                'class' => CatalogCharacteristic::class,
-                'label' => 'Характеристика каталога',
-                'choice_label' => 'name',
-                'placeholder' => 'Выберите Характеристику...',
-                'constraints' => [new NotBlank(['message' => 'Выберите характеристику'])],
-                'query_builder' => function (EntityRepository $er) use ($catalogId) {
-                    $qb = $er->createQueryBuilder('cc');
-                    if ($catalogId) {
-                        $qb->where('cc.catalog = :catalogId')->setParameter('catalogId', $catalogId);
-                    } else {
-                        $qb->where('cc.id = 0');
-                    }
-                    return $qb;
-                },
+        $builder->add('catalogItem', EntityType::class, [
+            'class' => CatalogItem::class,
+            'placeholder' => 'Выберите продукт...',
+            'label' => 'Продукт',
+            'choice_label' => 'name',
+            'constraints' => [new NotBlank(['message' => 'Выберите продукт'])],
+            'attr' => [
+                'class' => 'js-product-select',
+                'data-url' => $urlCharsByProduct,
+                'data-url_all' => $urlAllCategoryCharacteristic,
+                'data-url_check' => $urlCheckCatalogMatch,
+            ],
+        ]);
 
-                'help' => '
+        $builder->add('catalogCharacteristic', EntityType::class, [
+            'class' => CatalogCharacteristic::class,
+            'placeholder' => 'Выберите xарактеристику...',
+            'label' => 'Характеристика категории',
+            'choice_label' => 'name',
+            'constraints' => [new NotBlank(['message' => 'Выберите характеристику'])],
+            'attr' => [
+                'class' => 'js-char-select',
+                'data-url' => $urlProductsByChar,
+                'data-url_all' => $urlAllProducts,
+                'data-url_check' => $urlCheckCatalogMatch,
+            ],
+            'help' => '
                 <script>
                 document.addEventListener("DOMContentLoaded", function() {
-                    const productSelect = document.querySelector(".js-product-select");
-                    const charSelect = document.querySelector("[id$=\'_catalogCharacteristic\']");
+                    let productSelect = document.querySelector(".js-product-select");
+                    let charSelect = document.querySelector(".js-char-select");
+                    let infoBlock = document.querySelector(".js-info-block");
                     if (!productSelect || !charSelect) return;
 
-                    productSelect.addEventListener("change", function() {
-                        const productId = this.value;
+                    function updateSelect(select, url, placeholder) {
+                        setInnerHTML(select, "Загрузка...");
+                        fetch(url)
+                            .then(r => r.ok ? r.json() : [])
+                            .then(data => {
+                                setInnerHTML(select, placeholder);
+                                if (data.messageInfo) {
+                                    infoBlock.value = data.messageInfo;
+                                    infoBlock.style.display = "block";
+                                }
+                                else {
+                                    infoBlock.style.display = "none";
+                                }
+                                data.items.forEach(item => {
+                                    const option = new Option(item.name, item.id);
+                                    select.add(option);
+                                });
+                            });
+                    }
 
-                        if (!productId) {
-                            updateOptions([]);
-                            return;
+                    function setInnerHTML(select, placeholder) {
+                        select.innerHTML = "<option value=\"\">" + placeholder + "</option>";
+                    }
+
+                    function change(self, select, option) {
+                        const val = self.value;
+                        let url;
+                        if (!val) {
+                            url = self.dataset.url_all;
+                        }
+                        else {
+                            url = self.dataset.url.replace("/0", "/" + val);
                         }
 
-                        const url = this.getAttribute("data-url").replace("/0", "/" + productId);
-                        fetch(url)
+                        if (select.value && val) {
+                            const urlCheck = self.dataset.url_check;
+
+                            const payload = {
+                                catalogItemId: productSelect.value,
+                                catalogCharacteristicId: charSelect.value
+                            };
+
+                            fetch(urlCheck, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-Requested-With": "XMLHttpRequest"
+                                },
+                                body: JSON.stringify(payload)
+                            })
                             .then(response => {
-                                if (!response.ok) throw new Error("Network response was not ok");
+                                if (!response.ok) {
+                                    setInnerHTML(select, "Ошибка, обновитите страницу");
+                                    throw new Error("Network response was not ok");
+                                }
                                 return response.json();
                             })
-                            .then(data => {
-                                updateOptions(data);
+                            .then(isMatch => {
+                                if(!isMatch){
+                                    url = self.dataset.url.replace("/0", "/" + val);
+                                    updateSelect(select, url, option);
+                                }
                             })
-                            .catch(error => {
-                                console.error("Error:", error);
-                                charSelect.innerHTML = "<option>Ошибка загрузки</option>";
-                            });
+                            return;
+                        }
+                        updateSelect(select, url, option);
+                    }
+
+
+                    productSelect.addEventListener("change", function() {
+                        change(this, charSelect, "Выберите характеристику...")
                     });
 
-                    function updateOptions(data) {
-                        charSelect.innerHTML = "<option value=\"\">Выберите Характеристику...</option>";
-                        data.forEach(item => {
-                            const option = document.createElement("option");
-                            option.value = item.id;
-                            option.text = item.name;
-                            charSelect.add(option);
-                        });
-                    }
+                    charSelect.addEventListener("change", function() {
+                        change(this, productSelect,"Выберите продукт...")
+                    });
                 });
                 </script>',
-                'help_html' => true,
-            ]);
-        };
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($formModifier) {
-            $data = $event->getData();
-            $formModifier($event->getForm(), $data ? $data->getCatalogItem() : null);
-        });
-
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($formModifier) {
-            $data = $event->getData();
-            $productId = $data['catalogItem'] ?? null;
-            $product = $productId ? $this->em->getRepository(CatalogItem::class)->find($productId) : null;
-            $formModifier($event->getForm(), $product);
-        });
+            'help_html' => true,
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => CatalogItemCharacteristic::class,
-        ]);
+        $resolver->setDefaults(['data_class' => CatalogItemCharacteristic::class]);
     }
 }

@@ -34,7 +34,6 @@ class CatalogItemType extends AbstractType
                 'label' => 'Каталог',
                 'choice_label' => 'name',
                 'placeholder' => 'Выберите каталог...',
-                'required' => false,
             ])
             ->add('position', IntegerType::class, [
                 'label' => 'Позиция',
