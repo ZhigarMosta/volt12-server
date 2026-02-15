@@ -64,6 +64,30 @@ services:
         tags:
             - { name: doctrine.orm.entity_listener }
 
+    App\EventListener\CatalogDeletionListener:
+        tags:
+            - {
+                name: kernel.event_listener,
+                event: app.catalog.pre_delete,
+                method: onPreDelete
+            }
+
+    App\EventListener\CatalogItemDeletionListener:
+        tags:
+            - {
+                name: kernel.event_listener,
+                event: app.catalog_item.pre_delete,
+                method: onPreDelete
+            }
+    
+    App\EventListener\CatalogCharacteristicDeletionListener:
+        tags:
+            - {
+                name: kernel.event_listener,
+                event: app.catalog_characteristic.pre_delete,
+                method: onPreDelete
+            }
+    
     App\Service\ImageUploader:
         arguments:
             $targetDirectory: '%catalog_items_directory%'

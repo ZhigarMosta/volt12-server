@@ -19,6 +19,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     {
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+        $this->characteristics = new ArrayCollection();
     }
 
     use TimestampableTrait;
@@ -60,6 +61,13 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     private bool $is_popular = false;
 
     private ?File $file = null;
+
+    #[ORM\OneToMany(mappedBy: 'catalogItem', targetEntity: CatalogItemCharacteristic::class)]
+    private Collection $characteristics;
+    public function getCharacteristics(): Collection
+    {
+        return $this->characteristics;
+    }
 
     public function getFile(): ?File
     {

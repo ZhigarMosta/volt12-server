@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use Sylius\Component\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
@@ -15,6 +17,7 @@ class CatalogCharacteristic implements ResourceInterface, TimestampableInterface
     {
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+        $this->itemCharacteristics = new ArrayCollection();
     }
 
     use TimestampableTrait;
@@ -36,6 +39,13 @@ class CatalogCharacteristic implements ResourceInterface, TimestampableInterface
     #[ORM\ManyToOne(targetEntity: Catalog::class)]
     #[ORM\JoinColumn(name: 'catalog_id', referencedColumnName: 'id', nullable: false)]
     private ?Catalog $catalog = null;
+
+    #[ORM\OneToMany(mappedBy: 'catalogCharacteristic', targetEntity: CatalogItemCharacteristic::class)]
+    private Collection $itemCharacteristics;
+    public function getItemCharacteristics(): Collection
+    {
+        return $this->itemCharacteristics;
+    }
 
 
     public function getId(): ?int { return $this->id; }
