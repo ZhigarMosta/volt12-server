@@ -152,7 +152,7 @@ class CatalogGroupCharacteristicType extends AbstractType
 
 
                     groupSelect.addEventListener("change", function() {
-                        change(this, charSelect, "Выберите характеристику...")
+                        change(this, charSelect, preselectChar)
                     });
 
                     charSelect.addEventListener("change", function() {

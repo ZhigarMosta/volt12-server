@@ -12,22 +12,29 @@ class CatalogCharacteristicService
 {
     public function __construct(
         private CatalogCharacteristicRepository $catalogCharacteristicRepository,
-        private LoggerInterface $logger
-    ) {}
+        private LoggerInterface                 $logger
+    )
+    {
+    }
 
     public function getCatalogCharacteristicsByCatalogId(int $catalogId): array
     {
         $without_group = [];
         $with_group = [];
-        foreach ($this->catalogCharacteristicRepository->list($catalogId,[ProductCodeProvider::CODE_VOLT12,ProductCodeProvider::CODE_ANY]) as $catalogCharacteristic) {
-            if(is_null($catalogCharacteristic['group_name'])) {
-                $without_group[] = $catalogCharacteristic;
+        foreach ($this->catalogCharacteristicRepository->list($catalogId, [ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY]) as $catalogCharacteristic) {
+            if (is_null($catalogCharacteristic['group_name'])) {
+                $without_group[] = [
+                    'id' => $catalogCharacteristic['id'],
+                    'name' => $catalogCharacteristic['name']
+                ];
                 continue;
             }
-            $with_group[$catalogCharacteristic['group_name']] = $catalogCharacteristic['name'];
+            $with_group[$catalogCharacteristic['group_name']][] = [
+                'id' => $catalogCharacteristic['id'],
+                'name' => $catalogCharacteristic['name']
+            ];
         }
-        $this->logger->debug('damp',$with_group);
-        return $this->catalogCharacteristicRepository->list($catalogId,[ProductCodeProvider::CODE_VOLT12,ProductCodeProvider::CODE_ANY]); // TODO обновить логику до новых таблиц
+        return ['without_group' => $without_group, 'with_group' => $with_group];
     }
 
     public function getAll()
