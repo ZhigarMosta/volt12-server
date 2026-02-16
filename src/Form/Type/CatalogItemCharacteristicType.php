@@ -39,9 +39,7 @@ class CatalogItemCharacteristicType extends AbstractType
                 'readonly' => true,
                 'style' => 'border:none; background: #fffbe6; display: none;',
             ],
-        ]);
-
-        $builder->add('catalogItem', EntityType::class, [
+        ])->add('catalogItem', EntityType::class, [
             'class' => CatalogItem::class,
             'placeholder' => 'Выберите продукт...',
             'label' => 'Продукт',
@@ -53,9 +51,7 @@ class CatalogItemCharacteristicType extends AbstractType
                 'data-url_all' => $urlAllCategoryCharacteristic,
                 'data-url_check' => $urlCheckCatalogMatch,
             ],
-        ]);
-
-        $builder->add('catalogCharacteristic', EntityType::class, [
+        ])->add('catalogCharacteristic', EntityType::class, [
             'class' => CatalogCharacteristic::class,
             'placeholder' => 'Выберите xарактеристику...',
             'label' => 'Характеристика категории',
