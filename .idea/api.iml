@@ -168,7 +168,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/sylius-labs/association-hydrator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/sylius-labs/coding-standard" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/sylius-labs/doctrine-migrations-extra-bundle" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/sylius-labs/polyfill-symfony-event-dispatcher" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/sylius-labs/suite-tags-extension" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/sylius/fixtures-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/sylius/grid-bundle" />
@@ -263,6 +262,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/willdurand/js-translation-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/willdurand/jsonp-callback-validator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/willdurand/negotiation" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/sylius/telemetry" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

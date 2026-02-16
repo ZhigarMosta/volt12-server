@@ -1,6 +1,6 @@
 php -S 127.0.0.1:8000 -t public
 APP_ENV=prod php bin/console cache:clear
-yarn instal
+yarn install
 yarn build
 
 
@@ -20,7 +20,6 @@ php bin/console doctrine:migrations:migrate #применяем миграции
 в config/packages/sylius_resource.yaml
 Вывести в админку
 в config/packages/sylius_grid.yaml
-Добавить файл по типу config/routes/zz_app_admin_catalog_item.yaml
 Добавить файл по типу config/routes/admin/catalog_item.yaml
 
 

@@ -1,0 +1,43 @@
+app_admin_catalog_group_characteristic_create:
+    path: /admin/catalog_group_characteristics/new
+    methods: [GET, POST]
+    defaults:
+        _controller: app.controller.catalog_group_characteristics:createAction
+        _sylius:
+            section: admin
+            template: admin/crud/create.html.twig
+            permission: true
+
+app_admin_catalog_group_characteristic_update:
+    path: /admin/catalog_group_characteristics/{id}/edit
+    methods: [GET, PUT, PATCH]
+    requirements:
+        id: \d+
+    defaults:
+        _controller: app.controller.catalog_group_characteristic:updateAction
+        _sylius:
+            section: admin
+            template: admin/crud/update.html.twig
+            permission: true
+
+app_admin_catalog_group_characteristics_delete:
+    path: /admin/catalog_group_characteristics/{id}
+    methods: [DELETE]
+    requirements:
+        id: \d+
+    defaults:
+        _controller: app.controller.catalog_group_characteristics:deleteAction
+        _sylius:
+            section: admin
+            permission: true
+
+app_admin_catalog_group_characteristic:
+    resource: |
+        alias: app.catalog_group_characteristics
+        section: admin
+        templates: "admin/crud"
+        grid: app_admin_catalog_group_characteristic
+        path: /admin/catalog_group_characteristics
+        permission: true
+        except: [show]
+    type: sylius.resource

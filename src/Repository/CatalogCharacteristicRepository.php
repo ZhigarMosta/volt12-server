@@ -6,7 +6,6 @@ use App\Entity\Catalog;
 use App\Entity\CatalogGroup;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
-use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 

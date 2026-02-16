@@ -2,32 +2,32 @@
 
 namespace App\Form\Type;
 
+use App\Entity\Catalog;
 use App\Entity\CatalogCharacteristic;
-use App\Entity\CatalogItem;
-use App\Entity\CatalogItemCharacteristic;
+use App\Entity\CatalogGroup;
+use App\Entity\CatalogGroupCharacteristic;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class CatalogItemCharacteristicType extends AbstractType
+class CatalogGroupCharacteristicType extends AbstractType
 {
     public function __construct(
         private RouterInterface $router
     )
     {
     }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $urlProductsByChar = $this->router->generate('admin_crud_catalog_items_by_characteristic', ['id' => 0]);
-        $urlCharsByProduct = $this->router->generate('admin_crud_catalog_characteristics_by_catalog_item', ['id' => 0]);
-        $urlAllProducts = $this->router->generate('admin_crud_all_catalog_items');
+        $urlGroupByChar = $this->router->generate('admin_crud_groups_by_characteristic', ['id' => 0]);
+        $urlCharsByGroup = $this->router->generate('admin_crud_catalog_characteristics_by_group', ['id' => 0]);
+        $urlAllGroup = $this->router->generate('admin_crud_all_catalog_group');
         $urlAllCategoryCharacteristic = $this->router->generate('admin_crud_all_catalog_characteristic');
-        $urlCheckCatalogMatch = $this->router->generate('admin_crud_check_catalog_match_between_catalog_item_and_catalog_characteristic');
+        $urlCheckCatalogMatch = $this->router->generate('admin_crud_check_catalog_match_between_catalog_group_and_catalog_characteristic');
         $builder->add('info_block', TextType::class, [
             'mapped' => false,
             'required' => false,
@@ -39,43 +39,40 @@ class CatalogItemCharacteristicType extends AbstractType
                 'readonly' => true,
                 'style' => 'border:none; background: #fffbe6; display: none;',
             ],
-        ]);
-
-        $builder->add('catalogItem', EntityType::class, [
-            'class' => CatalogItem::class,
-            'placeholder' => 'Выберите продукт...',
-            'label' => 'Продукт',
-            'choice_label' => 'name',
-            'constraints' => [new NotBlank(['message' => 'Выберите продукт'])],
-            'attr' => [
-                'class' => 'js-product-select',
-                'data-url' => $urlCharsByProduct,
-                'data-url_all' => $urlAllCategoryCharacteristic,
-                'data-url_check' => $urlCheckCatalogMatch,
-            ],
-        ]);
-
-        $builder->add('catalogCharacteristic', EntityType::class, [
-            'class' => CatalogCharacteristic::class,
-            'placeholder' => 'Выберите xарактеристику...',
-            'label' => 'Характеристика категории',
-            'choice_label' => 'name',
-            'constraints' => [new NotBlank(['message' => 'Выберите характеристику'])],
-            'attr' => [
-                'class' => 'js-char-select',
-                'data-url' => $urlProductsByChar,
-                'data-url_all' => $urlAllProducts,
-                'data-url_check' => $urlCheckCatalogMatch,
-            ],
-            'help' => '
+        ])->add('catalogGroup', EntityType::class, [
+                'class' => CatalogGroup::class,
+                'label' => 'Группа',
+                'choice_label' => 'name',
+                'placeholder' => 'Выберите группу...',
+                'constraints' => [new NotBlank(['message' => 'Выберите группу'])],
+                'attr' => [
+                    'class' => 'js-group-select',
+                    'data-url' => $urlCharsByGroup,
+                    'data-url_all' => $urlAllCategoryCharacteristic,
+                    'data-url_check' => $urlCheckCatalogMatch,
+                ],
+            ])
+            ->add('catalogCharacteristic', EntityType::class, [
+                'class' => CatalogCharacteristic::class,
+                'label' => 'Характеристика',
+                'choice_label' => 'name',
+                'placeholder' => 'Выберите характеристику...',
+                'constraints' => [new NotBlank(['message' => 'Выберите характеристику'])],
+                'attr' => [
+                    'class' => 'js-char-select',
+                    'data-url' => $urlGroupByChar,
+                    'data-url_all' => $urlAllGroup,
+                    'data-url_check' => $urlCheckCatalogMatch,
+                ],
+                'help' => '
                 <script>
                 document.addEventListener("DOMContentLoaded", function() {
-                    let productSelect = document.querySelector(".js-product-select");
+                    let groupSelect = document.querySelector(".js-group-select");
                     let charSelect = document.querySelector(".js-char-select");
                     let infoBlock = document.querySelector(".js-info-block");
-                    const preselectProduct = "Выберите продукт...";
+                    const preselectGroup = "Выберите продукт...";
                     const preselectChar = "Выберите характеристику...";
-                    if (!productSelect || !charSelect) return;
+                    if (!groupSelect || !charSelect) return;
 
                     function updateSelect(select, url, placeholder) {
                         setInnerHTML(select, "Загрузка...");
@@ -115,7 +112,7 @@ class CatalogItemCharacteristicType extends AbstractType
                             const urlCheck = self.dataset.url_check;
 
                             const payload = {
-                                catalogItemId: productSelect.value,
+                                catalogGroupId: groupSelect.value,
                                 catalogCharacteristicId: charSelect.value
                             };
 
@@ -143,9 +140,9 @@ class CatalogItemCharacteristicType extends AbstractType
                             return;
                         }
                         updateSelect(select, url, option);
-                        if (!productSelect.value && !charSelect.value) {
+                        if (!groupSelect.value && !charSelect.value) {
                             if (select.classList.contains("js-char-select")) {
-                                updateSelect(productSelect, "' . $urlAllProducts . '", preselectProduct);
+                                updateSelect(groupSelect, "' . $urlAllGroup . '", preselectGroup);
                             }
                             else {
                                 updateSelect(charSelect, "' . $urlAllCategoryCharacteristic . '", preselectChar);
@@ -154,21 +151,23 @@ class CatalogItemCharacteristicType extends AbstractType
                     }
 
 
-                    productSelect.addEventListener("change", function() {
-                        change(this, charSelect, preselectChar)
+                    groupSelect.addEventListener("change", function() {
+                        change(this, charSelect, "Выберите характеристику...")
                     });
 
                     charSelect.addEventListener("change", function() {
-                        change(this, productSelect, preselectProduct)
+                        change(this, groupSelect, preselectGroup)
                     });
                 });
                 </script>',
-            'help_html' => true,
-        ]);
+                'help_html' => true,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => CatalogItemCharacteristic::class]);
+        $resolver->setDefaults([
+            'data_class' => CatalogGroupCharacteristic::class,
+        ]);
     }
 }

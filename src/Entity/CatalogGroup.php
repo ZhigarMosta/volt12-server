@@ -8,7 +8,7 @@ use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'catalog_groups')] //catalog_group_characteristic
+#[ORM\Table(name: 'catalog_groups')]
 class CatalogGroup implements ResourceInterface, TimestampableInterface
 {
     public function __construct()
@@ -29,7 +29,6 @@ class CatalogGroup implements ResourceInterface, TimestampableInterface
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
-
 
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $name = '';

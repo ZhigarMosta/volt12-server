@@ -207,3 +207,47 @@ sylius_grid:
                 item:
                     update: { type: update }
                     delete: { type: delete }
+
+        app_admin_catalog_group_characteristic:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\CatalogGroupCharacteristic
+            filters:
+                catalogGroup:
+                    type: entity
+                    label: Группа
+                    options:
+                        fields: [ catalogGroup ]
+                    form_options:
+                        class: App\Entity\CatalogGroup
+                        choice_label: name
+                catalogCharacteristic:
+                    type: entity
+                    label: Характеристика
+                    options:
+                        fields: [ catalogCharacteristic ]
+                    form_options:
+                        class: App\Entity\CatalogCharacteristic
+                        choice_label: name
+            fields:
+                catalogCharacteristic:
+                    type: twig
+                    label: Каталог
+                    path: .
+                    sortable: catalog_group.name
+                    options:
+                        template: 'admin/grid/field/catalogGroup.html.twig'
+                catalogGroup:
+                    type: twig
+                    label: Характеристика
+                    path: .
+                    sortable: catalog_characteristic.name
+                    options:
+                        template: 'admin/grid/field/catalogCharacteristic.html.twig'
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
