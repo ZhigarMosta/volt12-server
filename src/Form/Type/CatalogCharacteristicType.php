@@ -4,8 +4,10 @@ namespace App\Form\Type;
 
 use App\Entity\Catalog;
 use App\Entity\CatalogCharacteristic;
+use App\Provider\ProductCodeProvider;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -24,6 +26,11 @@ class CatalogCharacteristicType extends AbstractType
                 'choice_label' => 'name',
                 'placeholder' => 'Выберите каталог...',
                 'required' => false,
+            ])
+            ->add('product_code', ChoiceType::class, [
+                'label' => 'Код продукта',
+                'choices' => ProductCodeProvider::getAllProducts(),
+                'placeholder' => 'Выберите тип...',
             ])
         ;
     }

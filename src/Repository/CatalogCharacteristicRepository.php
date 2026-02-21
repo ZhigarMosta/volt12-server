@@ -23,7 +23,7 @@ class CatalogCharacteristicRepository extends EntityRepository
             )
             ->leftJoin('cgc.catalogGroup', 'g')
             ->where('cch.catalog = :catalogId')
-            ->andWhere('c.product_code IN (:productCodes)')
+            ->andWhere('cch.product_code IN (:productCodes)')
             ->setParameters(new ArrayCollection([
                 new Parameter('catalogId', $catalogId),
                 new Parameter('productCodes', $productCodes),

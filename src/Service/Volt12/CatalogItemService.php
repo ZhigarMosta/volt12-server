@@ -10,11 +10,13 @@ class CatalogItemService
 {
     public function __construct(
         private CatalogItemRepository $catalogItemRepository
-    ) {}
-
-    public function getCatalogItemByCatalogID(int $catalogId): array
+    )
     {
-        return $this->catalogItemRepository->list(ProductCodeProvider::CODE_VOLT12,$catalogId,[]);
+    }
+
+    public function getCatalogItemByCatalogID(int $catalogId, array $characteristicIds): array
+    {
+        return $this->catalogItemRepository->list([ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY], $catalogId, $characteristicIds);
     }
 
     public function getCatalogItemList(): array

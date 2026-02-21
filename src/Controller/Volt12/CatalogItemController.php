@@ -20,6 +20,7 @@ class CatalogItemController extends AbstractController
     {
         $data = $request->toArray();
         $catalogId = $data['catalogId'];
-        return $this->json($this->catalogItemService->getCatalogItemByCatalogID($catalogId));
+        $characteristicIds = $data['characteristicIds'];
+        return $this->json($this->catalogItemService->getCatalogItemByCatalogID($catalogId, $characteristicIds));
     }
 }

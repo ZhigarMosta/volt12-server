@@ -10,26 +10,26 @@ use Doctrine\ORM\Query\Parameter;
 
 class CatalogItemRepository extends EntityRepository
 {
-    public function list(string $productCode, int $catalogId, array $characteristicId)
+    public function list(array $productCodes, int $catalogId, array $characteristicIds)
     {
-        $res = $this->createQueryBuilder('ci')
-            ->innerJoin(
-                CatalogItemCharacteristic::class,
-                'cic',
-                Join::WITH,
-                'cic.catalogItem = ci'
-            )
+        $qb = $this->createQueryBuilder('ci')
+            ->select('ci')
+            ->innerJoin('ci.characteristics', 'cic')
             ->where('ci.catalog = :catalogId')
-            ->andWhere('ci.product_code = :productCode')
-            ->setParameters(new ArrayCollection([
-                new Parameter('catalogId', $catalogId),
-                new Parameter('productCode', $productCode),
-            ]));
-        if (count($characteristicId)) {
-            $res = $res->andWhere('cic.catalogCharacteristic IN (:characteristicId)')
-                ->setParameter('characteristicId', $characteristicId);
+            ->andWhere('ci.product_code IN (:productCodes)')
+            ->setParameter('catalogId', $catalogId)
+            ->setParameter('productCodes', $productCodes);
+
+        if (!empty($characteristicIds)) {
+            $count = count($characteristicIds);
+
+            $qb->andWhere('cic.catalogCharacteristic IN (:characteristicIds)')
+                ->setParameter('characteristicIds', $characteristicIds)
+                ->groupBy('ci.id')
+                ->having('COUNT(DISTINCT cic.catalogCharacteristic) = :count')
+                ->setParameter('count', $count);
         }
-        return $res->getQuery()
-            ->getResult();
+
+        return $qb->getQuery()->getResult();
     }
 }

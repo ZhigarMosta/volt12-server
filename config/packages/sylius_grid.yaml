@@ -112,6 +112,9 @@ sylius_grid:
                     form_options:
                         class: App\Entity\Catalog
                         choice_label: name
+                product_code:
+                    type: string
+                    label: Код продукта
             fields:
                 name:
                     type: string
@@ -124,6 +127,10 @@ sylius_grid:
                     sortable: catalog.name
                     options:
                         template: 'admin/grid/field/catalog.html.twig'
+                product_code:
+                    type: string
+                    label: Код продукта
+                    sortable: ~
             actions:
                 main:
                     create: { type: create }

@@ -10,6 +10,8 @@ use Sylius\Component\Resource\Model\TimestampableTrait;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Attribute\Ignore;
+
 #[ORM\Entity]
 #[ORM\Table(name: 'catalog_items')]
 #[ORM\EntityListeners([CatalogItemListener::class])]
@@ -36,7 +38,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private string $name;
+    private string $name = '';
 
     #[ORM\Column(type: 'integer')]
     private int $price = 0;
@@ -45,7 +47,8 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     private ?int $position = null;
 
     #[ORM\ManyToOne(targetEntity: Catalog::class)]
-    #[ORM\JoinColumn(name: 'catalog_id', referencedColumnName: 'id', nullable: null)]
+    #[ORM\JoinColumn(name: 'catalog_id', referencedColumnName: 'id', nullable: true)]
+    #[Ignore]
     private ?Catalog $catalog = null;
 
     #[ORM\Column(type: 'string', length: 2048, nullable: false)]
@@ -63,6 +66,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     private ?File $file = null;
 
     #[ORM\OneToMany(mappedBy: 'catalogItem', targetEntity: CatalogItemCharacteristic::class)]
+    #[Ignore]
     private Collection $characteristics;
     public function getCharacteristics(): Collection
     {
