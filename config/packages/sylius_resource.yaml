@@ -23,6 +23,7 @@ sylius_resource:
             classes:
                 model: App\Entity\CatalogItemCharacteristic
                 form: App\Form\Type\CatalogItemCharacteristicType
+                repository: App\Repository\CatalogItemCharacteristicRepository
         app.catalog_group:
             driver: doctrine/orm
             classes:
@@ -34,3 +35,4 @@ sylius_resource:
             classes:
                 model: App\Entity\CatalogGroupCharacteristic
                 form: App\Form\Type\CatalogGroupCharacteristicType
+                repository: App\Repository\CatalogGroupCharacteristicRepository

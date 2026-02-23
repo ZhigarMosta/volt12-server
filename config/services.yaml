@@ -93,6 +93,16 @@ services:
             - { name: kernel.event_listener, event: app.catalog_item.pre_create, method: onPreCreate }
             - { name: kernel.event_listener, event: app.catalog_item.pre_update, method: onPreUpdate }
     
+    App\EventListener\CatalogItemCharacteristicListener:
+        tags:
+            - { name: kernel.event_listener, event: app.catalog_item_characteristic.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.catalog_item_characteristic.pre_update, method: onPreUpdate }
+    
+    App\EventListener\CatalogGroupCharacteristicListener:
+        tags:
+            - { name: kernel.event_listener, event: app.catalog_group_characteristic.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.catalog_group_characteristic.pre_update, method: onPreUpdate }
+    
     App\EventListener\CatalogCharacteristicDeletionListener:
         tags:
             - {
