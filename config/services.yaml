@@ -88,6 +88,11 @@ services:
                 method: onPreDelete
             }
     
+    App\EventListener\CatalogItemResourceListener:
+        tags:
+            - { name: kernel.event_listener, event: app.catalog_item.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.catalog_item.pre_update, method: onPreUpdate }
+    
     App\EventListener\CatalogCharacteristicDeletionListener:
         tags:
             - {
