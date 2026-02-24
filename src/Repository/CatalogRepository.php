@@ -15,4 +15,12 @@ class CatalogRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function byId(int $id): array
+    {
+        return $this->createQueryBuilder('c')->where('c.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getResult();
+    }
 }

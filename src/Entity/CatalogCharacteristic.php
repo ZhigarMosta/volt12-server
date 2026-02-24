@@ -40,6 +40,10 @@ class CatalogCharacteristic implements ResourceInterface, TimestampableInterface
     #[ORM\JoinColumn(name: 'catalog_id', referencedColumnName: 'id', nullable: false)]
     private ?Catalog $catalog = null;
 
+    #[ORM\ManyToOne(targetEntity: CatalogGroup::class)]
+    #[ORM\JoinColumn(name: 'catalog_group_id', referencedColumnName: 'id', nullable: true)]
+    private ?CatalogGroup $catalogGroup = null;
+
     #[ORM\OneToMany(mappedBy: 'catalogCharacteristic', targetEntity: CatalogItemCharacteristic::class)]
     private Collection $itemCharacteristics;
     public function getItemCharacteristics(): Collection
@@ -59,6 +63,10 @@ class CatalogCharacteristic implements ResourceInterface, TimestampableInterface
         return $this->catalog;
     }
     public function setCatalog(?Catalog $catalog): void { $this->catalog = $catalog; }
+    public function getCatalogGroup(): ?CatalogGroup {
+        return $this->catalogGroup;
+    }
+    public function setCatalogGroup(?CatalogGroup $catalogGroup): void { $this->catalogGroup = $catalogGroup; }
 
     public function __toString(): string {
         return $this->name;

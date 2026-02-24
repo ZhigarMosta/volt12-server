@@ -28,6 +28,7 @@ services:
             $catalogCharacteristicService: '@App\Service\Volt12\CatalogCharacteristicService'
             $crudService: '@App\Service\Admin\CrudService'
             $catalogGroupService: '@App\Service\Volt12\CatalogGroupService'
+            $catalogService: '@App\Service\Volt12\CatalogService'
     
     App\Controller\Volt12\CatalogController:
         tags: [ 'controller.service_arguments' ]
@@ -63,10 +64,6 @@ services:
     App\Menu\CatalogGroupMenuListener:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-    
-    App\Menu\CatalogGroupCharacteristicMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
     App\EventListener\CatalogItemListener:
         tags:
@@ -98,11 +95,6 @@ services:
             - { name: kernel.event_listener, event: app.catalog_item_characteristic.pre_create, method: onPreCreate }
             - { name: kernel.event_listener, event: app.catalog_item_characteristic.pre_update, method: onPreUpdate }
     
-    App\EventListener\CatalogGroupCharacteristicListener:
-        tags:
-            - { name: kernel.event_listener, event: app.catalog_group_characteristic.pre_create, method: onPreCreate }
-            - { name: kernel.event_listener, event: app.catalog_group_characteristic.pre_update, method: onPreUpdate }
-    
     App\EventListener\CatalogCharacteristicDeletionListener:
         tags:
             - {
@@ -119,6 +111,6 @@ services:
         tags: [ 'form.type' ]
         autowire: true
         
-    App\Form\Type\CatalogGroupCharacteristicType:
+    App\Form\Type\CatalogCharacteristicType:
         tags: [ 'form.type' ]
         autowire: true

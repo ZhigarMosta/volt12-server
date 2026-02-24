@@ -2,14 +2,15 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Catalog;
 use App\Entity\CatalogCharacteristic;
 use App\Entity\CatalogGroup;
 use App\Entity\CatalogItem;
-use App\Repository\CatalogGroupRepository;
 use App\Service\Admin\CrudService;
 use App\Service\Volt12\CatalogCharacteristicService;
 use App\Service\Volt12\CatalogGroupService;
 use App\Service\Volt12\CatalogItemService;
+use App\Service\Volt12\CatalogService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +24,7 @@ class CatalogItemCharacteristicController extends AbstractController
         private CatalogCharacteristicService $catalogCharacteristicService,
         private CrudService $crudService,
         private CatalogGroupService $catalogGroupService,
+        private CatalogService $catalogService,
     ) {}
     #[Route('/catalog_characteristics_by_catalog_item/{id}', name: 'admin_crud_catalog_characteristics_by_catalog_item', methods: ['GET'])]
     public function catalogCharacteristicsByCatalogItem(CatalogItem $item): JsonResponse
@@ -34,13 +36,13 @@ class CatalogItemCharacteristicController extends AbstractController
         ]);
     }
 
-    #[Route('/catalog_characteristics_by_group/{id}', name: 'admin_crud_catalog_characteristics_by_group', methods: ['GET'])]
+    #[Route('/catalogs_by_group/{id}', name: 'admin_crud_catalogs_by_group', methods: ['GET'])] //2
     public function catalogCharacteristicsByGroup(CatalogGroup $item): JsonResponse
     {
         $catalog = $item->getCatalog();
         return $this->json([
-            'items' => $this->crudService->transformForSelect($catalog->getCharacteristics()),
-            'messageInfo' => '⚠ Характеристики каталога отфильтрованы по каталогу группы. Каталог: ' . $catalog->getName(),
+            'items' => $this->crudService->transformForSelect($this->catalogService->getCatalogsById($item->getCatalog()->getId())),
+            'messageInfo' => '⚠ Каталоги отфильтрованы по каталогу группы. Каталог: ' . $catalog->getName(),
         ]);
     }
 
@@ -57,6 +59,14 @@ class CatalogItemCharacteristicController extends AbstractController
     {
         return $this->json([
             'items' =>$this->crudService->transformForSelect($this->catalogCharacteristicService->getAll())
+        ]);
+    }
+
+    #[Route('/all_catalog', name: 'admin_crud_all_catalog', methods: ['GET'])]
+    public function allCatalog(): JsonResponse
+    {
+        return $this->json([
+            'items' =>$this->crudService->transformForSelect($this->catalogService->getAll())
         ]);
     }
 
@@ -78,13 +88,12 @@ class CatalogItemCharacteristicController extends AbstractController
         ]);
     }
 
-    #[Route('/groups_by_characteristic/{id}', name: 'admin_crud_groups_by_characteristic', methods: ['GET'])]
-    public function productsByCharacteristic(CatalogCharacteristic $characteristic): JsonResponse
+    #[Route('/groups_by_catalog/{id}', name: 'admin_crud_groups_by_catalog', methods: ['GET'])] //1
+    public function productsByCharacteristic(Catalog $catalog): JsonResponse
     {
-        $catalog = $characteristic->getCatalog();
         return $this->json([
             'items' => $this->crudService->transformForSelect($catalog->getGroups()),
-            'messageInfo' => '⚠ Группы отфильтрованы по каталогу характеристики каталога. Каталог: ' . $catalog->getName()
+            'messageInfo' => '⚠ Группы отфильтрованы по каталогу. Каталог: ' . $catalog->getName()
         ]);
     }
 
@@ -98,12 +107,12 @@ class CatalogItemCharacteristicController extends AbstractController
         return $this->json($catalogFromCatalogItem->getId() === $catalogFromCatalogCharacteristic->getId());
     }
 
-    #[Route('/check_catalog_match_between_catalog_group_and_catalog_characteristic', name: 'admin_crud_check_catalog_match_between_catalog_group_and_catalog_characteristic', methods: ['POST'])]
+    #[Route('/check_catalog_match_between_catalog_group_and_catalog_characteristic', name: 'admin_crud_check_catalog_match_between_catalog_group_and_catalog', methods: ['POST'])]
     public function checkCatalogMatch2(Request $request): JsonResponse
     {
         $data = $request->toArray();
         $catalogFromCatalogGroup = $this->catalogGroupService->getCatalogGroupById((int)$data['catalogGroupId'])->getCatalog();
-        $catalogFromCatalogCharacteristic = $this->catalogCharacteristicService->getCatalogCharacteristicById((int)$data['catalogCharacteristicId'])->getCatalog();
+        $catalogFromCatalogCharacteristic = $this->catalogService->getCatalogById((int)$data['catalogId']);
         if (!$catalogFromCatalogGroup || !$catalogFromCatalogCharacteristic) return $this->json(false);
         return $this->json($catalogFromCatalogGroup->getId() === $catalogFromCatalogCharacteristic->getId());
     }

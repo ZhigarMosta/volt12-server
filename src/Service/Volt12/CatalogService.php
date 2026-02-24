@@ -2,6 +2,7 @@
 
 namespace App\Service\Volt12;
 
+use App\Entity\Catalog;
 use App\Provider\ProductCodeProvider;
 use App\Repository\CatalogRepository;
 
@@ -14,5 +15,20 @@ class CatalogService
     public function getAllCatalogsData(): array
     {
         return $this->catalogRepository->list(ProductCodeProvider::CODE_VOLT12);
+    }
+
+    public function getCatalogsById(string $id): array
+    {
+        return $this->catalogRepository->byId($id);
+    }
+
+    public function getAll()
+    {
+        return $this->catalogRepository->findAll();
+    }
+
+    public function getCatalogById(int $id): ?Catalog
+    {
+        return $this->catalogRepository->find($id);
     }
 }
