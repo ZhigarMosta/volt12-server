@@ -2,15 +2,12 @@
 
 namespace App\Repository;
 
-use App\Entity\CatalogItemCharacteristic;
-use Doctrine\Common\Collections\ArrayCollection;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CatalogItemRepository extends EntityRepository
 {
-    public function list(array $productCodes, int $catalogId, array $characteristicIds)
+    public function list(array $productCodes, int $catalogId, array $characteristicIds, int $page, int $limit): Paginator
     {
         $qb = $this->createQueryBuilder('ci')
             ->select('ci')
@@ -29,7 +26,9 @@ class CatalogItemRepository extends EntityRepository
                 ->having('COUNT(DISTINCT cic.catalogCharacteristic) = :count')
                 ->setParameter('count', $count);
         }
-
-        return $qb->getQuery()->getResult();
+        $qb->orderBy('ci.position', 'DESC');
+        $qb->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+        return new Paginator($qb, true);
     }
 }

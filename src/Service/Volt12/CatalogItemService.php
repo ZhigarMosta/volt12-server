@@ -5,6 +5,7 @@ namespace App\Service\Volt12;
 use App\Entity\CatalogItem;
 use App\Provider\ProductCodeProvider;
 use App\Repository\CatalogItemRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CatalogItemService
 {
@@ -14,9 +15,9 @@ class CatalogItemService
     {
     }
 
-    public function getCatalogItemByCatalogID(int $catalogId, array $characteristicIds): array
+    public function getCatalogItemByCatalogID(int $catalogId, array $characteristicIds, int $page = 1, int $limit = 10): Paginator
     {
-        return $this->catalogItemRepository->list([ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY], $catalogId, $characteristicIds);
+        return $this->catalogItemRepository->list([ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY], $catalogId, $characteristicIds, $page, $limit);
     }
 
     public function getCatalogItemList(): array

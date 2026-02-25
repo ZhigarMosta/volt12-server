@@ -19,8 +19,33 @@ class CatalogItemController extends AbstractController
     public function catalog_items(Request $request): JsonResponse
     {
         $data = $request->toArray();
-        $catalogId = $data['catalogId'];
-        $characteristicIds = $data['characteristicIds'];
-        return $this->json($this->catalogItemService->getCatalogItemByCatalogID($catalogId, $characteristicIds));
+        $catalogId = $data['catalogId'] ?? null;
+        $characteristicIds = $data['characteristicIds'] ?? [];
+        $page = $data['page'] ?? 1;
+        $limit = $data['limit'] ?? 10;
+        $paginator = $this->catalogItemService->getCatalogItemByCatalogID(
+            $catalogId,
+            $characteristicIds,
+            $page,
+            $limit
+        );
+
+        $totalItems = count($paginator);
+        $totalPages = ceil($totalItems / $limit);
+
+        $items = [];
+        foreach ($paginator as $item) {
+            $items[] = $item;
+        }
+
+        return $this->json([
+            'items' => $items,
+            'meta' => [
+                'total_items' => $totalItems,
+                'total_pages' => $totalPages,
+                'current_page' => $page,
+                'limit' => $limit,
+            ]
+        ]);
     }
 }
