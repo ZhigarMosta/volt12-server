@@ -82,6 +82,14 @@ services:
                 method: onPreDelete
             }
 
+    App\EventListener\CatalogGroupDeletionListener:
+        tags:
+            - {
+                name: kernel.event_listener,
+                event: app.catalog_group.pre_delete,
+                method: onPreDelete
+            }
+
     App\EventListener\CatalogItemDeletionListener:
         tags:
             - {

@@ -2,10 +2,13 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'catalog_groups')]
@@ -15,6 +18,7 @@ class CatalogGroup implements ResourceInterface, TimestampableInterface
     {
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+        $this->catalogCharacteristics = new ArrayCollection();
     }
 
     use TimestampableTrait;
@@ -49,5 +53,13 @@ class CatalogGroup implements ResourceInterface, TimestampableInterface
 
     public function __toString(): string {
         return $this->name;
+    }
+
+    #[ORM\OneToMany(mappedBy: 'catalogGroup', targetEntity: CatalogCharacteristic::class)]
+    #[Ignore]
+    private Collection $catalogCharacteristics;
+    public function getCatalogCharacteristics(): Collection
+    {
+        return $this->catalogCharacteristics;
     }
 }
