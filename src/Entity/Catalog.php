@@ -27,6 +27,9 @@ class Catalog implements ResourceInterface, TimestampableInterface
     #[ORM\Column(type: 'string', length: 255)]
     private string $name = '';
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private string $slug = '';
+
     #[ORM\Column(type: 'string', length: 255)]
     private string $product_code = '';
 
@@ -34,6 +37,9 @@ class Catalog implements ResourceInterface, TimestampableInterface
 
     public function getName(): string { return $this->name; }
     public function setName(string $name): void { $this->name = $name; }
+
+    public function getSlug(): string { return $this->slug; }
+    public function setSlug(string $slug): void { $this->slug = $slug; }
 
     public function getProductCode(): string { return $this->product_code; }
     public function setProductCode(string $product_code): void { $this->product_code = $product_code; }

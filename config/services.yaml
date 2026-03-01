@@ -94,7 +94,12 @@ services:
         tags:
             - { name: kernel.event_listener, event: app.catalog_item.pre_create, method: onPreCreate }
             - { name: kernel.event_listener, event: app.catalog_item.pre_update, method: onPreUpdate }
-                
+    
+    App\EventListener\CatalogResourceListener:
+        tags:
+            - { name: kernel.event_listener, event: app.catalog.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.catalog.pre_update, method: onPreUpdate }
+     
     App\EventListener\CatalogItemImageResourceListener:
         tags:
             - { name: kernel.event_listener, event: app.catalog_item_image.pre_create, method: onPreCreate }

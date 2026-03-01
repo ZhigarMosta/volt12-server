@@ -2,13 +2,13 @@
 
 namespace App\EventListener;
 
-use App\Entity\CatalogItem;
+use App\Entity\Catalog;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Bundle\ResourceBundle\Event\ResourceControllerEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CatalogItemResourceListener
+class CatalogResourceListener
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -27,20 +27,16 @@ class CatalogItemResourceListener
 
     private function validate(ResourceControllerEvent $event): void
     {
-        /** @var CatalogItem $item */
+        /** @var Catalog $item */
         $item = $event->getSubject();
 
-        if (!$item instanceof CatalogItem) {
+        if (!$item instanceof Catalog) {
             return;
         }
 
         $errors = [];
 
         if ($error = $this->getSlugError($item)) {
-            $errors[] = $error;
-        }
-
-        if ($error = $this->getPositionError($item)) {
             $errors[] = $error;
         }
 
@@ -59,49 +55,21 @@ class CatalogItemResourceListener
         }
     }
 
-    private function getSlugError(CatalogItem $item): ?string
+    private function getSlugError(Catalog $item): ?string
     {
         $slug = $item->getSlug();
         if (!$slug) {
             return null;
         }
 
-        $repository = $this->entityManager->getRepository(CatalogItem::class);
+        $repository = $this->entityManager->getRepository(Catalog::class);
         $existing = $repository->findOneBy(['slug' => $slug]);
 
         if ($existing && $existing->getId() !== $item->getId()) {
             return sprintf(
-                'Ошибка! Slug "%s" уже занят продуктом "%s"',
+                'Ошибка! Slug "%s" уже занят каталогом "%s"',
                 $slug,
                 $existing->getName(),
-            );
-        }
-
-        return null;
-    }
-
-    private function getPositionError(CatalogItem $item): ?string
-    {
-        $position = $item->getPosition();
-        $catalog = $item->getCatalog();
-
-        if ($position === null || $catalog === null) {
-            return null;
-        }
-
-        $repository = $this->entityManager->getRepository(CatalogItem::class);
-
-        $existing = $repository->findOneBy([
-            'position' => $position,
-            'catalog' => $catalog,
-        ]);
-
-        if ($existing && $existing->getId() !== $item->getId()) {
-            return sprintf(
-                'Ошибка! Позиция %d уже занята товаром "%s" в каталоге "%s".',
-                $position,
-                $existing->getName(),
-                $existing->getCatalog()->getName()
             );
         }
 

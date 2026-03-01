@@ -97,11 +97,23 @@ sylius_grid:
                 name:
                     type: string
                     label: Название
-                product_code:
+                slug:
                     type: string
-                    label: Код продукта
+                    label: Название
+                product_code:
+                    label: "Код продукта"
+                    type: select
+                    form_options:
+                        choices:
+                            'Мастер вольт 12': 'volt12'
+                            'Пандора': 'pandora'
+                            'Любой': 'any'
             fields:
                 name:
+                    type: string
+                    label: Название
+                    sortable: ~
+                slug:
                     type: string
                     label: Название
                     sortable: ~
@@ -109,7 +121,6 @@ sylius_grid:
                     type: string
                     label: Код продукта
                     sortable: ~
-            
             actions:
                 main:
                     create: { type: create }
