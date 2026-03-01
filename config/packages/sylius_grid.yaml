@@ -13,7 +13,7 @@ sylius_grid:
                     label: Название
                 slug:
                     type: string
-                    label: Название
+                    label: Slug
                 price:
                     label: Цена
                     type: numeric_range
@@ -99,7 +99,7 @@ sylius_grid:
                     label: Название
                 slug:
                     type: string
-                    label: Название
+                    label: Slug
                 product_code:
                     label: "Код продукта"
                     type: select
@@ -161,8 +161,13 @@ sylius_grid:
                         class: App\Entity\CatalogGroup
                         choice_label: name
                 product_code:
-                    type: string
-                    label: Код продукта
+                    label: "Код продукта"
+                    type: select
+                    form_options:
+                        choices:
+                            'Мастер вольт 12': 'volt12'
+                            'Пандора': 'pandora'
+                            'Любой': 'any'
             fields:
                 name:
                     type: string
@@ -243,6 +248,9 @@ sylius_grid:
                 options:
                     class: App\Entity\CatalogGroup
             filters:
+                name:
+                    type: string
+                    label: Название
                 catalog:
                     type: entity
                     label: Каталог
@@ -280,13 +288,15 @@ sylius_grid:
             filters:
                 alt:
                     type: string
-                    label: Название
+                    label: Alt
                 title:
                     type: string
-                    label: Название
+                    label: Title
                 position:
                     label: Позиция
                     type: numeric_range
+                    form_options:
+                        label: Позиция
                 catalog_item:
                     type: entity
                     label: Продукт

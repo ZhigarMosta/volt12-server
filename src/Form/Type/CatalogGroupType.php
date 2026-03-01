@@ -10,6 +10,8 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CatalogGroupType extends AbstractType
 {
@@ -18,12 +20,26 @@ class CatalogGroupType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Название',
+                'constraints' => [
+                    new NotBlank(['message' => 'Укажите наименование']),
+                    new Length([
+                        'max' => 255,
+                        'maxMessage' => 'Название слишком длинное (макс. {{ limit }} символов)',
+                    ]),
+                ],
+                'required' => true,
+                'empty_data' => '',
             ])
             ->add('catalog', EntityType::class, [
                 'class' => Catalog::class,
                 'label' => 'Категория',
                 'choice_label' => 'name',
                 'placeholder' => 'Выберите категорию...',
+                'constraints' => [
+                    new NotBlank(['message' => 'Укажите каталог']),
+                ],
+                'required' => true,
+                'empty_data' => '',
             ])
         ;
     }

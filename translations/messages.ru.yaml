@@ -1,7 +1,17 @@
 app:
     ui:
-        catalog_item: 'Продукт'
         catalog_items: 'Продукты'
+        catalog_item: 'Продукт'
+        catalogs: 'Каталоги'
+        catalog: 'Каталог'
+        catalog_characteristics: 'Характеристики каталога'
+        catalog_characteristic: 'Характеристика каталога'
+        catalog_item_characteristics: 'Характеристики продукта'
+        catalog_item_characteristic: 'Характеристика продукта'
+        catalog_item_images: 'Изображения продукта'
+        catalog_item_image: 'Изображение продукта'
+        catalog_groups: 'Группы каталога'
+        catalog_group: 'Группа каталога'
 sylius:
     ui:
         this_message_contains_errors: 'Эта форма содержит ошибки'
@@ -9,7 +19,3 @@ sylius:
             number_of_results: ''
         no_results_adjust_your_search: ''
         search_menu: 'Поиск'
-    resource:
-        create: "%resource% успешно создан."
-        update: "%resource% успешно обновлен."
-        delete: "%resource% успешно удален."
