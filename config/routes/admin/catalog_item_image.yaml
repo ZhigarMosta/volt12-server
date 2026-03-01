@@ -1,0 +1,43 @@
+app_admin_catalog_item_image_create:
+  path: /admin/catalog_item_images/new
+  methods: [GET, POST]
+  defaults:
+    _controller: app.controller.catalog_item_images:createAction
+    _sylius:
+      section: admin
+      template: admin/crud/create.html.twig
+      permission: true
+
+app_admin_catalog_item_image_update:
+  path: /admin/catalog_item_images/{id}/edit
+  methods: [GET, PUT, PATCH]
+  requirements:
+    id: \d+
+  defaults:
+    _controller: app.controller.catalog_item_image:updateAction
+    _sylius:
+      section: admin
+      template: admin/crud/update.html.twig
+      permission: true
+
+app_admin_catalog_item_images_delete:
+  path: /admin/catalog_item_images/{id}
+  methods: [DELETE]
+  requirements:
+    id: \d+
+  defaults:
+    _controller: app.controller.catalog_item_images:deleteAction
+    _sylius:
+      section: admin
+      permission: true
+
+app_admin_catalog_item_image:
+  resource: |
+    alias: app.catalog_item_images
+    section: admin
+    templates: "admin/crud"
+    grid: app_admin_catalog_item_image
+    path: /admin/catalog_item_images
+    permission: true
+    except: [show]
+  type: sylius.resource

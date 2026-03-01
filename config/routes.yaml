@@ -79,3 +79,18 @@ app_admin_catalog_group:
     type: sylius.resource
     prefix: /admin
 
+app_admin_catalog_item_image:
+    resource: |
+        alias: app.catalog_item_image
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_catalog_item_image
+        vars:
+            all:
+                subheader: app.ui.catalog_item_image
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin

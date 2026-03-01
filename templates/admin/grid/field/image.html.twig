@@ -2,7 +2,8 @@
 
 {% if item.imgLink is not empty %}
     <img src="{{ asset(item.imgLink) }}"
-         alt="{{ item.name }}"
+         alt="{{ item.alt }}"
+         title="{{ item.title }}"
          class="ui image rounded"
          style="max-height: 50px; max-width: 80px; object-fit: cover;"
     />

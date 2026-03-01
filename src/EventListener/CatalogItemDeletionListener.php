@@ -17,22 +17,25 @@ class CatalogItemDeletionListener
 
     public function onPreDelete(ResourceControllerEvent $event): void
     {
-        $catalog = $event->getSubject();
+        $catalogItem = $event->getSubject();
 
-        if (!$catalog instanceof CatalogItem) {
+        if (!$catalogItem instanceof CatalogItem) {
             return;
         }
 
         $relations = [];
 
-        if (!$catalog->getCharacteristics()->isEmpty()) {
-            $relations[] = 'Характеристики (' . $catalog->getCharacteristics()->count() . ' шт.)';
+        if (!$catalogItem->getCharacteristics()->isEmpty()) {
+            $relations[] = 'Характеристики (' . $catalogItem->getCharacteristics()->count() . ' шт.)';
+        }
+        if (!$catalogItem->getCatalogItemImages()->isEmpty()) {
+            $relations[] = 'Изоображения (' . $catalogItem->getCatalogItemImages()->count() . ' шт.)';
         }
 
         if (!empty($relations)) {
             $message = sprintf(
                 'Ошибка удаления! Продукт "%s" привязан к следующим таблицам: %s. Сначала удалите привязки (или сами сущности), затем попробуйте снова.',
-                $catalog->getName(),
+                $catalogItem->getName(),
                 implode(', ', $relations)
             );
 

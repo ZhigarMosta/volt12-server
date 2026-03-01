@@ -1,5 +1,6 @@
 parameters:
     catalog_items_directory: '%kernel.project_dir%/public/uploads/items'
+    locale: ru
 
 services:
     _defaults:
@@ -65,7 +66,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
-    App\EventListener\CatalogItemListener:
+    App\Menu\CatalogItemImageMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\EventListener\CatalogItemImageListener:
         tags:
             - { name: doctrine.orm.entity_listener }
 
@@ -89,6 +94,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: app.catalog_item.pre_create, method: onPreCreate }
             - { name: kernel.event_listener, event: app.catalog_item.pre_update, method: onPreUpdate }
+                
+    App\EventListener\CatalogItemImageResourceListener:
+        tags:
+            - { name: kernel.event_listener, event: app.catalog_item_image.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.catalog_item_image.pre_update, method: onPreUpdate }
     
     App\EventListener\CatalogItemCharacteristicListener:
         tags:

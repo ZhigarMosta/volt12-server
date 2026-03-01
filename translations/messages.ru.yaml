@@ -1,4 +1,15 @@
 app:
     ui:
-        alarms: 'Сигнализации'
-        alarm: 'Сигнализация'
+        catalog_item: 'Продукт'
+        catalog_items: 'Продукты'
+sylius:
+    ui:
+        this_message_contains_errors: 'Эта форма содержит ошибки'
+        pagination:
+            number_of_results: ''
+        no_results_adjust_your_search: ''
+        search_menu: 'Поиск'
+    resource:
+        create: "%resource% успешно создан."
+        update: "%resource% успешно обновлен."
+        delete: "%resource% успешно удален."

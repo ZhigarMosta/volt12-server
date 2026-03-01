@@ -30,3 +30,9 @@ sylius_resource:
                 model: App\Entity\CatalogGroup
                 form: App\Form\Type\CatalogGroupType
                 repository: App\Repository\CatalogGroupRepository
+        app.catalog_item_image:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\CatalogItemImage
+                form: App\Form\Type\CatalogItemImageType
+                repository: App\Repository\CatalogItemImageRepository

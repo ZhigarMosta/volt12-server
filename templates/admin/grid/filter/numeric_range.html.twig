@@ -1,0 +1,21 @@
+<div class="mb-3">
+    <label class="form-label fw-bold">
+        {{ form.vars.label }}
+    </label>
+
+    <div class="d-flex gap-3">
+        <div class="flex-grow-1">
+            <div class="input-group">
+                <span class="input-group-text text-muted" style="font-size: 0.85em;">От</span>
+                {{ form_widget(form.greaterThan, {'attr': {'class': 'form-control', 'placeholder': '0'}}) }}
+            </div>
+        </div>
+
+        <div class="flex-grow-1">
+            <div class="input-group">
+                <span class="input-group-text text-muted" style="font-size: 0.85em;">До</span>
+                {{ form_widget(form.lessThan, {'attr': {'class': 'form-control', 'placeholder': '∞'}}) }}
+            </div>
+        </div>
+    </div>
+</div>

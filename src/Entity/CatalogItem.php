@@ -4,17 +4,14 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Resource\Model\ResourceInterface;
-use App\EventListener\CatalogItemListener;
 use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
-use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'catalog_items')]
-#[ORM\EntityListeners([CatalogItemListener::class])]
 class CatalogItem implements ResourceInterface, TimestampableInterface
 {
     public function __construct()
@@ -22,6 +19,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
         $this->characteristics = new ArrayCollection();
+        $this->catalogItemImages = new ArrayCollection();
     }
 
     use TimestampableTrait;
@@ -41,7 +39,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     private string $name = '';
 
     #[ORM\Column(type: 'integer')]
-    private int $price = 0;
+    private ?int $price;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $position = null;
@@ -51,11 +49,11 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     #[Ignore]
     private ?Catalog $catalog = null;
 
-    #[ORM\Column(type: 'string', length: 2048, nullable: false)]
-    private string $img_link = '';
-
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private string $product_code = '';
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private string $slug = '';
 
     #[ORM\Column(type: 'boolean')]
     private bool $is_new = false;
@@ -63,7 +61,8 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     #[ORM\Column(type: 'boolean')]
     private bool $is_popular = false;
 
-    private ?File $file = null;
+    #[ORM\Column(type: 'boolean')]
+    private bool $is_published = false;
 
     #[ORM\OneToMany(mappedBy: 'catalogItem', targetEntity: CatalogItemCharacteristic::class)]
     #[Ignore]
@@ -73,23 +72,20 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
         return $this->characteristics;
     }
 
-    public function getFile(): ?File
+    #[ORM\OneToMany(mappedBy: 'catalogItem', targetEntity: CatalogItemImage::class)]
+    private Collection $catalogItemImages;
+    public function getCatalogItemImages(): Collection
     {
-        return $this->file;
-    }
-
-    public function setFile(?File $file): void
-    {
-        $this->file = $file;
-        if ($file) {
-            $this->updatedAt = new \DateTime();
-        }
+        return $this->catalogItemImages;
     }
 
     public function getId(): ?int { return $this->id; }
 
     public function getName(): string { return $this->name; }
     public function setName(string $name): void { $this->name = $name; }
+
+    public function getSlug(): string { return $this->slug; }
+    public function setSlug(string $slug): void { $this->slug = $slug; }
 
     public function getPrice(): int { return $this->price; }
     public function setPrice(int $price): void { $this->price = $price; }
@@ -103,11 +99,11 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     public function getIsPopular(): bool { return $this->is_popular; }
     public function setIsPopular( bool $is_popular): void { $this->is_popular = $is_popular; }
 
-    public function getImgLink(): string { return $this->img_link; }
-    public function setImgLink(string $img_link): void { $this->img_link = $img_link; }
+    public function getIsPublished(): bool { return $this->is_published; }
+    public function setIsPublished( bool $is_published): void { $this->is_published = $is_published; }
 
     public function getProductCode(): string { return $this->product_code; }
-    public function setProductCode(string $product_code): void { $this->product_code = $product_code; }
+    public function setProductCode(?string $product_code): void { $this->product_code = (string) $product_code; }
 
     public function getCatalog(): ?Catalog {
         return $this->catalog;

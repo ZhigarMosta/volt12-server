@@ -11,10 +11,14 @@ sylius_grid:
                 name:
                     type: string
                     label: Название
+                slug:
+                    type: string
+                    label: Название
                 price:
-                    type: money
                     label: Цена
-                    options: { currency: 'RUB'}
+                    type: numeric_range
+                    form_options:
+                        label: Цена
                 catalog:
                     type: entity
                     label: Каталог
@@ -23,25 +27,41 @@ sylius_grid:
                     form_options:
                         class: App\Entity\Catalog
                         choice_label: name
-            fields:
-                image:
-                    type: twig
-                    label: Изобр.
-                    path: .
-                    sortable: ~
-                    options:
-                        template: "admin/grid/field/image.html.twig"
+                product_code:
+                    label: "Код продукта"
+                    type: select
+                    form_options:
+                        choices:
+                            'Мастер вольт 12': 'volt12'
+                            'Пандора': 'pandora'
+                            'Любой': 'any'
                 position:
-                    type: string
                     label: Позиция
-                    sortable: ~
+                    type: numeric_range
+                    form_options:
+                        label: Позиция
+                is_new:
+                    label: Новое?
+                    type: boolean
+                is_popular:
+                    label: Популярное?
+                    type: boolean
+                is_published:
+                    label: Опубликован?
+                    type: boolean
+            fields:
                 name:
                     type: string
                     label: Название
                     sortable: ~
+                slug:
+                    type: string
+                    label: Slug
+                    sortable: ~
                 price:
                     type: twig
                     label: Цена
+                    path: .
                     options:
                         template: 'admin/field/money.html.twig'
                 catalog:
@@ -51,13 +71,22 @@ sylius_grid:
                     sortable: catalog.name
                     options:
                         template: 'admin/grid/field/catalog.html.twig'
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
+                is_published:
+                    type: twig
+                    label: Опубликован?
+                    path: .
+                    options:
+                        template: 'admin/grid/field/isPublished.html.twig'
             actions:
                 main:
                     create: { type: create }
                 item:
                     update: { type: update }
                     delete: { type: delete }
-                    
 
         app_admin_catalog:
             driver:
@@ -229,3 +258,66 @@ sylius_grid:
                 item:
                     update: { type: update }
                     delete: { type: delete }
+
+        app_admin_catalog_item_image:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\CatalogItemImage
+            sorting:
+                position: asc
+            filters:
+                alt:
+                    type: string
+                    label: Название
+                title:
+                    type: string
+                    label: Название
+                position:
+                    label: Позиция
+                    type: numeric_range
+                catalog_item:
+                    type: entity
+                    label: Продукт
+                    options:
+                        fields: [ catalogItem ]
+                    form_options:
+                        class: App\Entity\CatalogItem
+                        choice_label: name
+            fields:
+                image:
+                    type: twig
+                    label: Изобр.
+                    path: .
+                    sortable: ~
+                    options:
+                        template: "admin/grid/field/image.html.twig"
+                catalog_item:
+                    type: twig
+                    label: Продукт
+                    path: .
+                    sortable: catalog_item.name
+                    options:
+                        template: 'admin/grid/field/catalogItem.html.twig'
+                alt:
+                    type: string
+                    label: Alt
+                    sortable: ~
+                title:
+                    type: string
+                    label: Title
+                    sortable: ~
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+                    
+    templates:
+        filter:
+            numeric_range: "admin/grid/filter/numeric_range.html.twig"

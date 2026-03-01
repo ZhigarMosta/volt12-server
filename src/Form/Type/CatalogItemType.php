@@ -10,13 +10,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Validator\Constraints\File;
-
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\Length;
 class CatalogItemType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -24,19 +25,83 @@ class CatalogItemType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Название',
+                'constraints' => [
+                    new NotBlank(['message' => 'Укажите наименование']),
+                    new Length([
+                        'max' => 255,
+                        'maxMessage' => 'Название слишком длинное (макс. {{ limit }} символов)',
+                    ]),
+                ],
+                'required' => true,
+                'empty_data' => '',
             ])
-            ->add('price', MoneyType::class, [
-                'label' => 'Цена',
-                'currency' => 'RUB',
+            ->add('slug', TextType::class, [
+                'label' => 'Slug',
+                'constraints' => [
+                    new NotBlank(['message' => 'Укажите slug']),
+                    new Length(['max' => 255]),
+                    new Regex([
+                        'pattern' => '/^[a-z0-9-]+$/',
+                        'message' => 'Slug может содержать только маленькие латинские буквы, цифры и дефис.',
+                    ]),
+                ],
+                'required' => true,
+                'empty_data' => '',
+            ])
+            ->add('price', IntegerType::class, [
+                'label' => 'Цена (RUB)',
+                'required' => true,
+                'constraints' => [
+                    new NotBlank(['message' => 'Укажите цену']),
+                    new PositiveOrZero(['message' => 'Цена не может быть отрицательной']),
+                    new Range([
+                        'max' => 2147483647,
+                        'maxMessage' => 'Цена слишком велика для базы данных',
+                    ]),
+                ],
+                'attr' => [
+                    'min' => 0,
+                    'step' => 1,
+                    'placeholder' => '0',
+                    'inputmode' => 'numeric',
+                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 0",
+                    'onpaste' => "let paste = (event.clipboardData || window.clipboardData).getData('text'); if(!/^\d+$/.test(paste)) { event.preventDefault(); }",
+                ],
             ])
             ->add('catalog', EntityType::class, [
                 'class' => Catalog::class,
                 'label' => 'Каталог',
                 'choice_label' => 'name',
                 'placeholder' => 'Выберите каталог...',
+                'constraints' => [
+                    new NotBlank(['message' => 'Укажите каталог']),
+                ],
+                'required' => true,
+                'empty_data' => '',
             ])
             ->add('position', IntegerType::class, [
                 'label' => 'Позиция',
+                'attr' => [
+                    'min' => 0,
+                    'step' => 1,
+                    'placeholder' => '0',
+                    'inputmode' => 'numeric',
+                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 0",
+                    'onpaste' => "let paste = (event.clipboardData || window.clipboardData).getData('text'); if(!/^\d+$/.test(paste)) { event.preventDefault(); }",
+                ],
+                'constraints' => [
+                    new PositiveOrZero(),
+                    new Range([
+                        'max' => 2147483647,
+                        'maxMessage' => 'Цена слишком велика для базы данных',
+                    ]),
+                ],
+                'required' => false,
+            ])
+            ->add('is_published', CheckboxType::class, [
+                'label' => 'Опубликован?',
+                'required' => false,
+                'value' => true
             ])
             ->add('is_new',  CheckboxType::class, [
                 'label' => 'Новое?',
@@ -50,20 +115,12 @@ class CatalogItemType extends AbstractType
                 'label' => 'Код продукта',
                 'choices' => ProductCodeProvider::getAllProducts(),
                 'placeholder' => 'Выберите тип...',
-            ])
-            ->add('file', FileType::class, [
-                'label' => 'Изображение (WebP)',
                 'constraints' => [
-                    new File([
-                        'maxSize' => '20M',
-                        'mimeTypes' => [
-                            'image/webp',
-                        ],
-                        'mimeTypesMessage' => 'Пожалуйста, загрузите валидное WebP изображение',
-                    ])
+                    new NotBlank(['message' => 'Укажите код продукта']),
                 ],
-            ])
-        ;
+                'required' => true,
+                'empty_data' => '',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

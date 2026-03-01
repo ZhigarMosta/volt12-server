@@ -2,7 +2,7 @@
 
 namespace App\EventListener;
 
-use App\Entity\CatalogItem;
+use App\Entity\CatalogItemImage;
 use App\Service\ImageUploader;
 use Doctrine\Common\EventArgs;
 use Doctrine\ORM\Event\PrePersistEventArgs;
@@ -10,23 +10,23 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Exception;
 
-class CatalogItemListener
+class CatalogItemImageListener
 {
     public function __construct(
         private ImageUploader $uploader,
     ) {}
 
-    public function prePersist(CatalogItem $item, PrePersistEventArgs $event): void
+    public function prePersist(CatalogItemImage $item, PrePersistEventArgs $event): void
     {
         $this->uploadFile($item, $event);
     }
 
-    public function preUpdate(CatalogItem $item, PreUpdateEventArgs $event): void
+    public function preUpdate(CatalogItemImage $item, PreUpdateEventArgs $event): void
     {
         $this->uploadFile($item, $event);
     }
 
-    private function uploadFile(CatalogItem $item, EventArgs $event = null): void
+    private function uploadFile(CatalogItemImage $item, EventArgs $event = null): void
     {
         $file = $item->getFile();
 
