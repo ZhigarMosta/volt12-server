@@ -30,7 +30,7 @@ class Catalog implements ResourceInterface, TimestampableInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $slug = '';
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private string $product_code = '';
 
     public function getId(): ?int { return $this->id; }
@@ -42,7 +42,7 @@ class Catalog implements ResourceInterface, TimestampableInterface
     public function setSlug(string $slug): void { $this->slug = $slug; }
 
     public function getProductCode(): string { return $this->product_code; }
-    public function setProductCode(string $product_code): void { $this->product_code = $product_code; }
+    public function setProductCode(?string $product_code): void { $this->product_code = (string) $product_code; }
 
     #[ORM\OneToMany(mappedBy: 'catalog', targetEntity: CatalogCharacteristic::class)]
     private Collection $characteristics;

@@ -58,7 +58,7 @@ class CatalogCharacteristic implements ResourceInterface, TimestampableInterface
     public function getName(): string { return $this->name; }
     public function setName(string $name): void { $this->name = $name; }
     public function getProductCode(): string { return $this->product_code; }
-    public function setProductCode(string $product_code): void { $this->product_code = $product_code; }
+    public function setProductCode(?string $product_code): void { $this->product_code = (string) $product_code; }
     public function getCatalog(): ?Catalog {
         return $this->catalog;
     }

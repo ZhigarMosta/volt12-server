@@ -47,7 +47,12 @@ class CatalogType extends AbstractType
                 'label' => 'Код продукта',
                 'choices' => ProductCodeProvider::getAllProducts(),
                 'placeholder' => 'Выберите тип...',
-            ])
+                'constraints' => [
+                    new NotBlank(['message' => 'Укажите код продукта']),
+                ],
+                'required' => true,
+                'empty_data' => '',
+            ]);
         ;
     }
 

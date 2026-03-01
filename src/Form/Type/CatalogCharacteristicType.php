@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CatalogCharacteristicType extends AbstractType
@@ -43,11 +44,25 @@ class CatalogCharacteristicType extends AbstractType
             ]])
             ->add('name', TextType::class, [
                 'label' => 'Название',
+                'constraints' => [
+                    new NotBlank(['message' => 'Укажите наименование']),
+                    new Length([
+                        'max' => 255,
+                        'maxMessage' => 'Название слишком длинное (макс. {{ limit }} символов)',
+                    ]),
+                ],
+                'required' => true,
+                'empty_data' => '',
             ])
             ->add('product_code', ChoiceType::class, [
                 'label' => 'Код продукта',
                 'choices' => ProductCodeProvider::getAllProducts(),
                 'placeholder' => 'Выберите тип...',
+                'constraints' => [
+                    new NotBlank(['message' => 'Укажите код продукта']),
+                ],
+                'required' => true,
+                'empty_data' => '',
             ])
             ->add('catalog', EntityType::class, [
                 'class' => Catalog::class,
