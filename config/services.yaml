@@ -46,6 +46,10 @@ services:
         arguments:
             $catalogCharacteristicService: '@App\Service\Volt12\CatalogCharacteristicService'
     
+    App\Menu\AdminMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
+    
     App\Menu\CatalogItemMenuListener:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
