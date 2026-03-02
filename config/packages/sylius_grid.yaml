@@ -78,9 +78,9 @@ sylius_grid:
                 is_published:
                     type: twig
                     label: Опубликован?
-                    path: .
+                    path: is_published
                     options:
-                        template: 'admin/grid/field/isPublished.html.twig'
+                        template: 'admin/grid/field/boolean.html.twig'
             actions:
                 main:
                     create: { type: create }
@@ -100,6 +100,14 @@ sylius_grid:
                 slug:
                     type: string
                     label: Slug
+                position:
+                    label: Позиция
+                    type: numeric_range
+                    form_options:
+                        label: Позиция
+                is_new:
+                    label: Популярное?
+                    type: boolean
                 product_code:
                     label: "Код продукта"
                     type: select
@@ -117,6 +125,16 @@ sylius_grid:
                     type: string
                     label: Название
                     sortable: ~
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
+                is_popular:
+                    type: twig
+                    label: Популярный?
+                    path: is_popular
+                    options:
+                        template: 'admin/grid/field/boolean.html.twig'
                 product_code:
                     type: string
                     label: Код продукта

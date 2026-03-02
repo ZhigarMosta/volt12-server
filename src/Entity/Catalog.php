@@ -30,8 +30,14 @@ class Catalog implements ResourceInterface, TimestampableInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $slug = '';
 
-    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $product_code = '';
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $position = null;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private bool $is_popular = false;
 
     public function getId(): ?int { return $this->id; }
 
@@ -43,6 +49,12 @@ class Catalog implements ResourceInterface, TimestampableInterface
 
     public function getProductCode(): string { return $this->product_code; }
     public function setProductCode(?string $product_code): void { $this->product_code = (string) $product_code; }
+
+    public function getPosition(): ?int { return $this->position; }
+    public function setPosition(?int $position): void { $this->position = $position; }
+
+    public function getIsPopular(): bool { return $this->is_popular; }
+    public function setIsPopular( bool $is_popular): void { $this->is_popular = $is_popular; }
 
     #[ORM\OneToMany(mappedBy: 'catalog', targetEntity: CatalogCharacteristic::class)]
     private Collection $characteristics;

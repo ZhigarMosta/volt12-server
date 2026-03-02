@@ -5,12 +5,16 @@ namespace App\Form\Type;
 use App\Provider\ProductCodeProvider;
 use App\Entity\Catalog;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
+use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 
 class CatalogType extends AbstractType
@@ -42,6 +46,29 @@ class CatalogType extends AbstractType
                 ],
                 'required' => true,
                 'empty_data' => '',
+            ])
+            ->add('position', IntegerType::class, [
+                'label' => 'Позиция',
+                'attr' => [
+                    'min' => 0,
+                    'step' => 1,
+                    'placeholder' => '0',
+                    'inputmode' => 'numeric',
+                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 0",
+                    'onpaste' => "let paste = (event.clipboardData || window.clipboardData).getData('text'); if(!/^\d+$/.test(paste)) { event.preventDefault(); }",
+                ],
+                'constraints' => [
+                    new PositiveOrZero(),
+                    new Range([
+                        'max' => 2147483647,
+                        'maxMessage' => 'Цена слишком велика для базы данных',
+                    ]),
+                ],
+                'required' => false,
+            ])
+            ->add('is_popular',  CheckboxType::class, [
+                'label' => 'Популярное?',
+                'required' => false,
             ])
             ->add('product_code', ChoiceType::class, [
                 'label' => 'Код продукта',
