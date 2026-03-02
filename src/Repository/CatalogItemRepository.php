@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\CatalogItem;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
@@ -30,5 +31,20 @@ class CatalogItemRepository extends EntityRepository
         $qb->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
         return new Paginator($qb, true);
+    }
+
+    public function findPopular(array $productCodes, int $page, int $limit): Paginator
+    {
+        $query = $this->createQueryBuilder('ci')
+            ->select('ci')
+            ->where('ci.product_code IN (:productCodes)')
+            ->andWhere('ci.is_popular = :isPopular')
+            ->setParameter('productCodes', $productCodes)
+            ->setParameter('isPopular', true)
+            ->orderBy('ci.position', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        return new Paginator($query, true);
     }
 }

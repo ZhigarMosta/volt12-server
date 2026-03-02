@@ -29,4 +29,10 @@ class CatalogItemService
     {
         return $this->catalogItemRepository->find($id);
     }
+
+    public function getPopularCatalogItemList(int $page = 1, int $limit = 12): Paginator
+    {
+        return $this->catalogItemRepository->findPopular([ProductCodeProvider::CODE_ANY,ProductCodeProvider::CODE_VOLT12], $page, $limit);
+    }
+
 }

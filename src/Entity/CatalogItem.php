@@ -14,6 +14,9 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 #[ORM\Table(name: 'catalog_items')]
 class CatalogItem implements ResourceInterface, TimestampableInterface
 {
+
+    const POPULAR = true;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();

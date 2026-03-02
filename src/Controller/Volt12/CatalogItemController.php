@@ -13,7 +13,9 @@ class CatalogItemController extends AbstractController
 {
     public function __construct(
         private CatalogItemService $catalogItemService
-    ) {}
+    )
+    {
+    }
 
     #[Route('/catalog_items', name: 'volt12_catalog_items', methods: ['POST'])]
     public function catalog_items(Request $request): JsonResponse
@@ -29,6 +31,33 @@ class CatalogItemController extends AbstractController
             $page,
             $limit
         );
+
+        $totalItems = count($paginator);
+        $totalPages = ceil($totalItems / $limit);
+
+        $items = [];
+        foreach ($paginator as $item) {
+            $items[] = $item;
+        }
+
+        return $this->json([
+            'items' => $items,
+            'meta' => [
+                'total_items' => $totalItems,
+                'total_pages' => $totalPages,
+                'current_page' => $page,
+                'limit' => $limit,
+            ]
+        ]);
+    }
+
+    #[Route('/popular_catalog_items', name: 'volt12_popular_catalog_items', methods: ['POST'])]
+    public function popular_catalog_items(Request $request): JsonResponse
+    {
+        $data = $request->toArray();
+        $page = $data['page'] ?? 1;
+        $limit = $data['limit'] ?? 10;
+        $paginator = $this->catalogItemService->getPopularCatalogItemList($page, $limit);
 
         $totalItems = count($paginator);
         $totalPages = ceil($totalItems / $limit);

@@ -16,7 +16,7 @@ class CatalogCharacteristicController extends AbstractController
     ) {}
 
     #[Route('/catalog_characteristics', name: 'volt12_catalog_characteristics', methods: ['POST'])]
-    public function catalog_items(Request $request): JsonResponse
+    public function catalog_characteristics(Request $request): JsonResponse
     {
         $data = $request->toArray();
         $catalogId = $data['catalogId'];
