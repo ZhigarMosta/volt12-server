@@ -51,30 +51,15 @@ class CatalogItemController extends AbstractController
         ]);
     }
 
-    #[Route('/popular_catalog_items', name: 'volt12_popular_catalog_items', methods: ['POST'])]
-    public function popular_catalog_items(Request $request): JsonResponse
+    #[Route('/popular_catalog_items', name: 'volt12_popular_catalog_items', methods: ['GET'])]
+    public function popular_catalog_items(): JsonResponse
     {
-        $data = $request->toArray();
-        $page = $data['page'] ?? 1;
-        $limit = $data['limit'] ?? 10;
-        $paginator = $this->catalogItemService->getPopularCatalogItemList($page, $limit);
+        return $this->json($this->catalogItemService->getPopularCatalogItemList());
+    }
 
-        $totalItems = count($paginator);
-        $totalPages = ceil($totalItems / $limit);
-
-        $items = [];
-        foreach ($paginator as $item) {
-            $items[] = $item;
-        }
-
-        return $this->json([
-            'items' => $items,
-            'meta' => [
-                'total_items' => $totalItems,
-                'total_pages' => $totalPages,
-                'current_page' => $page,
-                'limit' => $limit,
-            ]
-        ]);
+    #[Route('/popular_catalog_items_by_first_popular_catalog', name: 'volt12_popular_catalog_items_by_first_popular_catalog', methods: ['GET'])]
+    public function popular_catalog_items_by_catalog(): JsonResponse
+    {
+        return $this->json($this->catalogItemService->getCatalogItemListByFirstPopularCatalog());
     }
 }

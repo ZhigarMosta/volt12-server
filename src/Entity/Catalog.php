@@ -8,10 +8,16 @@ use Sylius\Component\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Attribute\Ignore;
+
 #[ORM\Entity]
 #[ORM\Table(name: 'catalogs')]
 class Catalog implements ResourceInterface, TimestampableInterface
 {
+    const POPULAR = true;
+    const LIMIT_POPULAR = 3;
+    const FIRST_POPULAR = 1;
+
     use TimestampableTrait;
     public function __construct()
     {
@@ -57,9 +63,11 @@ class Catalog implements ResourceInterface, TimestampableInterface
     public function setIsPopular( bool $is_popular): void { $this->is_popular = $is_popular; }
 
     #[ORM\OneToMany(mappedBy: 'catalog', targetEntity: CatalogCharacteristic::class)]
+    #[Ignore]
     private Collection $characteristics;
 
     #[ORM\OneToMany(mappedBy: 'catalog', targetEntity: CatalogItem::class)]
+    #[Ignore]
     private Collection $catalogItems;
     public function getCharacteristics(): Collection
     {
@@ -67,6 +75,7 @@ class Catalog implements ResourceInterface, TimestampableInterface
     }
 
     #[ORM\OneToMany(mappedBy: 'catalog', targetEntity: CatalogGroup::class)]
+    #[Ignore]
     private Collection $groups;
     public function getGroups(): Collection
     {

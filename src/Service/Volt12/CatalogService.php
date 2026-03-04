@@ -10,11 +10,18 @@ class CatalogService
 {
     public function __construct(
         private CatalogRepository $catalogRepository
-    ) {}
+    )
+    {
+    }
 
     public function getAllCatalogsData(): array
     {
         return $this->catalogRepository->list(ProductCodeProvider::CODE_VOLT12);
+    }
+
+    public function getPopularCatalogs(): array
+    {
+        return $this->catalogRepository->popularListWithLimit([ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY]);
     }
 
     public function getCatalogsById(string $id): array

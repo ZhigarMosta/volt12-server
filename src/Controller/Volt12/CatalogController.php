@@ -21,4 +21,12 @@ class CatalogController extends AbstractController
 
         return $this->json($data);
     }
+
+    #[Route('/popular_catalogs', name: 'volt12_popular_list', methods: ['GET'])]
+    public function popular_catalogs(): JsonResponse
+    {
+        $data = $this->catalogService->getPopularCatalogs();
+
+        return $this->json($data);
+    }
 }

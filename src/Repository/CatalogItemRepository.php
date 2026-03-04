@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Catalog;
 use App\Entity\CatalogItem;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -33,18 +34,33 @@ class CatalogItemRepository extends EntityRepository
         return new Paginator($qb, true);
     }
 
-    public function findPopular(array $productCodes, int $page, int $limit): Paginator
+    public function findPopular(array $productCodes)
     {
-        $query = $this->createQueryBuilder('ci')
+        return $this->createQueryBuilder('ci')
             ->select('ci')
             ->where('ci.product_code IN (:productCodes)')
             ->andWhere('ci.is_popular = :isPopular')
             ->setParameter('productCodes', $productCodes)
-            ->setParameter('isPopular', true)
+            ->setParameter('isPopular', CatalogItem::POPULAR)
             ->orderBy('ci.position', 'ASC')
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit);
+            ->setMaxResults(CatalogItem::LIMIT_POPULAR)
+            ->getQuery()
+            ->getResult();
+    }
 
-        return new Paginator($query, true);
+    public function findPopularByFirstPopularCatalog(array $productCodes, $catalog)
+    {
+        return $this->createQueryBuilder('ci')
+            ->select('ci')
+            ->where('ci.product_code IN (:productCodes)')
+            ->andWhere('ci.is_popular = :isPopular')
+            ->andWhere('ci.catalog = :catalog')
+            ->setParameter('productCodes', $productCodes)
+            ->setParameter('isPopular', CatalogItem::POPULAR)
+            ->setParameter('catalog', $catalog)
+            ->orderBy('ci.position', 'ASC')
+            ->setMaxResults(CatalogItem::LIMIT_POPULAR)
+            ->getQuery()
+            ->getResult();
     }
 }

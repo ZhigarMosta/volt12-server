@@ -5,12 +5,14 @@ namespace App\Service\Volt12;
 use App\Entity\CatalogItem;
 use App\Provider\ProductCodeProvider;
 use App\Repository\CatalogItemRepository;
+use App\Repository\CatalogRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CatalogItemService
 {
     public function __construct(
-        private CatalogItemRepository $catalogItemRepository
+        private CatalogItemRepository $catalogItemRepository,
+        private CatalogRepository $catalogRepository,
     )
     {
     }
@@ -30,9 +32,14 @@ class CatalogItemService
         return $this->catalogItemRepository->find($id);
     }
 
-    public function getPopularCatalogItemList(int $page = 1, int $limit = 12): Paginator
+    public function getPopularCatalogItemList()
     {
-        return $this->catalogItemRepository->findPopular([ProductCodeProvider::CODE_ANY,ProductCodeProvider::CODE_VOLT12], $page, $limit);
+        return $this->catalogItemRepository->findPopular([ProductCodeProvider::CODE_ANY,ProductCodeProvider::CODE_VOLT12]);
+    }
+
+    public function getCatalogItemListByFirstPopularCatalog() {
+        $code = [ProductCodeProvider::CODE_ANY,ProductCodeProvider::CODE_VOLT12];
+        return $this->catalogItemRepository->findPopularByFirstPopularCatalog($code,$this->catalogRepository->firstPopular($code));
     }
 
 }

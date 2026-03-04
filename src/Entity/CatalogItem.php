@@ -16,6 +16,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
 {
 
     const POPULAR = true;
+    const LIMIT_POPULAR = 12;
 
     public function __construct()
     {
