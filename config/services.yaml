@@ -22,6 +22,9 @@ services:
     App\Service\Volt12\CatalogGroupService:
         autowire: true
         
+    App\Service\Volt12\FeedbackFromMapService:
+        autowire: true
+        
     App\Controller\Admin\CatalogItemCharacteristicController:
         tags: [ 'controller.service_arguments' ]
         arguments:
@@ -41,6 +44,11 @@ services:
         arguments:
             $catalogItemService: '@App\Service\Volt12\CatalogItemService'
     
+    App\Controller\Volt12\FeedbackFromMapController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $feedbackFromMapService: '@App\Service\Volt12\FeedbackFromMapService'
+    
     App\Controller\Volt12\CatalogCharacteristicController:
         tags: [ 'controller.service_arguments' ]
         arguments:
@@ -55,6 +63,10 @@ services:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
     App\Menu\CatalogMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+    
+    App\Menu\FeedbackFromMapListener:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
@@ -111,6 +123,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: app.catalog.pre_create, method: onPreCreate }
             - { name: kernel.event_listener, event: app.catalog.pre_update, method: onPreUpdate }
+    
+    App\EventListener\FeedbackFromMapListener:
+        tags:
+            - { name: kernel.event_listener, event: app.feedback_from_map.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.feedback_from_map.pre_update, method: onPreUpdate }
      
     App\EventListener\CatalogItemImageResourceListener:
         tags:

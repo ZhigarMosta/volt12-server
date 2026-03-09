@@ -356,7 +356,82 @@ sylius_grid:
                 item:
                     update: { type: update }
                     delete: { type: delete }
-                    
+        
+        app_admin_feedback_from_map:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\FeedbackFromMap
+            sorting:
+                position: asc
+            filters:
+                user_name:
+                    type: string
+                    label: Имя пользователя
+                message:
+                    type: string
+                    label: Сообщение
+                map:
+                    label: "Карта"
+                    type: select
+                    form_options:
+                        choices:
+                            'Яндекс': 'yandex'
+                            '2Gis': '2gis'
+                position:
+                    label: Позиция
+                    type: numeric_range
+                    form_options:
+                        label: Позиция
+                star_count:
+                    label: Количество звёзд
+                    type: numeric_range
+                    form_options:
+                        label: Количество звёзд
+                product_code:
+                    label: "Код продукта"
+                    type: select
+                    form_options:
+                        choices:
+                            'Мастер вольт 12': 'volt12'
+                            'Пандора': 'pandora'
+                            'Любой': 'any'
+            fields:
+                user_name:
+                    type: string
+                    label: Имя пользователя
+                    sortable: ~
+                message:
+                    type: string
+                    label: Сообщение
+                    sortable: ~
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
+                star_count:
+                    type: string
+                    label: Звёзды
+                    sortable: ~
+                feedback_link:
+                    type: string
+                    label: Ссылка на сообщение
+                    sortable: ~
+                product_code:
+                    type: string
+                    label: Код продукта
+                    sortable: ~
+                map:
+                    type: string
+                    label: Карата
+                    sortable: ~
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+        
     templates:
         filter:
             numeric_range: "admin/grid/filter/numeric_range.html.twig"

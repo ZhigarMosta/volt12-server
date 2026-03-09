@@ -94,3 +94,19 @@ app_admin_catalog_item_image:
                 icon: 'file image outline'
     type: sylius.resource
     prefix: /admin
+
+app_admin_feedback_from_map:
+    resource: |
+        alias: app.feedback_from_map
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_feedback_from_map
+        vars:
+            all:
+                subheader: app.ui.feedback_from_map
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin
