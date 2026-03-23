@@ -8,11 +8,11 @@ use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 
 class CatalogRepository extends EntityRepository
 {
-    public function list(string $code): array
+    public function list(array $code): array
     {
         return $this->createQueryBuilder('c')
             ->select('c.id, c.name')
-            ->where('c.product_code = :product_code')
+            ->where('c.product_code in (:product_code)')
             ->setParameter('product_code', $code)
             ->getQuery()
             ->getResult();

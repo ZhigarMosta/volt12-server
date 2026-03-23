@@ -29,7 +29,7 @@ class FeedbackFromMap implements ResourceInterface, TimestampableInterface
         '5' => 5
     ];
 
-    const LIMIT_MAIN = 3;
+    const LIMIT_MAIN = 12;
 
     use TimestampableTrait;
     public function __construct()

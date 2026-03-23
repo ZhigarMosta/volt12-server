@@ -16,7 +16,7 @@ class CatalogService
 
     public function getAllCatalogsData(): array
     {
-        return $this->catalogRepository->list(ProductCodeProvider::CODE_VOLT12);
+        return $this->catalogRepository->list([ProductCodeProvider::CODE_VOLT12,ProductCodeProvider::CODE_ANY]);
     }
 
     public function getPopularCatalogs(): array

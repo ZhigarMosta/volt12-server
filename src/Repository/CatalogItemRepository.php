@@ -9,26 +9,24 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CatalogItemRepository extends EntityRepository
 {
-    public function list(array $productCodes, int $catalogId, array $characteristicIds, int $page, int $limit): Paginator
+    public function list(array $productCodes, int $catalogId, array $filterGroups, int $page, int $limit): Paginator
     {
         $qb = $this->createQueryBuilder('ci')
             ->select('ci')
-            ->innerJoin('ci.characteristics', 'cic')
             ->where('ci.catalog = :catalogId')
             ->andWhere('ci.product_code IN (:productCodes)')
             ->setParameter('catalogId', $catalogId)
             ->setParameter('productCodes', $productCodes);
 
-        if (!empty($characteristicIds)) {
-            $count = count($characteristicIds);
-
-            $qb->andWhere('cic.catalogCharacteristic IN (:characteristicIds)')
-                ->setParameter('characteristicIds', $characteristicIds)
-                ->groupBy('ci.id')
-                ->having('COUNT(DISTINCT cic.catalogCharacteristic) = :count')
-                ->setParameter('count', $count);
+        if (!empty($filterGroups)) {
+            foreach ($filterGroups as $index => $ids) {
+                $alias = 'cic_' . $index;
+                $qb->innerJoin('ci.characteristics', $alias);
+                $qb->andWhere($alias . '.catalogCharacteristic IN (:ids_' . $index . ')');
+                $qb->setParameter('ids_' . $index, $ids);
+            }
         }
-        $qb->orderBy('ci.position', 'DESC');
+        $qb->orderBy('ci.position', 'ASC');
         $qb->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
         return new Paginator($qb, true);

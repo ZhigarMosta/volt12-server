@@ -16,21 +16,26 @@ class CatalogItemController extends AbstractController
     )
     {
     }
-
+    /**
+     *{
+     * "filterGroups": [
+     * [101, 102],  Красный ИЛИ Синий
+     * [201],       Дерево
+     * [900]        В наличии
+     * ]
+     * }
+     */
     #[Route('/catalog_items', name: 'volt12_catalog_items', methods: ['POST'])]
     public function catalog_items(Request $request): JsonResponse
     {
         $data = $request->toArray();
         $catalogId = $data['catalogId'] ?? null;
-        $characteristicIds = $data['characteristicIds'] ?? [];
+
+        $filterGroups = $data['filterGroups'] ?? [];
         $page = $data['page'] ?? 1;
         $limit = $data['limit'] ?? 10;
-        $paginator = $this->catalogItemService->getCatalogItemByCatalogID(
-            $catalogId,
-            $characteristicIds,
-            $page,
-            $limit
-        );
+
+        $paginator = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $page, $limit);
 
         $totalItems = count($paginator);
         $totalPages = ceil($totalItems / $limit);
