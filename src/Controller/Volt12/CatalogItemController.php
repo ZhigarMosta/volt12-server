@@ -37,6 +37,8 @@ class CatalogItemController extends AbstractController
 
         $paginator = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $page, $limit);
 
+        $facets = $this->catalogItemService->calculateFacets($catalogId, $filterGroups);
+
         $totalItems = count($paginator);
         $totalPages = ceil($totalItems / $limit);
 
@@ -47,6 +49,7 @@ class CatalogItemController extends AbstractController
 
         return $this->json([
             'items' => $items,
+            'facets' => $facets,
             'meta' => [
                 'total_items' => $totalItems,
                 'total_pages' => $totalPages,
