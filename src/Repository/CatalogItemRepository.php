@@ -9,7 +9,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CatalogItemRepository extends EntityRepository
 {
-    public function list(array $productCodes, int $catalogId, array $filterGroups, int $page, int $limit): Paginator
+    public function list(array $productCodes, int $catalogId, array $filterGroups, array $price, int $page, int $limit): Paginator
     {
         $qb = $this->createQueryBuilder('ci')
             ->select('ci')
@@ -17,6 +17,16 @@ class CatalogItemRepository extends EntityRepository
             ->andWhere('ci.product_code IN (:productCodes)')
             ->setParameter('catalogId', $catalogId)
             ->setParameter('productCodes', $productCodes);
+
+        if (isset($price['max']) && is_int((int) $price['max'])) {
+            $qb->andWhere('ci.price <= (:priceMax)')
+                ->setParameter('priceMax', $price['max']);
+        }
+
+        if (isset($price['min']) && is_int((int) $price['min'])) {
+            $qb->andWhere('ci.price >= (:priceMin)')
+                ->setParameter('priceMin', $price['min']);
+        }
 
         if (!empty($filterGroups)) {
             foreach ($filterGroups as $index => $ids) {
@@ -75,6 +85,7 @@ class CatalogItemRepository extends EntityRepository
         int $catalogId,
         array $productCodes,
         array $filterGroups,
+        array $price,
         ?int $excludeGroupIndex = null,
         ?array $targetCharIds = null
     ): array
@@ -86,6 +97,16 @@ class CatalogItemRepository extends EntityRepository
             ->andWhere('ci.product_code IN (:productCodes)')
             ->setParameter('catalogId', $catalogId)
             ->setParameter('productCodes', $productCodes);
+
+        if (isset($price['max']) && is_int((int) $price['max'])) {
+            $qb->andWhere('ci.price <= (:priceMax)')
+                ->setParameter('priceMax', $price['max']);
+        }
+
+        if (isset($price['min']) && is_int((int) $price['min'])) {
+            $qb->andWhere('ci.price >= (:priceMin)')
+                ->setParameter('priceMin', $price['min']);
+        }
 
         if (!empty($filterGroups)) {
             foreach ($filterGroups as $index => $ids) {

@@ -3,6 +3,7 @@
 namespace App\Controller\Volt12;
 
 use App\Service\Volt12\CatalogItemService;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,7 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class CatalogItemController extends AbstractController
 {
     public function __construct(
-        private CatalogItemService $catalogItemService
+        private CatalogItemService $catalogItemService,
+        private LoggerInterface $logger
     )
     {
     }
@@ -34,10 +36,13 @@ class CatalogItemController extends AbstractController
         $filterGroups = $data['filterGroups'] ?? [];
         $page = $data['page'] ?? 1;
         $limit = $data['limit'] ?? 10;
+        $price = $data['price'] ?? [];
 
-        $paginator = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $page, $limit);
+//        $this->logger->info('CatalogItemController: price', ['price' => $price]);
 
-        $facets = $this->catalogItemService->calculateFacets($catalogId, $filterGroups);
+        $paginator = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $price, $page, $limit);
+
+        $facets = $this->catalogItemService->calculateFacets($catalogId, $filterGroups, $price);
 
         $totalItems = count($paginator);
         $totalPages = ceil($totalItems / $limit);

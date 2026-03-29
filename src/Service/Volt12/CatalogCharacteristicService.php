@@ -20,7 +20,8 @@ class CatalogCharacteristicService
     public function getCatalogCharacteristicsByCatalogId(int $catalogId): array
     {
         $without_group = [];
-        $with_group = [];
+        $groups = [];
+        
         foreach ($this->catalogCharacteristicRepository->list($catalogId, [ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY]) as $catalogCharacteristic) {
             if (is_null($catalogCharacteristic['group_name'])) {
                 $without_group[] = [
@@ -29,12 +30,27 @@ class CatalogCharacteristicService
                 ];
                 continue;
             }
-            $with_group[$catalogCharacteristic['group_name']][] = [
+            
+            $groupId = $catalogCharacteristic['group_id'];
+            
+            if (!isset($groups[$groupId])) {
+                $groups[$groupId] = [
+                    'id' => $groupId,
+                    'name' => $catalogCharacteristic['group_name'],
+                    'items' => []
+                ];
+            }
+            
+            $groups[$groupId]['items'][] = [
                 'id' => $catalogCharacteristic['id'],
                 'name' => $catalogCharacteristic['name']
             ];
         }
-        return ['without_group' => $without_group, 'with_group' => $with_group];
+        
+        return [
+            'without_group' => $without_group,
+            'with_group' => array_values($groups)
+        ];
     }
 
     public function getAll()

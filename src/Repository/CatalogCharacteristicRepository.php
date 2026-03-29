@@ -9,7 +9,7 @@ class CatalogCharacteristicRepository extends EntityRepository
     public function list(int $catalogId, array $productCodes)
     {
         return $this->createQueryBuilder('cch')
-            ->select('cch.id', 'cch.name', 'g.name as group_name')
+            ->select('cch.id', 'cch.name', 'g.name as group_name', 'g.id as group_id')
             ->leftJoin('cch.catalogGroup', 'g')
             ->where('cch.catalog = :catalogId')
             ->andWhere('cch.product_code IN (:productCodes)')

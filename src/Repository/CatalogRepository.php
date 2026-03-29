@@ -11,7 +11,7 @@ class CatalogRepository extends EntityRepository
     public function list(array $code): array
     {
         return $this->createQueryBuilder('c')
-            ->select('c.id, c.name')
+            ->select('c.id, c.name, c.slug')
             ->where('c.product_code in (:product_code)')
             ->setParameter('product_code', $code)
             ->getQuery()
