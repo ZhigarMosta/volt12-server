@@ -20,15 +20,15 @@ class CatalogItemService
     }
     private array $productCodes = [ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY];
 
-    public function getCatalogItemByCatalogID(int $catalogId, array $filterGroups, array $price, int $page = 1, int $limit = 10): Paginator
+    public function getCatalogItemByCatalogID(int $catalogId, array $filterGroups, array $price, string $search, int $page = 1, int $limit = 10): Paginator
     {
-        return $this->catalogItemRepository->list($this->productCodes, $catalogId, $filterGroups, $price, $page, $limit);
+        return $this->catalogItemRepository->list($this->productCodes, $catalogId, $filterGroups, $price, $search, $page, $limit);
     }
 
     /**
      * Основной метод для расчета фасетов (Умный подсчет N+1)
      */
-    public function calculateFacets(int $catalogId, array $filterGroups, array $price): array
+    public function calculateFacets(int $catalogId, array $filterGroups, array $price, string $search): array
     {
         $allChars = $this->catalogCharacteristicRepository->list($catalogId, $this->productCodes);
 
@@ -66,6 +66,7 @@ class CatalogItemService
                 $this->productCodes,
                 $filterGroups,
                 $price,
+                $search,
                 $filterIndex,
                 $targetIds
             );
@@ -94,6 +95,7 @@ class CatalogItemService
                 $this->productCodes,
                 $filterGroups,
                 $price,
+                $search,
                 null,
                 $passiveCharIds
             );

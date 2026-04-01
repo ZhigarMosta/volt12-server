@@ -9,7 +9,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CatalogItemRepository extends EntityRepository
 {
-    public function list(array $productCodes, int $catalogId, array $filterGroups, array $price, int $page, int $limit): Paginator
+    public function list(array $productCodes, int $catalogId, array $filterGroups, array $price, string $search, int $page, int $limit): Paginator
     {
         $qb = $this->createQueryBuilder('ci')
             ->select('ci')
@@ -26,6 +26,11 @@ class CatalogItemRepository extends EntityRepository
         if (isset($price['min']) && is_int((int) $price['min'])) {
             $qb->andWhere('ci.price >= (:priceMin)')
                 ->setParameter('priceMin', $price['min']);
+        }
+
+        if (!empty($search)) {
+            $qb->andWhere('ci.name LIKE :searchName')
+                ->setParameter('searchName', '%' . $search . '%');
         }
 
         if (!empty($filterGroups)) {
@@ -86,6 +91,7 @@ class CatalogItemRepository extends EntityRepository
         array $productCodes,
         array $filterGroups,
         array $price,
+        string $search,
         ?int $excludeGroupIndex = null,
         ?array $targetCharIds = null
     ): array
@@ -106,6 +112,11 @@ class CatalogItemRepository extends EntityRepository
         if (isset($price['min']) && is_int((int) $price['min'])) {
             $qb->andWhere('ci.price >= (:priceMin)')
                 ->setParameter('priceMin', $price['min']);
+        }
+
+        if (!empty($search)) {
+            $qb->andWhere('ci.name LIKE :searchName')
+                ->setParameter('searchName', '%' . $search . '%');
         }
 
         if (!empty($filterGroups)) {

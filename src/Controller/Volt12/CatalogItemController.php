@@ -37,12 +37,13 @@ class CatalogItemController extends AbstractController
         $page = $data['page'] ?? 1;
         $limit = $data['limit'] ?? 10;
         $price = $data['price'] ?? [];
+        $search = $data['search'] ?? '';
 
 //        $this->logger->info('CatalogItemController: price', ['price' => $price]);
 
-        $paginator = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $price, $page, $limit);
+        $paginator = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $price, $search, $page, $limit);
 
-        $facets = $this->catalogItemService->calculateFacets($catalogId, $filterGroups, $price);
+        $facets = $this->catalogItemService->calculateFacets($catalogId, $filterGroups, $price, $search);
 
         $totalItems = count($paginator);
         $totalPages = ceil($totalItems / $limit);
