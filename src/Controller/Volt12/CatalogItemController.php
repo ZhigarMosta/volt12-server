@@ -38,10 +38,11 @@ class CatalogItemController extends AbstractController
         $limit = $data['limit'] ?? 10;
         $price = $data['price'] ?? [];
         $search = $data['search'] ?? '';
+        $sortPrice = $data['sortPrice'] ?? null;
 
 //        $this->logger->info('CatalogItemController: price', ['price' => $price]);
 
-        $paginator = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $price, $search, $page, $limit);
+        $paginator = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $price, $search,$sortPrice, $page, $limit);
 
         $facets = $this->catalogItemService->calculateFacets($catalogId, $filterGroups, $price, $search);
 

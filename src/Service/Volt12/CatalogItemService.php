@@ -20,9 +20,15 @@ class CatalogItemService
     }
     private array $productCodes = [ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY];
 
-    public function getCatalogItemByCatalogID(int $catalogId, array $filterGroups, array $price, string $search, int $page = 1, int $limit = 10): Paginator
+    public function getCatalogItemByCatalogID(int $catalogId, array $filterGroups, array $price, string $search, ?int $sortPrice, int $page = 1, int $limit = 10): Paginator
     {
-        return $this->catalogItemRepository->list($this->productCodes, $catalogId, $filterGroups, $price, $search, $page, $limit);
+        if($sortPrice === 1){
+            $sortPrice = 'ASC';
+        } elseif ($sortPrice === 2){
+            $sortPrice = 'DESC';
+        }
+
+        return $this->catalogItemRepository->list($this->productCodes, $catalogId, $filterGroups, $price, $search, $sortPrice, $page, $limit);
     }
 
     /**
