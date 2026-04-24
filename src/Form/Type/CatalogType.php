@@ -118,6 +118,14 @@ class CatalogType extends AbstractType
             'help_attr' => [
                 'style' => 'grid-area: image; margin: 0;',
             ],
+        ])
+        ->add('imgAlt', TextType::class, [
+            'label' => 'Alt',
+            'required' => false,
+        ])
+        ->add('imgTitle', TextType::class, [
+            'label' => 'Title',
+            'required' => false,
         ]);
     }
 

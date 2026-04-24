@@ -51,6 +51,12 @@ class Catalog implements ResourceInterface, TimestampableInterface
     #[ORM\Column(name: 'imglink', type: 'string', length: 2048, nullable: true)]
     private ?string $img_link = '';
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private string $imgAlt = '';
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private string $imgTitle = '';
+
     private ?File $file = null;
 
     public function getFile(): ?File
@@ -87,6 +93,12 @@ class Catalog implements ResourceInterface, TimestampableInterface
         $this->img_link = $img_link;
         $this->updatedAt = new \DateTime();
     }
+
+    public function getImgAlt(): string { return $this->imgAlt; }
+    public function setImgAlt(string $imgAlt): void { $this->imgAlt = $imgAlt; }
+
+    public function getImgTitle(): string { return $this->imgTitle; }
+    public function setImgTitle(string $imgTitle): void { $this->imgTitle = $imgTitle; }
 
     #[ORM\OneToMany(mappedBy: 'catalog', targetEntity: CatalogCharacteristic::class)]
     #[Ignore]
