@@ -13,17 +13,33 @@ class CatalogResourceListener
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private CatalogImageListener $catalogImageListener,
     ) {}
 
     public function onPreCreate(ResourceControllerEvent $event): void
     {
+        $this->uploadImage($event);
         $this->validate($event);
     }
 
     public function onPreUpdate(ResourceControllerEvent $event): void
     {
+        $this->uploadImage($event);
         $this->validate($event);
+    }
+
+    private function uploadImage(ResourceControllerEvent $event): void
+    {
+        $item = $event->getSubject();
+
+        if (!$item instanceof Catalog) {
+            return;
+        }
+
+        if ($item->getFile()) {
+            $this->catalogImageListener->prePersist($item, null);
+        }
     }
 
     private function validate(ResourceControllerEvent $event): void

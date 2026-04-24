@@ -9,9 +9,12 @@ use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\HttpFoundation\File\File;
+use App\EventListener\CatalogImageListener;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'catalogs')]
+#[ORM\EntityListeners([CatalogImageListener::class])]
 class Catalog implements ResourceInterface, TimestampableInterface
 {
     const POPULAR = true;
@@ -45,6 +48,22 @@ class Catalog implements ResourceInterface, TimestampableInterface
     #[ORM\Column(type: 'boolean', nullable: true)]
     private bool $is_popular = false;
 
+    #[ORM\Column(name: 'imglink', type: 'string', length: 2048, nullable: true)]
+    private ?string $img_link = '';
+
+    private ?File $file = null;
+
+    public function getFile(): ?File
+    {
+        return $this->file;
+    }
+
+    public function setFile(?File $file): void
+    {
+        $this->file = $file;
+        $this->updatedAt = new \DateTime();
+    }
+
     public function getId(): ?int { return $this->id; }
 
     public function getName(): string { return $this->name; }
@@ -61,6 +80,13 @@ class Catalog implements ResourceInterface, TimestampableInterface
 
     public function getIsPopular(): bool { return $this->is_popular; }
     public function setIsPopular( bool $is_popular): void { $this->is_popular = $is_popular; }
+
+    public function getImgLink(): ?string { return $this->img_link; }
+    public function setImgLink(string $img_link): void
+    {
+        $this->img_link = $img_link;
+        $this->updatedAt = new \DateTime();
+    }
 
     #[ORM\OneToMany(mappedBy: 'catalog', targetEntity: CatalogCharacteristic::class)]
     #[Ignore]

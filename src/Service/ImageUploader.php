@@ -14,18 +14,25 @@ class ImageUploader
         private SluggerInterface $slugger
     ) {}
 
-    public function upload(UploadedFile $file): string
+    public function upload(UploadedFile|string $file): string
     {
-        if ($file->getMimeType() !== 'image/webp') {
+        $isPath = is_string($file);
+        $mimeType = $isPath ? mime_content_type($file) : $file->getMimeType();
+
+        if ($mimeType !== 'image/webp') {
              throw new Exception('Разрешены только WebP изображения!');
         }
 
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $originalFilename = $isPath ? pathinfo($file, PATHINFO_FILENAME) : pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $this->slugger->slug($originalFilename);
-        $fileName = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+        $fileName = $safeFilename.'-'.uniqid().'.' . ($isPath ? 'webp' : $file->guessExtension());
 
         try {
-            $file->move($this->targetDirectory, $fileName);
+            if ($isPath) {
+                copy($file, $this->targetDirectory . '/' . $fileName);
+            } else {
+                $file->move($this->targetDirectory, $fileName);
+            }
         } catch (FileException $e) {
             throw new Exception('Ошибка при загрузке файла');
         }
