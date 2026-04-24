@@ -8,12 +8,22 @@ use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 
 class CatalogRepository extends EntityRepository
 {
-    public function list(array $code): array
+    public function list(array $codes): array
     {
         return $this->createQueryBuilder('c')
-            ->select('c.id, c.name, c.slug, c.img_link, c.imgAlt, c.imgTitle')
-            ->where('c.product_code in (:product_code)')
-            ->setParameter('product_code', $code)
+            ->select('c.id, c.name, c.slug, c.img_link, c.imgAlt, c.imgTitle, (
+            SELECT COUNT(DISTINCT i2.id)
+            FROM App\Entity\CatalogItem i2
+            WHERE i2.catalog = c.id
+            AND i2.product_code IN (:product_code)
+            AND EXISTS (
+                SELECT 1
+                FROM App\Entity\CatalogItemImage img2
+                WHERE img2.catalogItem = i2.id
+            )
+        ) as items_count')
+            ->where('c.product_code IN (:product_code)')
+            ->setParameter('product_code', $codes)
             ->getQuery()
             ->getResult();
     }
