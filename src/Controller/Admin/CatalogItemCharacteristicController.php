@@ -11,6 +11,7 @@ use App\Service\Volt12\CatalogCharacteristicService;
 use App\Service\Volt12\CatalogGroupService;
 use App\Service\Volt12\CatalogItemService;
 use App\Service\Volt12\CatalogService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,7 @@ class CatalogItemCharacteristicController extends AbstractController
         private CrudService $crudService,
         private CatalogGroupService $catalogGroupService,
         private CatalogService $catalogService,
+        private ?LoggerInterface       $logger = null
     ) {}
     #[Route('/catalog_characteristics_by_catalog_item/{id}', name: 'admin_crud_catalog_characteristics_by_catalog_item', methods: ['GET'])]
     public function catalogCharacteristicsByCatalogItem(CatalogItem $item): JsonResponse
@@ -51,6 +53,14 @@ class CatalogItemCharacteristicController extends AbstractController
     {
         return $this->json([
             'items' =>$this->crudService->transformForSelect($this->catalogItemService->getCatalogItemList())
+        ]);
+    }
+
+    #[Route('/all_catalog_items_by_catalog_id/{id}', name: 'admin_crud_all_catalog_items_by_catalog_id', methods: ['GET'])]
+    public function allProductsByCatalog(Catalog $item): JsonResponse
+    {
+        return $this->json([
+            'items' => $this->crudService->transformSortProduct($this->catalogItemService->getCatalogItemByCatalogID(catalogId: $item->getId(), page: null, limit: null)),
         ]);
     }
 
@@ -116,4 +126,13 @@ class CatalogItemCharacteristicController extends AbstractController
         if (!$catalogFromCatalogGroup || !$catalogFromCatalogCharacteristic) return $this->json(false);
         return $this->json($catalogFromCatalogGroup->getId() === $catalogFromCatalogCharacteristic->getId());
     }
+
+    #[Route('/sort_catalog_items', name: 'admin_crud_sort_catalog_items', methods: ['POST'])]
+    public function sortCatalogItems(Request $request): JsonResponse
+    {
+        $data = $request->toArray();
+
+        return $this->json($this->catalogItemService->sortCatalogItem($data));
+    }
+
 }

@@ -7,20 +7,24 @@ use App\Provider\ProductCodeProvider;
 use App\Repository\CatalogCharacteristicRepository;
 use App\Repository\CatalogItemRepository;
 use App\Repository\CatalogRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Psr\Log\LoggerInterface;
 
 class CatalogItemService
 {
     public function __construct(
         private CatalogItemRepository $catalogItemRepository,
         private CatalogRepository $catalogRepository,
-        private CatalogCharacteristicRepository $catalogCharacteristicRepository
+        private CatalogCharacteristicRepository $catalogCharacteristicRepository,
+        private EntityManagerInterface $entityManager,
+        private ?LoggerInterface $logger = null,
     )
     {
     }
     private array $productCodes = [ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY];
 
-    public function getCatalogItemByCatalogID(int $catalogId, array $filterGroups, array $price, string $search, ?int $sortPrice, int $page = 1, int $limit = 10): Paginator
+    public function getCatalogItemByCatalogID(int $catalogId, ?array $filterGroups = [], ?array $price = [], ?string $search = null, ?int $sortPrice = null, ?int $page = 1, ?int $limit = 10)
     {
         if($sortPrice === 1){
             $sortPrice = 'ASC';
@@ -133,4 +137,46 @@ class CatalogItemService
         return $this->catalogItemRepository->findPopularByFirstPopularCatalog($code,$this->catalogRepository->firstPopular($code));
     }
 
+    public function sortCatalogItem(?array $data): null|int
+    {
+        $items = $data['items'];
+        $current = $data['current'];
+
+        if (empty($items)) {
+            return null;
+        }
+
+        $ids = array_column($items, 'id');
+        $products = $this->catalogItemRepository->findBy(['id' => $ids]);
+
+        $productMap = [];
+        foreach ($products as $product) {
+            $productMap[$product->getId()] = $product;
+        }
+
+        foreach ($items as $itemData) {
+            if (!isset($itemData['id']) || !isset($itemData['position'])) {
+                continue;
+            }
+
+            if (!isset($productMap[$itemData['id']])) {
+                continue;
+            }
+
+            $productMap[$itemData['id']]->setPosition($itemData['position']);
+            $this->entityManager->persist($productMap[$itemData['id']]);
+        }
+
+        $this->entityManager->flush();
+
+        if($current===-1){
+            return $items[array_search($current, array_column($items, 'id'))]['position'] ?? null;
+        }
+        else{
+            if(!$current){
+               return null;
+            }
+            return $productMap[$current]->getPosition()??null;
+        }
+    }
 }

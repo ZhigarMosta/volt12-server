@@ -9,7 +9,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CatalogItemRepository extends EntityRepository
 {
-    public function list(array $productCodes, int $catalogId, array $filterGroups, array $price, string $search, ?string $sortPrice, int $page, int $limit): Paginator
+    public function list(array $productCodes, int $catalogId, ?array $filterGroups, ?array $price, ?string $search, ?string $sortPrice, ?int $page, ?int $limit)
     {
         $qb = $this->createQueryBuilder('ci')
             ->select('ci')
@@ -45,9 +45,14 @@ class CatalogItemRepository extends EntityRepository
         if ($sortPrice) {
             $qb->orderBy('ci.price', $sortPrice);
         }
-        $qb->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit);
-        return new Paginator($qb, true);
+
+        if (!empty($limit) && !empty($page)) {
+            $qb->setFirstResult(($page - 1) * $limit)
+                ->setMaxResults($limit);
+            return new Paginator($qb, true);
+        } else {
+            return $qb->getQuery()->getResult();
+        }
     }
 
     public function findPopular(array $productCodes)

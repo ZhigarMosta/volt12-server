@@ -1,0 +1,16 @@
+{% use 'bootstrap_5_layout.html.twig' %}
+
+{% block form_row -%}
+    <div class="mb-3{% if compound %} row{% endif %}">
+        {{ form_label(form) }}
+        {{ form_widget(form) }}
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}
+
+{% block catat_item_form_widget %}
+    <div class="row">
+        <div class="col">{{ block('form_widget') }}</div>
+        <div class="col-auto">{% include '@App/admin/modal/catalog_item_sort.html.twig' %}</div>
+    </div>
+{% endblock %}
