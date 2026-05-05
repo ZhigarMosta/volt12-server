@@ -434,6 +434,10 @@ sylius_grid:
                     sortable: ~
             actions:
                 main:
+                    sort_feedback:
+                        type: default
+                        label: Сортировка
+                        template: "admin/grid/action/sort_feedback_from_map.html.twig"
                     create: { type: create }
                 item:
                     update: { type: update }
