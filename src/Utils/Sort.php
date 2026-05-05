@@ -8,7 +8,12 @@ class Sort
     {
         $uuidSortItemsBtn = 'sort-items-btn-'.uniqid();
         $uuidJsSave = 'js-save-'.uniqid();
-        return '<button type="button" style="margin: 0; margin-top: -0.25rem" class="btn btn-done" id='. json_encode($uuidSortItemsBtn) .'>Сортировка</button>
+        $uuidModal = 'catalog-item-sort-modal-'.uniqid();
+        $btnStyle = '';
+        if ($isSortInEditModel) {
+            $btnStyle = 'margin-top: -0.25rem';
+        }
+        return '<button type="button" style="margin: 0; ' . $btnStyle . '" class="btn btn-done" id='. json_encode($uuidSortItemsBtn) .'>Сортировка</button>
                 <script>
                     document.getElementById('. json_encode($uuidSortItemsBtn) .').addEventListener("click", function() {
                         const nameField = '. json_encode($pathName) .';
@@ -27,8 +32,18 @@ class Sort
                         }
                         const isNew = urlParts[urlParts.length - 1] === "new";
                         const isNewItem = !editItemId || isNaN(parseInt(editItemId));
-                        if (!document.getElementById("catalog-item-sort-modal")) {
-                            var modalHtml = `<div class="modal fade js-catalog-item-sort-modal" tabindex="-1" aria-hidden="true">
+                        const modalId = '. json_encode($uuidModal) .';
+                        document.querySelectorAll(".js-catalog-item-sort-modal").forEach(el => {
+                            let oldModal = bootstrap.Modal.getInstance(el);
+                            if (oldModal) {
+                                oldModal.dispose();
+                            }
+                            el.remove();
+                        });
+                        document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+                        document.body.classList.remove("modal-open");
+                        document.body.style.removeProperty("padding-right");
+                        var modalHtml = `<div class="modal fade js-catalog-item-sort-modal" id="${modalId}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -46,41 +61,44 @@ class Sort
                                     </div>
                                 </div>
                             </div>`;
-                            document.body.insertAdjacentHTML("beforeend", modalHtml);
-                        }
+                        document.body.insertAdjacentHTML("beforeend", modalHtml);
 
-                        document.querySelector(' . json_encode('.' . $uuidJsSave) . ').addEventListener("click", function() {
-                            if(this.disabled){
-                                modal.hide();
-                                return;
-                            }
-                            this.disabled = true;
+                         document.querySelector(' . json_encode('.' . $uuidJsSave) . ').addEventListener("click", function() {
+                             if(this.disabled){
+                                 if (modal) {
+                                     modal.hide();
+                                 }
+                                 return;
+                             }
+                             this.disabled = true;
 
-                            let payload = {
-                                items: getResult(),
-                                current: null,
-                            };
+                             let payload = {
+                                 items: getResult(),
+                                 current: null,
+                             };
 
-                            if(isSortInEditModel){
-                                payload.current = isNew ? -1 : editItemId;
-                            }
-                            fetch("' . $urlSortCatalogItems . '", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-Requested-With": "XMLHttpRequest"
-                                },
-                                body: JSON.stringify(payload)
-                            }).then(r=> r.ok?r.json():[])
-                            .then(data => {
-                                if(isSortInEditModel){
-                                    positionSelect.value = data;
-                                }
-                            modal.hide();
-                            }).finally(()=>{
-                                this.disabled = false;
-                            })
-                        });
+                             if(isSortInEditModel){
+                                 payload.current = isNew ? -1 : editItemId;
+                             }
+                             fetch("' . $urlSortCatalogItems . '", {
+                                 method: "POST",
+                                 headers: {
+                                     "Content-Type": "application/json",
+                                     "X-Requested-With": "XMLHttpRequest"
+                                 },
+                                 body: JSON.stringify(payload)
+                             }).then(r=> r.ok?r.json():[])
+                             .then(data => {
+                                 if(isSortInEditModel){
+                                     positionSelect.value = data;
+                                 }
+                             }).finally(()=>{
+                                 if (modal) {
+                                     modal.hide();
+                                 }
+                                 this.disabled = false;
+                             })
+                         });
 
                         function getResult() {
                             const list = document.getElementById("sortable-list");
@@ -170,7 +188,7 @@ class Sort
                                     </div>`;
                         }
 
-                        modal = new bootstrap.Modal(document.querySelector(".js-catalog-item-sort-modal"));
+                        modal = new bootstrap.Modal(document.getElementById(modalId));
                         let catalogId = 0;
                         if(parseInt('. json_encode($catalogId) .')) {
                              catalogId =  parseInt('. json_encode($catalogId) .');
