@@ -4,11 +4,13 @@ namespace App\Utils;
 
 class Sort
 {
-    public static function getModal(string $pathName, string $pathImg, bool $isSortInEditModel, string $urlSortCatalogItems, string $urlAllProducts)
+    public static function getModal(string $pathName, string $pathImg, bool $isSortInEditModel, string $urlSortCatalogItems, string $urlAllProducts, ?int $catalogId = null)
     {
-        return '<button type="button" style="margin: 0; margin-top: -0.25rem" class="btn btn-done" id="sort-items-btn">Сортировка</button>
+        $uuidSortItemsBtn = 'sort-items-btn-'.uniqid();
+        $uuidJsSave = 'js-save-'.uniqid();
+        return '<button type="button" style="margin: 0; margin-top: -0.25rem" class="btn btn-done" id='. json_encode($uuidSortItemsBtn) .'>Сортировка</button>
                 <script>
-                    document.getElementById("sort-items-btn").addEventListener("click", function() {
+                    document.getElementById('. json_encode($uuidSortItemsBtn) .').addEventListener("click", function() {
                         const nameField = '. json_encode($pathName) .';
                         const imageField = '. json_encode($pathImg) .';
                         const isSortInEditModel = '. json_encode($isSortInEditModel) .';
@@ -39,7 +41,7 @@ class Sort
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                                            <button type="button" class="btn btn-primary js-save">Сохранить</button>
+                                            <button type="button" class="btn btn-primary ' . $uuidJsSave . '">Сохранить</button>
                                         </div>
                                     </div>
                                 </div>
@@ -47,7 +49,12 @@ class Sort
                             document.body.insertAdjacentHTML("beforeend", modalHtml);
                         }
 
-                        document.querySelector(".js-save").addEventListener("click", function() {
+                        document.querySelector(' . json_encode('.' . $uuidJsSave) . ').addEventListener("click", function() {
+                            if(this.disabled){
+                                modal.hide();
+                                return;
+                            }
+                            this.disabled = true;
 
                             let payload = {
                                 items: getResult(),
@@ -57,7 +64,6 @@ class Sort
                             if(isSortInEditModel){
                                 payload.current = isNew ? -1 : editItemId;
                             }
-
                             fetch("' . $urlSortCatalogItems . '", {
                                 method: "POST",
                                 headers: {
@@ -70,9 +76,10 @@ class Sort
                                 if(isSortInEditModel){
                                     positionSelect.value = data;
                                 }
-                            })
-
                             modal.hide();
+                            }).finally(()=>{
+                                this.disabled = false;
+                            })
                         });
 
                         function getResult() {
@@ -164,7 +171,12 @@ class Sort
                         }
 
                         modal = new bootstrap.Modal(document.querySelector(".js-catalog-item-sort-modal"));
-                        const catalogId = document.querySelector(".js-catalog-select").value;
+                        let catalogId = 0;
+                        if(parseInt('. json_encode($catalogId) .')) {
+                             catalogId =  parseInt('. json_encode($catalogId) .');
+                        } else {
+                            catalogId = document.querySelector(".js-catalog-select").value;
+                        }
                         let dragAndDropContent = document.querySelector(".js-drag-and-drop__content");
                         if(!catalogId){
                             dragAndDropContent.innerHTML = "<p>Сортировка по позиции зависит от каталога, выберите каталог и попробуйте ещё раз</p>";

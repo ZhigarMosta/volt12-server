@@ -6,6 +6,9 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+        
+    App\Twig\AppExtension:
+        tags: ['twig.extension']
     
     App\Service\Admin\CrudService:
         autowire: true
