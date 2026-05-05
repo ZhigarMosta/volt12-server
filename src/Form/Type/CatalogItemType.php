@@ -90,7 +90,7 @@ class CatalogItemType extends AbstractType
                 'required' => true,
                 'empty_data' => '',
                 'attr' => [
-                    'class' => 'js-catalog-select',
+                    'class' => 'js-entity-select',
                 ],
             ])
             ->add('position', IntegerType::class, [
@@ -112,7 +112,7 @@ class CatalogItemType extends AbstractType
                     ]),
                 ],
                 'required' => false,
-                'help' => Sort::getModal('name', 'img.imgLink', true, $urlSortCatalogItems, $urlAllProducts),
+                'help' => Sort::getModal('name', 'img.imgLink', true, $urlSortCatalogItems, $urlAllProducts,'catalog_items'),
                 'help_html' => true,
                 'row_attr' => [
                     'class' => 'mb-3',

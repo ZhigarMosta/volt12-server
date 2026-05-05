@@ -4,11 +4,18 @@ namespace App\Utils;
 
 class Sort
 {
-    public static function getModal(string $pathName, string $pathImg, bool $isSortInEditModel, string $urlSort, string $urlAllEntites)
+    public static array $map = [
+        'catalog_items' => [
+            'name' => 'Сортировка продуктов',
+            'noSelectEntity' => 'Сортировка по позиции зависит от каталога, выберите каталог и попробуйте ещё раз'
+        ],
+    ];
+
+    public static function getModal(string $pathName, string $pathImg, bool $isSortInEditModel, string $urlSort, string $urlAllEntities, string $modalName)
     {
-        $uuidSortItemsBtn = 'sort-items-btn-'.uniqid();
-        $uuidJsSave = 'js-save-'.uniqid();
-        $uuidModal = 'catalog-item-sort-modal-'.uniqid();
+        $uuidSortItemsBtn = 'sort-items-btn-' . uniqid();
+        $uuidJsSave = 'js-save-' . uniqid();
+        $uuidModal = 'catalog-item-sort-modal-' . uniqid();
         $btnStyle = '';
         if ($isSortInEditModel) {
             $btnStyle = 'margin-top: -0.25rem';
@@ -46,9 +53,9 @@ class Sort
                         var modalHtml = `<div class="modal fade js-catalog-item-sort-modal" id="${modalId}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                     <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Сортировка продуктов</h5>
-                                            <h5 class="modal-title">Изменения применятся после сохранения сущности</h5>
+                                        <div class="modal-header" style="display:flex;flex-direction:column;align-items:start;">
+                                            <h5 class="modal-title">' . self::$map["catalog_items"]["name"] . '</h5>
+                                            <h6 class="modal-title" style="color:#E2000F">Данные сохранятся после нажатия на кнопку Сохранить</h6>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body js-drag-and-drop__content">
@@ -175,7 +182,7 @@ class Sort
                                  currentColor = `border: 2px solid #e83e8c;`;
                              }
                              if((flags & DragItemFlags.IS_NEW) !== 0){
-                                 current = `<p style="color: #e83e8c; margin:0;">Новый в каталоге</p>`;
+                                 current = `<p style="color: #e83e8c; margin:0;">Новый</p>`;
                              }
 
                             return `<div class="sort-item card mb-2 p-2" style="display:flex;gap:4px; flex-direction:column; justify-content:space-between; height:80px; width:200px; user-select: none; ${currentColor} opacity: 0.7; cursor: grab;" data-id="${item?item.id:editItemId}" data-position="${(index + 1) ?? "new"}">
@@ -188,19 +195,20 @@ class Sort
                         }
 
                         modal = new bootstrap.Modal(document.getElementById(modalId));
-                        let catalogId = 0;
-                        const catalogSelect = document.querySelector(".js-catalog-select");
-                        if(catalogSelect) {
-                            catalogId  = catalogSelect.value;
+                        let entityId = 0;
+                        const entitySelect = document.querySelector(".js-entity-select");
+                        if(entitySelect) {
+                            entityId  = entitySelect.value;
                         }
                         let dragAndDropContent = document.querySelector(".js-drag-and-drop__content");
-                        if(catalogSelect && catalogId){
-                            dragAndDropContent.innerHTML = "<p>Сортировка по позиции зависит от каталога, выберите каталог и попробуйте ещё раз</p>";
+                        let url = "' . $urlAllEntities . '";
+                        const isEntityIdInUrl = url.slice(-2) !== "/0"
+                        if(!isEntityIdInUrl && !entityId){
+                            dragAndDropContent.innerHTML = "<p>' . self::$map["catalog_items"]["noSelectEntity"] . '</p>";
                             modal.show();
                         } else {
-                            let url = "' . $urlAllEntites . '";
                             if (url.slice(-2) === "/0") {
-                                url = "' . $urlAllEntites . '".replace("/0", "/" + catalogId);
+                                url = "' . $urlAllEntities . '".replace("/0", "/" + entityId);
                             }
 
                             fetch(url)
