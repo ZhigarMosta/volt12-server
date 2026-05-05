@@ -4,7 +4,7 @@ namespace App\Utils;
 
 class Sort
 {
-    public static function getModal(string $pathName, string $pathImg, bool $isSortInEditModel, string $urlSortCatalogItems, string $urlAllProducts, ?int $catalogId = null)
+    public static function getModal(string $pathName, string $pathImg, bool $isSortInEditModel, string $urlSort, string $urlAllEntites)
     {
         $uuidSortItemsBtn = 'sort-items-btn-'.uniqid();
         $uuidJsSave = 'js-save-'.uniqid();
@@ -79,7 +79,7 @@ class Sort
                              if(isSortInEditModel){
                                  payload.current = isNew ? -1 : editItemId;
                              }
-                             fetch("' . $urlSortCatalogItems . '", {
+                             fetch("' . $urlSort . '", {
                                  method: "POST",
                                  headers: {
                                      "Content-Type": "application/json",
@@ -189,17 +189,20 @@ class Sort
 
                         modal = new bootstrap.Modal(document.getElementById(modalId));
                         let catalogId = 0;
-                        if(parseInt('. json_encode($catalogId) .')) {
-                             catalogId =  parseInt('. json_encode($catalogId) .');
-                        } else {
-                            catalogId = document.querySelector(".js-catalog-select").value;
+                        const catalogSelect = document.querySelector(".js-catalog-select");
+                        if(catalogSelect) {
+                            catalogId  = catalogSelect.value;
                         }
                         let dragAndDropContent = document.querySelector(".js-drag-and-drop__content");
-                        if(!catalogId){
+                        if(catalogSelect && catalogId){
                             dragAndDropContent.innerHTML = "<p>Сортировка по позиции зависит от каталога, выберите каталог и попробуйте ещё раз</p>";
                             modal.show();
                         } else {
-                            let url = "' . $urlAllProducts . '".replace("/0", "/" + catalogId);
+                            let url = "' . $urlAllEntites . '";
+                            if (url.slice(-2) === "/0") {
+                                url = "' . $urlAllEntites . '".replace("/0", "/" + catalogId);
+                            }
+
                             fetch(url)
                                 .then(r=> r.ok?r.json():[])
                                 .then(data => {
