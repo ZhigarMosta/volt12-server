@@ -41,7 +41,13 @@ class CatalogGroup implements ResourceInterface, TimestampableInterface
     #[ORM\JoinColumn(name: 'catalog_id', referencedColumnName: 'id', nullable: false)]
     private ?Catalog $catalog = null;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $position = null;
+
     public function getId(): ?int { return $this->id; }
+
+    public function getPosition(): ?int { return $this->position; }
+    public function setPosition(?int $position): void { $this->position = $position; }
 
     public function getName(): string { return $this->name; }
     public function setName(string $name): void { $this->name = $name; }

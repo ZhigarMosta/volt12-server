@@ -6,12 +6,14 @@ use App\Entity\Catalog;
 use App\Entity\CatalogCharacteristic;
 use App\Entity\CatalogGroup;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 class CatalogGroupType extends AbstractType
 {
@@ -29,6 +31,20 @@ class CatalogGroupType extends AbstractType
                 ],
                 'required' => true,
                 'empty_data' => '',
+            ])
+            ->add('position', IntegerType::class, [
+                'label' => 'Позиция',
+                'constraints' => [
+                    new PositiveOrZero(['message' => 'Позиция не может быть отрицательной']),
+                ],
+                'required' => false,
+                'empty_data' => '',
+                'attr' => [
+                    'min' => 0,
+                    'step' => 1,
+                    'placeholder' => 'Автоматически',
+                    'inputmode' => 'numeric',
+                ],
             ])
             ->add('catalog', EntityType::class, [
                 'class' => Catalog::class,
