@@ -13,14 +13,15 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Constraints\Length;
 class CatalogItemType extends AbstractType
 {
     public function __construct(
@@ -150,6 +151,12 @@ class CatalogItemType extends AbstractType
                 'attr' => [
                     'class' => 'js-hidden-sort',
                 ],
+            ])
+            ->add('description', TextareaType::class, [
+                'label' => 'Описание',
+                'required' => false,
+                'empty_data' => '',
+                'attr' => ['class' => 'js-ckeditor'],
             ]);
     }
 

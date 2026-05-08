@@ -56,6 +56,9 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private string $product_code = '';
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private string $description = '';
+
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $slug = '';
 
@@ -113,4 +116,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
         return $this->catalog;
     }
     public function setCatalog(?Catalog $catalog): void { $this->catalog = $catalog; }
+
+    public function getDescription(): string { return $this->description; }
+    public function setDescription(string $description): void { $this->description = $description; }
 }
