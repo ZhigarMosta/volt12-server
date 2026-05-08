@@ -63,4 +63,4 @@ phpstan.neon
 ###< liip/imagine-bundle ###
 
 /public/uploads
-.env
+/.env
