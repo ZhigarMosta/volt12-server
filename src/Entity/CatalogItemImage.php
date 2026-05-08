@@ -52,9 +52,6 @@ class CatalogItemImage implements ResourceInterface, TimestampableInterface
     #[ORM\Column(type: 'string', length: 2048, nullable: false)]
     private string $img_link = '';
 
-    #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    private string $product_code = '';
-
     private ?File $file = null;
 
     public function getFile(): ?File
@@ -82,9 +79,6 @@ class CatalogItemImage implements ResourceInterface, TimestampableInterface
 
     public function getImgLink(): string { return $this->img_link; }
     public function setImgLink(string $img_link): void { $this->img_link = $img_link; }
-
-    public function getProductCode(): string { return $this->product_code; }
-    public function setProductCode(?string $product_code): void { $this->product_code = (string) $product_code; }
 
     public function getCatalogItem(): ?CatalogItem {
         return $this->catalogItem;

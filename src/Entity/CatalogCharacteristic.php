@@ -51,6 +51,9 @@ class CatalogCharacteristic implements ResourceInterface, TimestampableInterface
         return $this->itemCharacteristics;
     }
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $position = null;
+
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private string $product_code = '';
 
@@ -59,6 +62,8 @@ class CatalogCharacteristic implements ResourceInterface, TimestampableInterface
     public function setName(string $name): void { $this->name = $name; }
     public function getProductCode(): string { return $this->product_code; }
     public function setProductCode(?string $product_code): void { $this->product_code = (string) $product_code; }
+    public function getPosition(): ?int { return $this->position; }
+    public function setPosition(?int $position): void { $this->position = $position; }
     public function getCatalog(): ?Catalog {
         return $this->catalog;
     }

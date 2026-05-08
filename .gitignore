@@ -64,3 +64,5 @@ phpstan.neon
 
 /public/uploads
 /.env
+
+/promtail-config.yml

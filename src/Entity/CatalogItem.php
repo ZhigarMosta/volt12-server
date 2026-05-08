@@ -8,6 +8,7 @@ use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity]
@@ -80,6 +81,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     }
 
     #[ORM\OneToMany(mappedBy: 'catalogItem', targetEntity: CatalogItemImage::class)]
+    #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $catalogItemImages;
     public function getCatalogItemImages(): Collection
     {

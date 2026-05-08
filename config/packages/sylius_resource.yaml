@@ -42,3 +42,8 @@ sylius_resource:
                 model: App\Entity\FeedbackFromMap
                 form: App\Form\Type\FeedbackFromMapType
                 repository: App\Repository\FeedbackFromMapRepository
+        app.user:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\User
+                repository: App\Repository\UserRepository

@@ -185,14 +185,6 @@ sylius_grid:
                     form_options:
                         class: App\Entity\CatalogGroup
                         choice_label: name
-                product_code:
-                    label: "Код продукта"
-                    type: select
-                    form_options:
-                        choices:
-                            'Мастер вольт 12': 'volt12'
-                            'Пандора': 'pandora'
-                            'Любой': 'any'
             fields:
                 name:
                     type: string
@@ -215,6 +207,10 @@ sylius_grid:
                 product_code:
                     type: string
                     label: Код продукта
+                    sortable: ~
+                position:
+                    type: string
+                    label: Позиция
                     sortable: ~
             actions:
                 main:
@@ -296,6 +292,10 @@ sylius_grid:
                     sortable: catalog.name
                     options:
                         template: 'admin/grid/field/catalog.html.twig'
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
             actions:
                 main:
                     create: { type: create }
@@ -434,6 +434,10 @@ sylius_grid:
                     sortable: ~
             actions:
                 main:
+                    sort_feedback:
+                        type: default
+                        label: Сортировка
+                        template: "admin/grid/action/sort_feedback_from_map.html.twig"
                     create: { type: create }
                 item:
                     update: { type: update }

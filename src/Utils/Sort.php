@@ -4,11 +4,25 @@ namespace App\Utils;
 
 class Sort
 {
-    public static function getModal(string $pathName, string $pathImg, bool $isSortInEditModel, string $urlSortCatalogItems, string $urlAllProducts)
+    public static array $map = [
+        'catalog_items' => [
+            'name' => 'Сортировка продуктов',
+            'noSelectEntity' => 'Сортировка по позиции зависит от каталога, выберите каталог и попробуйте ещё раз'
+        ],
+    ];
+
+    public static function getModal(string $pathName, string $pathImg, bool $isSortInEditModel, string $urlSort, string $urlAllEntities, string $modalName)
     {
-        return '<button type="button" style="margin: 0; margin-top: -0.25rem" class="btn btn-done" id="sort-items-btn">Сортировка</button>
+        $uuidSortItemsBtn = 'sort-items-btn-' . uniqid();
+        $uuidJsSave = 'js-save-' . uniqid();
+        $uuidModal = 'entity-sort-modal-' . uniqid();
+        $btnStyle = '';
+        if ($isSortInEditModel) {
+            $btnStyle = 'margin-top: -0.25rem';
+        }
+        return '<button type="button" style="margin: 0; ' . $btnStyle . '" class="btn btn-done" id='. json_encode($uuidSortItemsBtn) .'>Сортировка</button>
                 <script>
-                    document.getElementById("sort-items-btn").addEventListener("click", function() {
+                    document.getElementById('. json_encode($uuidSortItemsBtn) .').addEventListener("click", function() {
                         const nameField = '. json_encode($pathName) .';
                         const imageField = '. json_encode($pathImg) .';
                         const isSortInEditModel = '. json_encode($isSortInEditModel) .';
@@ -25,55 +39,72 @@ class Sort
                         }
                         const isNew = urlParts[urlParts.length - 1] === "new";
                         const isNewItem = !editItemId || isNaN(parseInt(editItemId));
-                        if (!document.getElementById("catalog-item-sort-modal")) {
-                            var modalHtml = `<div class="modal fade js-catalog-item-sort-modal" tabindex="-1" aria-hidden="true">
+                        const modalId = '. json_encode($uuidModal) .';
+                        document.querySelectorAll(".js-entity-sort-modal").forEach(el => {
+                            let oldModal = bootstrap.Modal.getInstance(el);
+                            if (oldModal) {
+                                oldModal.dispose();
+                            }
+                            el.remove();
+                        });
+                        document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+                        document.body.classList.remove("modal-open");
+                        document.body.style.removeProperty("padding-right");
+                        var modalHtml = `<div class="modal fade js-entity-sort-modal" id="${modalId}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                     <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Сортировка продуктов</h5>
-                                            <h5 class="modal-title">Изменения применятся после сохранения сущности</h5>
+                                        <div class="modal-header" style="display:flex;flex-direction:column;align-items:start;">
+                                            <h5 class="modal-title">' . self::$map[$modalName]["name"] . '</h5>
+                                            <h6 class="modal-title" style="color:#E2000F">Данные сохранятся после нажатия на кнопку Сохранить</h6>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body js-drag-and-drop__content">
-                                            <p>helloworld</p>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                                            <button type="button" class="btn btn-primary js-save">Сохранить</button>
+                                            <button type="button" class="btn btn-primary ' . $uuidJsSave . '">Сохранить</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>`;
-                            document.body.insertAdjacentHTML("beforeend", modalHtml);
-                        }
+                        document.body.insertAdjacentHTML("beforeend", modalHtml);
 
-                        document.querySelector(".js-save").addEventListener("click", function() {
+                         document.querySelector(' . json_encode('.' . $uuidJsSave) . ').addEventListener("click", function() {
+                             if(this.disabled){
+                                 if (modal) {
+                                     modal.hide();
+                                 }
+                                 return;
+                             }
+                             this.disabled = true;
 
-                            let payload = {
-                                items: getResult(),
-                                current: null,
-                            };
+                             let payload = {
+                                 items: getResult(),
+                                 current: null,
+                             };
 
-                            if(isSortInEditModel){
-                                payload.current = isNew ? -1 : editItemId;
-                            }
-
-                            fetch("' . $urlSortCatalogItems . '", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-Requested-With": "XMLHttpRequest"
-                                },
-                                body: JSON.stringify(payload)
-                            }).then(r=> r.ok?r.json():[])
-                            .then(data => {
-                                if(isSortInEditModel){
-                                    positionSelect.value = data;
-                                }
-                            })
-
-                            modal.hide();
-                        });
+                             if(isSortInEditModel){
+                                 payload.current = isNew ? -1 : editItemId;
+                             }
+                             fetch("' . $urlSort . '", {
+                                 method: "POST",
+                                 headers: {
+                                     "Content-Type": "application/json",
+                                     "X-Requested-With": "XMLHttpRequest"
+                                 },
+                                 body: JSON.stringify(payload)
+                             }).then(r=> r.ok?r.json():[])
+                             .then(data => {
+                                 if(isSortInEditModel){
+                                     positionSelect.value = data;
+                                 }
+                             }).finally(()=>{
+                                 if (modal) {
+                                     modal.hide();
+                                 }
+                                 this.disabled = false;
+                             })
+                         });
 
                         function getResult() {
                             const list = document.getElementById("sortable-list");
@@ -151,7 +182,7 @@ class Sort
                                  currentColor = `border: 2px solid #e83e8c;`;
                              }
                              if((flags & DragItemFlags.IS_NEW) !== 0){
-                                 current = `<p style="color: #e83e8c; margin:0;">Новый в каталоге</p>`;
+                                 current = `<p style="color: #e83e8c; margin:0;">Новый</p>`;
                              }
 
                             return `<div class="sort-item card mb-2 p-2" style="display:flex;gap:4px; flex-direction:column; justify-content:space-between; height:80px; width:200px; user-select: none; ${currentColor} opacity: 0.7; cursor: grab;" data-id="${item?item.id:editItemId}" data-position="${(index + 1) ?? "new"}">
@@ -163,14 +194,23 @@ class Sort
                                     </div>`;
                         }
 
-                        modal = new bootstrap.Modal(document.querySelector(".js-catalog-item-sort-modal"));
-                        const catalogId = document.querySelector(".js-catalog-select").value;
+                        modal = new bootstrap.Modal(document.getElementById(modalId));
+                        let entityId = 0;
+                        const entitySelect = document.querySelector(".js-entity-select");
+                        if(entitySelect) {
+                            entityId  = entitySelect.value;
+                        }
                         let dragAndDropContent = document.querySelector(".js-drag-and-drop__content");
-                        if(!catalogId){
-                            dragAndDropContent.innerHTML = "<p>Сортировка по позиции зависит от каталога, выберите каталог и попробуйте ещё раз</p>";
+                        let url = "' . $urlAllEntities . '";
+                        const isEntityIdInUrl = url.slice(-2) !== "/0"
+                        if(!isEntityIdInUrl && !entityId){
+                            dragAndDropContent.innerHTML = "<p>' . self::$map[$modalName]["noSelectEntity"] . '</p>";
                             modal.show();
                         } else {
-                            let url = "' . $urlAllProducts . '".replace("/0", "/" + catalogId);
+                            if (url.slice(-2) === "/0") {
+                                url = "' . $urlAllEntities . '".replace("/0", "/" + entityId);
+                            }
+
                             fetch(url)
                                 .then(r=> r.ok?r.json():[])
                                 .then(data => {

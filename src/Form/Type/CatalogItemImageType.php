@@ -78,16 +78,6 @@ CatalogItemImageType extends AbstractType
                 'required' => true,
                 'empty_data' => '',
             ])
-            ->add('product_code', ChoiceType::class, [
-                'label' => 'Код продукта',
-                'choices' => ProductCodeProvider::getAllProducts(),
-                'placeholder' => 'Выберите тип...',
-                'constraints' => [
-                    new NotBlank(['message' => 'Укажите код продукта']),
-                ],
-                'required' => true,
-                'empty_data' => '',
-            ])
             ->add('catalogItem', EntityType::class, [
                 'class' => CatalogItem::class,
                 'label' => 'Продукт',

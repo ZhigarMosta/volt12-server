@@ -6,6 +6,9 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+        
+    App\Twig\AppExtension:
+        tags: ['twig.extension']
     
     App\Service\Admin\CrudService:
         autowire: true
@@ -150,7 +153,29 @@ services:
                 event: app.catalog_characteristic.pre_delete,
                 method: onPreDelete
             }
-    
+
+    App\EventListener\CatalogCharacteristicResourceListener:
+        tags:
+            - { name: kernel.event_listener, event: app.catalog_characteristic.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.catalog_characteristic.pre_update, method: onPreUpdate }
+
+    App\EventListener\CatalogGroupResourceListener:
+        tags:
+            - { name: kernel.event_listener, event: app.catalog_group.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.catalog_group.pre_update, method: onPreUpdate }
+
+    App\EventListener\UserFromCookieListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 10 }
+
+    App\Service\Volt12\UserService:
+        autowire: true
+
+    App\Controller\Volt12\AuthController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $userService: '@App\Service\Volt12\UserService'
+
     App\Service\ImageUploader:
         arguments:
             $targetDirectory: '%catalog_items_directory%'

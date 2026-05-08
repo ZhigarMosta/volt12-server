@@ -15,8 +15,8 @@ class CatalogCharacteristicRepository extends EntityRepository
             ->andWhere('cch.product_code IN (:productCodes)')
             ->setParameter('catalogId', $catalogId)
             ->setParameter('productCodes', $productCodes)
-            ->orderBy('g.name', 'ASC')
-            ->addOrderBy('cch.name', 'ASC')
+            ->orderBy('g.position', 'ASC')
+            ->addOrderBy('cch.position', 'ASC')
             ->getQuery()
             ->getResult();
     }
