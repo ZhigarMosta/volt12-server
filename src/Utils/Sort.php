@@ -15,7 +15,7 @@ class Sort
     {
         $uuidSortItemsBtn = 'sort-items-btn-' . uniqid();
         $uuidJsSave = 'js-save-' . uniqid();
-        $uuidModal = 'catalog-item-sort-modal-' . uniqid();
+        $uuidModal = 'entity-sort-modal-' . uniqid();
         $btnStyle = '';
         if ($isSortInEditModel) {
             $btnStyle = 'margin-top: -0.25rem';
@@ -40,7 +40,7 @@ class Sort
                         const isNew = urlParts[urlParts.length - 1] === "new";
                         const isNewItem = !editItemId || isNaN(parseInt(editItemId));
                         const modalId = '. json_encode($uuidModal) .';
-                        document.querySelectorAll(".js-catalog-item-sort-modal").forEach(el => {
+                        document.querySelectorAll(".js-entity-sort-modal").forEach(el => {
                             let oldModal = bootstrap.Modal.getInstance(el);
                             if (oldModal) {
                                 oldModal.dispose();
@@ -50,11 +50,11 @@ class Sort
                         document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
                         document.body.classList.remove("modal-open");
                         document.body.style.removeProperty("padding-right");
-                        var modalHtml = `<div class="modal fade js-catalog-item-sort-modal" id="${modalId}" tabindex="-1" aria-hidden="true">
+                        var modalHtml = `<div class="modal fade js-entity-sort-modal" id="${modalId}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header" style="display:flex;flex-direction:column;align-items:start;">
-                                            <h5 class="modal-title">' . self::$map["catalog_items"]["name"] . '</h5>
+                                            <h5 class="modal-title">' . self::$map[$modalName]["name"] . '</h5>
                                             <h6 class="modal-title" style="color:#E2000F">Данные сохранятся после нажатия на кнопку Сохранить</h6>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
@@ -204,7 +204,7 @@ class Sort
                         let url = "' . $urlAllEntities . '";
                         const isEntityIdInUrl = url.slice(-2) !== "/0"
                         if(!isEntityIdInUrl && !entityId){
-                            dragAndDropContent.innerHTML = "<p>' . self::$map["catalog_items"]["noSelectEntity"] . '</p>";
+                            dragAndDropContent.innerHTML = "<p>' . self::$map[$modalName]["noSelectEntity"] . '</p>";
                             modal.show();
                         } else {
                             if (url.slice(-2) === "/0") {
