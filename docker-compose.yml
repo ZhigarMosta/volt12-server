@@ -35,6 +35,14 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
+  # --- Log Shipper (Promtail → Grafana Loki) ---
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - .:/var/www/html:cached
+      - ./promtail-config.yml:/etc/promtail/config.yml:ro
+    command: -config.file=/etc/promtail/config.yml
+
   # --- Frontend (Nuxt) ---
   client:
     image: node:20-alpine

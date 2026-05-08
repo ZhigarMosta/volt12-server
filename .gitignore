@@ -63,3 +63,5 @@ phpstan.neon
 ###< liip/imagine-bundle ###
 
 /public/uploads
+
+/promtail-config.yml
