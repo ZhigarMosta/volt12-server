@@ -1,11 +1,10 @@
 php -S 127.0.0.1:8000 -t public
-APP_ENV=prod php bin/console cache:clear
+php bin/console cache:clear
 yarn install
 yarn build
 
 
 composer dump-autoload -o
-APP_ENV=prod php bin/console debug:router | grep -E 'app_admin_alarm_(create|index|show|update|delete)'
 
 
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'password';"

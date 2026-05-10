@@ -237,6 +237,24 @@ services:
         arguments:
             $feedbackService: '@App\Service\Volt12\FeedbackService'
 
+    App\Service\Volt12\CartService:
+        autowire: true
+
+    App\Service\Volt12\CompareService:
+        autowire: true
+
+    App\Controller\Volt12\CartController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $cartService: '@App\Service\Volt12\CartService'
+            $catalogItemRepository: '@App\Repository\CatalogItemRepository'
+
+    App\Controller\Volt12\CompareController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $compareService: '@App\Service\Volt12\CompareService'
+            $catalogItemRepository: '@App\Repository\CatalogItemRepository'
+
     App\Service\ImageUploader:
         arguments:
             $targetDirectory: '%catalog_items_directory%'
@@ -263,5 +281,21 @@ services:
         autowire: true
 
     App\Menu\UserMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\Form\Type\CartType:
+        tags: [ 'form.type' ]
+        autowire: true
+
+    App\Form\Type\CompareType:
+        tags: [ 'form.type' ]
+        autowire: true
+
+    App\Menu\CartMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\Menu\CompareMenuListener:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }

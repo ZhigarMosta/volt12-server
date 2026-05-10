@@ -48,6 +48,20 @@ sylius_resource:
                 model: App\Entity\User
                 form: App\Form\Type\UserType
                 repository: App\Repository\UserRepository
+        app.cart:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\Cart
+                form: App\Form\Type\CartType
+                repository: App\Repository\CartRepository
+
+        app.compare:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\Compare
+                form: App\Form\Type\CompareType
+                repository: App\Repository\CompareRepository
+
         app.service_group:
             driver: doctrine/orm
             classes:

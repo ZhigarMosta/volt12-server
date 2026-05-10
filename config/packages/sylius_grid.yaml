@@ -589,6 +589,76 @@ sylius_grid:
                     update: { type: update }
                     delete: { type: delete }
 
+        app_admin_cart:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\Cart
+            sorting:
+                id: desc
+            fields:
+                id:
+                    type: string
+                    label: ID
+                    sortable: ~
+                user:
+                    type: string
+                    label: Пользователь
+                    path: user.name
+                    sortable: ~
+                catalogItem:
+                    type: string
+                    label: Товар
+                    path: catalogItem.name
+                    sortable: ~
+                count:
+                    type: string
+                    label: Количество
+                    sortable: ~
+                created_at:
+                    type: datetime
+                    label: Дата добавления
+                    sortable: ~
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+
+        app_admin_compare:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\Compare
+            sorting:
+                id: desc
+            fields:
+                id:
+                    type: string
+                    label: ID
+                    sortable: ~
+                user:
+                    type: string
+                    label: Пользователь
+                    path: user.name
+                    sortable: ~
+                catalogItem:
+                    type: string
+                    label: Товар
+                    path: catalogItem.name
+                    sortable: ~
+                created_at:
+                    type: datetime
+                    label: Дата добавления
+                    sortable: ~
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+
     templates:
         filter:
             numeric_range: "admin/grid/filter/numeric_range.html.twig"

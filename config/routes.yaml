@@ -159,3 +159,35 @@ app_admin_user:
                 icon: 'user outline'
     type: sylius.resource
     prefix: /admin
+
+app_admin_cart:
+    resource: |
+        alias: app.cart
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_cart
+        vars:
+            all:
+                subheader: app.ui.cart
+            index:
+                icon: 'shopping cart'
+    type: sylius.resource
+    prefix: /admin
+
+app_admin_compare:
+    resource: |
+        alias: app.compare
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_compare
+        vars:
+            all:
+                subheader: app.ui.compare
+            index:
+                icon: 'balance scale'
+    type: sylius.resource
+    prefix: /admin
