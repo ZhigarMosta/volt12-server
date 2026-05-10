@@ -143,6 +143,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: app.feedback_from_map.pre_create, method: onPreCreate }
             - { name: kernel.event_listener, event: app.feedback_from_map.pre_update, method: onPreUpdate }
+
+    App\EventListener\UserResourceListener:
+        tags:
+            - { name: kernel.event_listener, event: app.user.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.user.pre_update, method: onPreUpdate }
      
     App\EventListener\CatalogItemImageResourceListener:
         tags:
@@ -252,3 +257,11 @@ services:
     App\Form\Type\CatalogImageType:
         tags: [ 'form.type' ]
         autowire: true
+
+    App\Form\Type\UserType:
+        tags: [ 'form.type' ]
+        autowire: true
+
+    App\Menu\UserMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }

@@ -142,3 +142,20 @@ app_admin_service:
                 icon: 'file image outline'
     type: sylius.resource
     prefix: /admin
+
+app_admin_user:
+    resource: |
+        alias: app.user
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_user
+        path: client_users
+        vars:
+            all:
+                subheader: app.ui.user
+            index:
+                icon: 'user outline'
+    type: sylius.resource
+    prefix: /admin
