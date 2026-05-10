@@ -17,6 +17,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+use App\Entity\CatalogItemImage;
+use App\Repository\CatalogItemImageRepository;
+use App\Service\Volt12\CatalogItemImageService;
+
 #[Route('/admin/crud')]
 class CatalogItemCharacteristicController extends AbstractController
 {
@@ -26,6 +30,8 @@ class CatalogItemCharacteristicController extends AbstractController
         private CrudService $crudService,
         private CatalogGroupService $catalogGroupService,
         private CatalogService $catalogService,
+        private CatalogItemImageService $catalogItemImageService,
+        private CatalogItemImageRepository $catalogItemImageRepository,
         private ?LoggerInterface       $logger = null
     ) {}
     #[Route('/catalog_characteristics_by_catalog_item/{id}', name: 'admin_crud_catalog_characteristics_by_catalog_item', methods: ['GET'])]
@@ -135,4 +141,31 @@ class CatalogItemCharacteristicController extends AbstractController
         return $this->json($this->catalogItemService->sortCatalogItem($data));
     }
 
+    #[Route('/sort_catalog_item_images', name: 'admin_crud_sort_catalog_item_images', methods: ['POST'])]
+    public function sortCatalogItemImages(Request $request): JsonResponse
+    {
+        $data = $request->toArray();
+
+        return $this->json($this->catalogItemImageService->sortCatalogItemImage($data));
+    }
+
+    #[Route('/all_catalog_item_images_by_catalog_item_id/{id}', name: 'admin_crud_all_catalog_item_images_by_catalog_item_id', methods: ['GET'])]
+    public function getCatalogItemImagesByCatalogItemId(int $id): JsonResponse
+    {
+        $images = $this->catalogItemImageRepository->findBy(
+            ['catalogItem' => $id],
+            ['position' => 'ASC']
+        );
+
+        $items = array_map(function (CatalogItemImage $image) {
+            return [
+                'id' => $image->getId(),
+                'name' => $image->getTitle() ?? $image->getAlt() ?? 'Изображение',
+                'imgLink' => $image->getImgLink(),
+                'position' => $image->getPosition(),
+            ];
+        }, $images);
+
+        return $this->json(['items' => $items]);
+    }
 }

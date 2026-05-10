@@ -18,12 +18,22 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
+use App\Utils\Sort;
+use Symfony\Component\Routing\RouterInterface;
 
 class
 CatalogItemImageType extends AbstractType
 {
+    public function __construct(
+        private RouterInterface $router
+    )
+    {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $urlAllImages = $this->router->generate('admin_crud_all_catalog_item_images_by_catalog_item_id', ['id' => 0]);
+        $urlSortImages = $this->router->generate('admin_crud_sort_catalog_item_images');
         $item = $builder->getData();
         $constraints = [
             new File([
@@ -71,12 +81,30 @@ CatalogItemImageType extends AbstractType
                     'inputmode' => 'numeric',
                     'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 0",
                     'onpaste' => "let paste = (event.clipboardData || window.clipboardData).getData('text'); if(!/^\d+$/.test(paste)) { event.preventDefault(); }",
+                    'class' => 'js-position-select'
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'Укажите позицию']),
+                    new PositiveOrZero(),
                 ],
                 'required' => true,
+                'help' => Sort::getModal(
+                    'name',
+                    'imgLink',
+                    true, 
+                    $urlSortImages,
+                    $urlAllImages,
+                    'catalog_item_images'
+                ),
+                'help_html' => true,
                 'empty_data' => '',
+                'row_attr' => [
+                    'class' => 'mb-3',
+                    'style' => 'display: grid; grid-template-areas: "label label" "image input"; grid-template-columns: 1fr auto; align-items: center; column-gap:15px;',
+                ],
+                'label_attr' => [
+                    'style' => 'grid-area: label;',
+                ],
             ])
             ->add('catalogItem', EntityType::class, [
                 'class' => CatalogItem::class,
@@ -88,7 +116,11 @@ CatalogItemImageType extends AbstractType
                 ],
                 'required' => true,
                 'empty_data' => '',
-            ])->add('file', FileType::class, [
+                'attr' => [
+                    'class' => 'js-entity-select',
+                ],
+            ])
+            ->add('file', FileType::class, [
                 'label' => 'Изображение (WebP)',
                 'required' => $isEdit,
                 'constraints' => $constraints,

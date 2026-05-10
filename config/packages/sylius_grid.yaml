@@ -23,7 +23,7 @@ sylius_grid:
                     type: entity
                     label: Каталог
                     options:
-                        fields: [ catalog ]
+                        fields: [catalog]
                     form_options:
                         class: App\Entity\Catalog
                         choice_label: name
@@ -32,9 +32,9 @@ sylius_grid:
                     type: select
                     form_options:
                         choices:
-                            'Мастер вольт 12': 'volt12'
-                            'Пандора': 'pandora'
-                            'Любой': 'any'
+                            "Мастер вольт 12": "volt12"
+                            "Пандора": "pandora"
+                            "Любой": "any"
                 position:
                     label: Позиция
                     type: numeric_range
@@ -63,14 +63,14 @@ sylius_grid:
                     label: Цена
                     path: .
                     options:
-                        template: 'admin/field/money.html.twig'
+                        template: "admin/field/money.html.twig"
                 catalog:
                     type: twig
                     label: Каталог
                     path: .
                     sortable: catalog.name
                     options:
-                        template: 'admin/grid/field/catalog.html.twig'
+                        template: "admin/grid/field/catalog.html.twig"
                 position:
                     type: string
                     label: Позиция
@@ -80,13 +80,17 @@ sylius_grid:
                     label: Опубликован?
                     path: is_published
                     options:
-                        template: 'admin/grid/field/boolean.html.twig'
+                        template: "admin/grid/field/boolean.html.twig"
             actions:
                 main:
                     create: { type: create }
                 item:
                     update: { type: update }
                     delete: { type: delete }
+                    show_catalog_item_images:
+                        type: default
+                        label: Картинки
+                        template: "admin/grid/action/sort_images.html.twig"
 
         app_admin_catalog:
             driver:
@@ -113,9 +117,9 @@ sylius_grid:
                     type: select
                     form_options:
                         choices:
-                            'Мастер вольт 12': 'volt12'
-                            'Пандора': 'pandora'
-                            'Любой': 'any'
+                            "Мастер вольт 12": "volt12"
+                            "Пандора": "pandora"
+                            "Любой": "any"
             fields:
                 image:
                     type: twig
@@ -141,7 +145,7 @@ sylius_grid:
                     label: Популярный?
                     path: is_popular
                     options:
-                        template: 'admin/grid/field/boolean.html.twig'
+                        template: "admin/grid/field/boolean.html.twig"
                 product_code:
                     type: string
                     label: Код продукта
@@ -159,7 +163,6 @@ sylius_grid:
                         options:
                             route_to_item: app_admin_catalog_item_index
 
-
         app_admin_catalog_characteristic:
             driver:
                 name: doctrine/orm
@@ -173,7 +176,7 @@ sylius_grid:
                     type: entity
                     label: Каталог
                     options:
-                        fields: [ catalog ]
+                        fields: [catalog]
                     form_options:
                         class: App\Entity\Catalog
                         choice_label: name
@@ -181,7 +184,7 @@ sylius_grid:
                     type: entity
                     label: Группа
                     options:
-                        fields: [ catalogGroup ]
+                        fields: [catalogGroup]
                     form_options:
                         class: App\Entity\CatalogGroup
                         choice_label: name
@@ -196,14 +199,14 @@ sylius_grid:
                     path: .
                     sortable: catalog.name
                     options:
-                        template: 'admin/grid/field/catalog.html.twig'
+                        template: "admin/grid/field/catalog.html.twig"
                 catalogGroup:
                     type: twig
                     label: Группа
                     path: .
                     sortable: catalog_group.name
                     options:
-                        template: 'admin/grid/field/catalogGroup.html.twig'
+                        template: "admin/grid/field/catalogGroup.html.twig"
                 product_code:
                     type: string
                     label: Код продукта
@@ -229,7 +232,7 @@ sylius_grid:
                     type: entity
                     label: Продукт
                     options:
-                        fields: [ catalog_item ]
+                        fields: [catalog_item]
                     form_options:
                         class: App\Entity\CatalogItem
                         choice_label: name
@@ -237,7 +240,7 @@ sylius_grid:
                     type: entity
                     label: Характеристика продукта
                     options:
-                        fields: [ catalog_characteristic ]
+                        fields: [catalog_characteristic]
                     form_options:
                         class: App\Entity\CatalogCharacteristic
                         choice_label: name
@@ -248,21 +251,21 @@ sylius_grid:
                     path: .
                     sortable: catalog_item.name
                     options:
-                        template: 'admin/grid/field/catalogItem.html.twig'
+                        template: "admin/grid/field/catalogItem.html.twig"
                 catalog_characteristic:
                     type: twig
                     label: Характеристика каталога
                     path: .
                     sortable: catalog_characteristic.name
                     options:
-                        template: 'admin/grid/field/catalogCharacteristic.html.twig'
+                        template: "admin/grid/field/catalogCharacteristic.html.twig"
             actions:
                 main:
                     create: { type: create }
                 item:
                     update: { type: update }
                     delete: { type: delete }
-        
+
         app_admin_catalog_group:
             driver:
                 name: doctrine/orm
@@ -276,7 +279,7 @@ sylius_grid:
                     type: entity
                     label: Каталог
                     options:
-                        fields: [ catalog ]
+                        fields: [catalog]
                     form_options:
                         class: App\Entity\Catalog
                         choice_label: name
@@ -291,7 +294,7 @@ sylius_grid:
                     path: .
                     sortable: catalog.name
                     options:
-                        template: 'admin/grid/field/catalog.html.twig'
+                        template: "admin/grid/field/catalog.html.twig"
                 position:
                     type: string
                     label: Позиция
@@ -326,7 +329,7 @@ sylius_grid:
                     type: entity
                     label: Продукт
                     options:
-                        fields: [ catalogItem ]
+                        fields: [catalogItem]
                     form_options:
                         class: App\Entity\CatalogItem
                         choice_label: name
@@ -344,7 +347,7 @@ sylius_grid:
                     path: .
                     sortable: catalog_item.name
                     options:
-                        template: 'admin/grid/field/catalogItem.html.twig'
+                        template: "admin/grid/field/catalogItem.html.twig"
                 alt:
                     type: string
                     label: Alt
@@ -363,7 +366,7 @@ sylius_grid:
                 item:
                     update: { type: update }
                     delete: { type: delete }
-        
+
         app_admin_feedback_from_map:
             driver:
                 name: doctrine/orm
@@ -383,8 +386,8 @@ sylius_grid:
                     type: select
                     form_options:
                         choices:
-                            'Яндекс': 'yandex'
-                            '2Gis': '2gis'
+                            "Яндекс": "yandex"
+                            "2Gis": "2gis"
                 position:
                     label: Позиция
                     type: numeric_range
@@ -400,9 +403,9 @@ sylius_grid:
                     type: select
                     form_options:
                         choices:
-                            'Мастер вольт 12': 'volt12'
-                            'Пандора': 'pandora'
-                            'Любой': 'any'
+                            "Мастер вольт 12": "volt12"
+                            "Пандора": "pandora"
+                            "Любой": "any"
             fields:
                 user_name:
                     type: string
@@ -442,7 +445,7 @@ sylius_grid:
                 item:
                     update: { type: update }
                     delete: { type: delete }
-        
+
     templates:
         filter:
             numeric_range: "admin/grid/filter/numeric_range.html.twig"

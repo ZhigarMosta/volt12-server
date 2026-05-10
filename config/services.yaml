@@ -1,93 +1,130 @@
 parameters:
-    catalog_items_directory: '%kernel.project_dir%/public/uploads/items'
+    catalog_items_directory: "%kernel.project_dir%/public/uploads/items"
     locale: ru
 
 services:
     _defaults:
         autowire: true
         autoconfigure: true
-        
+
     App\Twig\AppExtension:
-        tags: ['twig.extension']
-    
+        tags: ["twig.extension"]
+
     App\Service\Admin\CrudService:
         autowire: true
-        
+
     App\Service\Volt12\CatalogService:
         autowire: true
-    
+
     App\Service\Volt12\CatalogItemService:
         autowire: true
-        
+
     App\Service\Volt12\CatalogCharacteristicService:
         autowire: true
-        
+
     App\Service\Volt12\CatalogGroupService:
         autowire: true
-        
+
     App\Service\Volt12\FeedbackFromMapService:
         autowire: true
-        
+
+    App\Service\Volt12\CatalogItemImageService:
+        autowire: true
+
     App\Controller\Admin\CatalogItemCharacteristicController:
-        tags: [ 'controller.service_arguments' ]
+        tags: ["controller.service_arguments"]
         arguments:
             $catalogItemService: '@App\Service\Volt12\CatalogItemService'
             $catalogCharacteristicService: '@App\Service\Volt12\CatalogCharacteristicService'
             $crudService: '@App\Service\Admin\CrudService'
             $catalogGroupService: '@App\Service\Volt12\CatalogGroupService'
             $catalogService: '@App\Service\Volt12\CatalogService'
-    
+            $catalogItemImageService: '@App\Service\Volt12\CatalogItemImageService'
+            $catalogItemImageRepository: '@App\Repository\CatalogItemImageRepository'
+
     App\Controller\Volt12\CatalogController:
-        tags: [ 'controller.service_arguments' ]
+        tags: ["controller.service_arguments"]
         arguments:
             $catalogService: '@App\Service\Volt12\CatalogService'
 
     App\Controller\Volt12\CatalogItemController:
-        tags: [ 'controller.service_arguments' ]
+        tags: ["controller.service_arguments"]
         arguments:
             $catalogItemService: '@App\Service\Volt12\CatalogItemService'
-    
+
     App\Controller\Volt12\FeedbackFromMapController:
-        tags: [ 'controller.service_arguments' ]
+        tags: ["controller.service_arguments"]
         arguments:
             $feedbackFromMapService: '@App\Service\Volt12\FeedbackFromMapService'
-    
+
     App\Controller\Volt12\CatalogCharacteristicController:
-        tags: [ 'controller.service_arguments' ]
+        tags: ["controller.service_arguments"]
         arguments:
             $catalogCharacteristicService: '@App\Service\Volt12\CatalogCharacteristicService'
-    
+
     App\Menu\AdminMenuListener:
         tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
-    
+            - {
+                  name: kernel.event_listener,
+                  event: sylius.menu.admin.main,
+                  method: addAdminMenuItems,
+              }
+
     App\Menu\CatalogItemMenuListener:
         tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+            - {
+                  name: kernel.event_listener,
+                  event: sylius.menu.admin.main,
+                  method: addToMain,
+              }
 
     App\Menu\CatalogMenuListener:
         tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-    
+            - {
+                  name: kernel.event_listener,
+                  event: sylius.menu.admin.main,
+                  method: addToMain,
+              }
+
     App\Menu\FeedbackFromMapListener:
         tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+            - {
+                  name: kernel.event_listener,
+                  event: sylius.menu.admin.main,
+                  method: addToMain,
+              }
 
     App\Menu\CatalogCharacteristicMenuListener:
         tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+            - {
+                  name: kernel.event_listener,
+                  event: sylius.menu.admin.main,
+                  method: addToMain,
+              }
 
     App\Menu\CatalogItemCharacteristicMenuListener:
         tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+            - {
+                  name: kernel.event_listener,
+                  event: sylius.menu.admin.main,
+                  method: addToMain,
+              }
 
     App\Menu\CatalogGroupMenuListener:
         tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+            - {
+                  name: kernel.event_listener,
+                  event: sylius.menu.admin.main,
+                  method: addToMain,
+              }
 
     App\Menu\CatalogItemImageMenuListener:
         tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+            - {
+                  name: kernel.event_listener,
+                  event: sylius.menu.admin.main,
+                  method: addToMain,
+              }
 
     App\EventListener\CatalogItemImageListener:
         tags:
@@ -100,94 +137,159 @@ services:
     App\EventListener\CatalogDeletionListener:
         tags:
             - {
-                name: kernel.event_listener,
-                event: app.catalog.pre_delete,
-                method: onPreDelete
-            }
+                  name: kernel.event_listener,
+                  event: app.catalog.pre_delete,
+                  method: onPreDelete,
+              }
 
     App\EventListener\CatalogGroupDeletionListener:
         tags:
             - {
-                name: kernel.event_listener,
-                event: app.catalog_group.pre_delete,
-                method: onPreDelete
-            }
+                  name: kernel.event_listener,
+                  event: app.catalog_group.pre_delete,
+                  method: onPreDelete,
+              }
 
     App\EventListener\CatalogItemDeletionListener:
         tags:
             - {
-                name: kernel.event_listener,
-                event: app.catalog_item.pre_delete,
-                method: onPreDelete
-            }
-    
+                  name: kernel.event_listener,
+                  event: app.catalog_item.pre_delete,
+                  method: onPreDelete,
+              }
+
     App\EventListener\CatalogItemResourceListener:
         tags:
-            - { name: kernel.event_listener, event: app.catalog_item.pre_create, method: onPreCreate }
-            - { name: kernel.event_listener, event: app.catalog_item.pre_update, method: onPreUpdate }
-    
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog_item.pre_create,
+                  method: onPreCreate,
+              }
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog_item.pre_update,
+                  method: onPreUpdate,
+              }
+
     App\EventListener\CatalogResourceListener:
         tags:
-            - { name: kernel.event_listener, event: app.catalog.pre_create, method: onPreCreate }
-            - { name: kernel.event_listener, event: app.catalog.pre_update, method: onPreUpdate }
-    
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog.pre_create,
+                  method: onPreCreate,
+              }
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog.pre_update,
+                  method: onPreUpdate,
+              }
+
     App\EventListener\FeedbackFromMapListener:
         tags:
-            - { name: kernel.event_listener, event: app.feedback_from_map.pre_create, method: onPreCreate }
-            - { name: kernel.event_listener, event: app.feedback_from_map.pre_update, method: onPreUpdate }
-     
+            - {
+                  name: kernel.event_listener,
+                  event: app.feedback_from_map.pre_create,
+                  method: onPreCreate,
+              }
+            - {
+                  name: kernel.event_listener,
+                  event: app.feedback_from_map.pre_update,
+                  method: onPreUpdate,
+              }
+
     App\EventListener\CatalogItemImageResourceListener:
         tags:
-            - { name: kernel.event_listener, event: app.catalog_item_image.pre_create, method: onPreCreate }
-            - { name: kernel.event_listener, event: app.catalog_item_image.pre_update, method: onPreUpdate }
-    
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog_item_image.pre_create,
+                  method: onPreCreate,
+              }
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog_item_image.pre_update,
+                  method: onPreUpdate,
+              }
+
     App\EventListener\CatalogItemCharacteristicListener:
         tags:
-            - { name: kernel.event_listener, event: app.catalog_item_characteristic.pre_create, method: onPreCreate }
-            - { name: kernel.event_listener, event: app.catalog_item_characteristic.pre_update, method: onPreUpdate }
-    
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog_item_characteristic.pre_create,
+                  method: onPreCreate,
+              }
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog_item_characteristic.pre_update,
+                  method: onPreUpdate,
+              }
+
     App\EventListener\CatalogCharacteristicDeletionListener:
         tags:
             - {
-                name: kernel.event_listener,
-                event: app.catalog_characteristic.pre_delete,
-                method: onPreDelete
-            }
+                  name: kernel.event_listener,
+                  event: app.catalog_characteristic.pre_delete,
+                  method: onPreDelete,
+              }
 
     App\EventListener\CatalogCharacteristicResourceListener:
         tags:
-            - { name: kernel.event_listener, event: app.catalog_characteristic.pre_create, method: onPreCreate }
-            - { name: kernel.event_listener, event: app.catalog_characteristic.pre_update, method: onPreUpdate }
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog_characteristic.pre_create,
+                  method: onPreCreate,
+              }
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog_characteristic.pre_update,
+                  method: onPreUpdate,
+              }
 
     App\EventListener\CatalogGroupResourceListener:
         tags:
-            - { name: kernel.event_listener, event: app.catalog_group.pre_create, method: onPreCreate }
-            - { name: kernel.event_listener, event: app.catalog_group.pre_update, method: onPreUpdate }
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog_group.pre_create,
+                  method: onPreCreate,
+              }
+            - {
+                  name: kernel.event_listener,
+                  event: app.catalog_group.pre_update,
+                  method: onPreUpdate,
+              }
 
     App\EventListener\UserFromCookieListener:
         tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 10 }
+            - {
+                  name: kernel.event_listener,
+                  event: kernel.request,
+                  method: onKernelRequest,
+                  priority: 10,
+              }
 
     App\Service\Volt12\UserService:
         autowire: true
 
     App\Controller\Volt12\AuthController:
-        tags: [ 'controller.service_arguments' ]
+        tags: ["controller.service_arguments"]
         arguments:
             $userService: '@App\Service\Volt12\UserService'
 
     App\Service\ImageUploader:
         arguments:
-            $targetDirectory: '%catalog_items_directory%'
+            $targetDirectory: "%catalog_items_directory%"
 
     App\Form\Type\CatalogItemCharacteristicType:
-        tags: [ 'form.type' ]
+        tags: ["form.type"]
         autowire: true
-        
+
     App\Form\Type\CatalogCharacteristicType:
-        tags: [ 'form.type' ]
+        tags: ["form.type"]
         autowire: true
 
     App\Form\Type\CatalogItemType:
-        tags: [ 'form.type' ]
+        tags: ["form.type"]
+        autowire: true
+
+    App\Form\Type\CatalogItemImageType:
+        tags: ["form.type"]
         autowire: true

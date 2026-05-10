@@ -7,7 +7,13 @@ class Sort
     public static array $map = [
         'catalog_items' => [
             'name' => 'Сортировка продуктов',
-            'noSelectEntity' => 'Сортировка по позиции зависит от каталога, выберите каталог и попробуйте ещё раз'
+            'noSelectEntity' => 'Сортировка по позиции зависит от каталога, выберите каталог и попробуйте ещё раз',
+            'btnName' => 'Позиция продукта'
+        ],
+        'catalog_item_images' => [
+            'name' => 'Сортировка изображений',
+            'noSelectEntity' => 'Сортировка изображений зависит от продукта, выберите продукт и попробуйте ещё раз',
+            'btnName' => 'Позиция изображений'
         ],
     ];
 
@@ -20,7 +26,7 @@ class Sort
         if ($isSortInEditModel) {
             $btnStyle = 'margin-top: -0.25rem';
         }
-        return '<button type="button" style="margin: 0; ' . $btnStyle . '" class="btn btn-done" id='. json_encode($uuidSortItemsBtn) .'>Сортировка</button>
+        return '<button type="button" style="margin: 0; ' . $btnStyle . '" class="btn btn-done" id='. json_encode($uuidSortItemsBtn) .'>' . self::$map[$modalName]["btnName"] . '</button>
                 <script>
                     document.getElementById('. json_encode($uuidSortItemsBtn) .').addEventListener("click", function() {
                         const nameField = '. json_encode($pathName) .';

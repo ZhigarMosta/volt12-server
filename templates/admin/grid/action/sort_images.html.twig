@@ -1,0 +1,14 @@
+{# templates/admin/grid/action/sort_images.html.twig #}
+
+{% set catalog_item_id = data.id|default(null) %}
+
+{% if catalog_item_id is not null %}
+    {{ sort_modal(
+        'name',
+        'imgLink',
+        false,
+        path('admin_crud_sort_catalog_item_images'),
+        path('admin_crud_all_catalog_item_images_by_catalog_item_id', {'id': catalog_item_id}),
+        'catalog_item_images'
+    )|raw }}
+{% endif %}
