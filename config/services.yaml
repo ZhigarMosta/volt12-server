@@ -219,10 +219,18 @@ services:
     App\Service\Volt12\UserService:
         autowire: true
 
+    App\Service\Volt12\FeedbackService:
+        autowire: true
+
     App\Controller\Volt12\AuthController:
         tags: [ 'controller.service_arguments' ]
         arguments:
             $userService: '@App\Service\Volt12\UserService'
+
+    App\Controller\Volt12\FeedbackController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $feedbackService: '@App\Service\Volt12\FeedbackService'
 
     App\Service\ImageUploader:
         arguments:
