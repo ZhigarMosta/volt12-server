@@ -20,6 +20,20 @@ class AuthController extends AbstractController
         private UserService $userService
     ) {}
 
+    private function getUserFromRequest(Request $request): ?User
+    {
+        $user = $request->attributes->get('_app_user');
+        if ($user) return $user;
+
+        $authHeader = $request->headers->get('Authorization');
+        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+            $token = substr($authHeader, 7);
+            return $this->userService->getUserByAuthToken($token);
+        }
+
+        return null;
+    }
+
     #[Route('/register', name: 'volt12_auth_register', methods: ['POST'])]
     public function register(Request $request): JsonResponse
     {
@@ -44,7 +58,7 @@ class AuthController extends AbstractController
             return $this->json(['success' => false, 'error' => $e->getMessage()], 400);
         }
 
-        $response = $this->json(['success' => true, 'user' => $this->serializeUser($user)]);
+        $response = $this->json(['success' => true, 'user' => $this->serializeUser($user), 'token' => $user->getAuthToken()]);
         $response->headers->setCookie($this->createAuthCookie($user->getAuthToken()));
 
         return $response;
@@ -64,7 +78,7 @@ class AuthController extends AbstractController
             return $this->json(['success' => false, 'error' => 'Неверный email или пароль'], 401);
         }
 
-        $response = $this->json(['success' => true, 'user' => $this->serializeUser($user)]);
+        $response = $this->json(['success' => true, 'user' => $this->serializeUser($user), 'token' => $user->getAuthToken()]);
         $response->headers->setCookie($this->createAuthCookie($user->getAuthToken()));
 
         return $response;
@@ -73,7 +87,7 @@ class AuthController extends AbstractController
     #[Route('/logout', name: 'volt12_auth_logout', methods: ['POST'])]
     public function logout(Request $request): JsonResponse
     {
-        $user = $request->attributes->get('_app_user');
+        $user = $this->getUserFromRequest($request);
         if ($user) {
             $this->userService->logout($user);
         }
@@ -87,7 +101,7 @@ class AuthController extends AbstractController
     #[Route('/me', name: 'volt12_auth_me', methods: ['GET'])]
     public function me(Request $request): JsonResponse
     {
-        $user = $request->attributes->get('_app_user');
+        $user = $this->getUserFromRequest($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
@@ -113,7 +127,7 @@ class AuthController extends AbstractController
             time() + self::COOKIE_LIFETIME,
             '/',
             null,
-            true,
+            false,
             true,
             false,
             Cookie::SAMESITE_LAX
