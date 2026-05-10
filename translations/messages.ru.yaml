@@ -12,6 +12,10 @@ app:
         catalog_item_image: 'Изображение продукта'
         catalog_groups: 'Группы каталога'
         catalog_group: 'Группа каталога'
+        service_groups: 'Группы услуг'
+        service_group: 'Группа услуг'
+        services: 'Услуги'
+        service: 'Услуга'
 sylius:
     ui:
         this_message_contains_errors: 'Эта форма содержит ошибки'

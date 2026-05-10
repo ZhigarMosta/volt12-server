@@ -42,7 +42,7 @@ class CatalogGroupType extends AbstractType
                 'attr' => [
                     'min' => 0,
                     'step' => 1,
-                    'placeholder' => 'Автоматически',
+                    'placeholder' => '0',
                     'inputmode' => 'numeric',
                 ],
             ])

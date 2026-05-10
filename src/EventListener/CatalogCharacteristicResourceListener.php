@@ -17,51 +17,12 @@ class CatalogCharacteristicResourceListener
 
     public function onPreCreate(ResourceControllerEvent $event): void
     {
-        $this->assignPosition($event);
         $this->validate($event);
     }
 
     public function onPreUpdate(ResourceControllerEvent $event): void
     {
-        $this->assignPosition($event);
         $this->validate($event);
-    }
-
-    private function assignPosition(ResourceControllerEvent $event): void
-    {
-        $characteristic = $event->getSubject();
-        if (!$characteristic instanceof CatalogCharacteristic) {
-            return;
-        }
-
-        if ($characteristic->getPosition() !== null) {
-            return;
-        }
-
-        $repository = $this->entityManager->getRepository(CatalogCharacteristic::class);
-        $maxPosition = null;
-
-        if ($characteristic->getCatalogGroup()) {
-            $maxPosition = $repository->createQueryBuilder('cc')
-                ->select('MAX(cc.position)')
-                ->where('cc.catalogGroup = :group')
-                ->setParameter('group', $characteristic->getCatalogGroup())
-                ->getQuery()
-                ->getSingleScalarResult();
-        } else {
-            $catalog = $characteristic->getCatalog();
-            if ($catalog) {
-                $maxPosition = $repository->createQueryBuilder('cc')
-                    ->select('MAX(cc.position)')
-                    ->where('cc.catalog = :catalog')
-                    ->andWhere('cc.catalogGroup IS NULL')
-                    ->setParameter('catalog', $catalog)
-                    ->getQuery()
-                    ->getSingleScalarResult();
-            }
-        }
-
-        $characteristic->setPosition((int)$maxPosition + 1);
     }
 
     private function validate(ResourceControllerEvent $event): void

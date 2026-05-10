@@ -443,6 +443,111 @@ sylius_grid:
                     update: { type: update }
                     delete: { type: delete }
         
+        app_admin_service_group:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\ServiceGroup
+            sorting:
+                position: asc
+            filters:
+                name:
+                    type: string
+                    label: Название
+                product_code:
+                    label: "Код продукта"
+                    type: select
+                    form_options:
+                        choices:
+                            'Мастер вольт 12': 'volt12'
+                            'Пандора': 'pandora'
+                            'Любой': 'any'
+                position:
+                    label: Позиция
+                    type: numeric_range
+                    form_options:
+                        label: Позиция
+            fields:
+                image:
+                    type: twig
+                    label: Изобр.
+                    path: .
+                    sortable: ~
+                    options:
+                        template: "admin/grid/field/image.html.twig"
+                name:
+                    type: string
+                    label: Название
+                    sortable: ~
+                product_code:
+                    type: string
+                    label: Код продукта
+                    sortable: ~
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+
+        app_admin_service:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\Service
+            sorting:
+                position: asc
+            filters:
+                name:
+                    type: string
+                    label: Название
+                serviceGroup:
+                    type: entity
+                    label: Группа услуг
+                    options:
+                        fields: [ serviceGroup ]
+                    form_options:
+                        class: App\Entity\ServiceGroup
+                        choice_label: name
+                position:
+                    label: Позиция
+                    type: numeric_range
+                    form_options:
+                        label: Позиция
+            fields:
+                image:
+                    type: twig
+                    label: Изобр.
+                    path: .
+                    sortable: ~
+                    options:
+                        template: "admin/grid/field/image.html.twig"
+                name:
+                    type: string
+                    label: Название
+                    sortable: ~
+                serviceGroup:
+                    type: twig
+                    label: Группа услуг
+                    path: .
+                    sortable: serviceGroup.name
+                    options:
+                        template: 'admin/grid/field/serviceGroup.html.twig'
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+
     templates:
         filter:
             numeric_range: "admin/grid/filter/numeric_range.html.twig"

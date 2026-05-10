@@ -47,3 +47,15 @@ sylius_resource:
             classes:
                 model: App\Entity\User
                 repository: App\Repository\UserRepository
+        app.service_group:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\ServiceGroup
+                form: App\Form\Type\ServiceGroupType
+                repository: App\Repository\ServiceGroupRepository
+        app.service:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\Service
+                form: App\Form\Type\ServiceType
+                repository: App\Repository\ServiceRepository

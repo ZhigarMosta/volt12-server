@@ -2,13 +2,13 @@
 
 namespace App\EventListener;
 
-use App\Entity\CatalogGroup;
+use App\Entity\ServiceGroup;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Bundle\ResourceBundle\Event\ResourceControllerEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CatalogGroupResourceListener
+class ServiceGroupResourceListener
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -24,10 +24,11 @@ class CatalogGroupResourceListener
     {
         $this->validate($event);
     }
+
     private function validate(ResourceControllerEvent $event): void
     {
         $group = $event->getSubject();
-        if (!$group instanceof CatalogGroup) {
+        if (!$group instanceof ServiceGroup) {
             return;
         }
 
@@ -52,25 +53,23 @@ class CatalogGroupResourceListener
         }
     }
 
-    private function getPositionError(CatalogGroup $group): ?string
+    private function getPositionError(ServiceGroup $group): ?string
     {
         $position = $group->getPosition();
-        $catalog = $group->getCatalog();
 
-        if ($position === null || $catalog === null) {
+        if ($position === null) {
             return null;
         }
 
-        $repository = $this->entityManager->getRepository(CatalogGroup::class);
+        $repository = $this->entityManager->getRepository(ServiceGroup::class);
 
         $existing = $repository->findOneBy([
-            'position' => $position,
-            'catalog' => $catalog,
+            'position' => $position
         ]);
 
         if ($existing && $existing->getId() !== $group->getId()) {
             return sprintf(
-                'Ошибка! Позиция %d уже занята группой "%s".',
+                'Ошибка! Позиция %d уже занята группой услуг "%s".',
                 $position,
                 $existing->getName()
             );

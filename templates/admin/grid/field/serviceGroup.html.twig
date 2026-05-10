@@ -1,0 +1,7 @@
+{% if data.serviceGroup is not null %}
+    <a href="{{ path('app_admin_service_group_update', {'id': data.serviceGroup.id}) }}"
+       style="text-decoration: none;">{{ data.serviceGroup.name }}
+    </a>
+{% else %}
+    <span style="color: grey">-</span>
+{% endif %}

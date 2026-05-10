@@ -110,3 +110,35 @@ app_admin_feedback_from_map:
                 icon: 'file image outline'
     type: sylius.resource
     prefix: /admin
+
+app_admin_service_group:
+    resource: |
+        alias: app.service_group
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_service_group
+        vars:
+            all:
+                subheader: app.ui.service_group
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin
+
+app_admin_service:
+    resource: |
+        alias: app.service
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_service
+        vars:
+            all:
+                subheader: app.ui.service
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin

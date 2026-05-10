@@ -2,13 +2,13 @@
 
 namespace App\EventListener;
 
-use App\Entity\CatalogGroup;
+use App\Entity\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Bundle\ResourceBundle\Event\ResourceControllerEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CatalogGroupResourceListener
+class ServiceResourceListener
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -24,16 +24,17 @@ class CatalogGroupResourceListener
     {
         $this->validate($event);
     }
+
     private function validate(ResourceControllerEvent $event): void
     {
-        $group = $event->getSubject();
-        if (!$group instanceof CatalogGroup) {
+        $service = $event->getSubject();
+        if (!$service instanceof Service) {
             return;
         }
 
         $errors = [];
 
-        if ($error = $this->getPositionError($group)) {
+        if ($error = $this->getPositionError($service)) {
             $errors[] = $error;
         }
 
@@ -52,27 +53,28 @@ class CatalogGroupResourceListener
         }
     }
 
-    private function getPositionError(CatalogGroup $group): ?string
+    private function getPositionError(Service $service): ?string
     {
-        $position = $group->getPosition();
-        $catalog = $group->getCatalog();
+        $position = $service->getPosition();
+        $group = $service->getServiceGroup();
 
-        if ($position === null || $catalog === null) {
+        if ($position === null || $group === null) {
             return null;
         }
 
-        $repository = $this->entityManager->getRepository(CatalogGroup::class);
+        $repository = $this->entityManager->getRepository(Service::class);
 
         $existing = $repository->findOneBy([
             'position' => $position,
-            'catalog' => $catalog,
+            'serviceGroup' => $group,
         ]);
 
-        if ($existing && $existing->getId() !== $group->getId()) {
+        if ($existing && $existing->getId() !== $service->getId()) {
             return sprintf(
-                'Ошибка! Позиция %d уже занята группой "%s".',
+                'Ошибка! Позиция %d уже занята услугой "%s" в группе "%s".',
                 $position,
-                $existing->getName()
+                $existing->getName(),
+                $existing->getServiceGroup()->getName()
             );
         }
 
