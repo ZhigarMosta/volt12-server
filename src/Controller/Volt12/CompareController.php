@@ -23,21 +23,21 @@ class CompareController extends AbstractController
         return $request->attributes->get('_app_user');
     }
 
-    #[Route('', name: 'volt12_compare_list', methods: ['GET'])]
+    #[Route('/list', name: 'volt12_compare_list', methods: ['GET'])]
     public function list(Request $request): JsonResponse
     {
-        $user = $this->getUser($request);
+        $user = $this->getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
 
-        return $this->json(['success' => true, 'items' => $this->compareService->list($user)]);
+        return $this->json(['success' => true, 'data' => $this->compareService->list($user)]);
     }
 
-    #[Route('', name: 'volt12_compare_add', methods: ['POST'])]
+    #[Route('/add', name: 'volt12_compare_add', methods: ['POST'])]
     public function add(Request $request): JsonResponse
     {
-        $user = $this->getUser($request);
+        $user = $this->getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
@@ -58,10 +58,10 @@ class CompareController extends AbstractController
         return $this->json(['success' => true, 'item' => $item]);
     }
 
-    #[Route('/{id}', name: 'volt12_compare_remove', methods: ['DELETE'])]
+    #[Route('/remove/{id}', name: 'volt12_compare_remove', methods: ['DELETE'])]
     public function remove(int $id, Request $request): JsonResponse
     {
-        $user = $this->getUser($request);
+        $user = $this->getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
@@ -76,7 +76,7 @@ class CompareController extends AbstractController
     #[Route('/clear', name: 'volt12_compare_clear', methods: ['DELETE'])]
     public function clear(Request $request): JsonResponse
     {
-        $user = $this->getUser($request);
+        $user = $this->getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }

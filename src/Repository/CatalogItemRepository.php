@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Catalog;
 use App\Entity\CatalogItem;
+use App\Provider\ProductCodeProvider;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
