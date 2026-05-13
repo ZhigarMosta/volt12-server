@@ -209,6 +209,11 @@ services:
     App\Service\Volt12\ServiceService:
         autowire: true
 
+    App\Controller\Volt12\ServiceController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $serviceService: '@App\Service\Volt12\ServiceService'
+
     App\Form\Type\ServiceGroupType:
         tags: [ 'form.type' ]
         autowire: true

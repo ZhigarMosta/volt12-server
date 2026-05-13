@@ -2,22 +2,24 @@
 
 namespace App\Service\Volt12;
 
-use App\Entity\Service;
+use App\Repository\ServiceGroupRepository;
 use App\Repository\ServiceRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class ServiceService
 {
     public function __construct(
         private ServiceRepository $serviceRepository,
+        private ServiceGroupRepository $serviceGroupRepository
     ) {}
 
-    public function getAll()
+    public function list(?int $serviceGroupId, ?string $search, int $page = 1, int $limit = 10): Paginator
     {
-        return $this->serviceRepository->findAll();
+        return $this->serviceRepository->list($serviceGroupId, $search, $page, $limit);
     }
 
-    public function getServiceById(int $id): ?Service
+    public function getGroups(): array
     {
-        return $this->serviceRepository->find($id);
+        return $this->serviceGroupRepository->findAllWithServiceCount();
     }
 }
