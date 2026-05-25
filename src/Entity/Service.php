@@ -42,6 +42,9 @@ class Service implements ResourceInterface, TimestampableInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $short_description = null;
 
+    #[ORM\Column(type: 'string', length: 255, unique: true, nullable: true)]
+    private ?string $slug = null;
+
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $position = null;
 
@@ -66,6 +69,8 @@ class Service implements ResourceInterface, TimestampableInterface
     }
 
     public function getId(): ?int { return $this->id; }
+    public function getSlug(): ?string { return $this->slug; }
+    public function setSlug(?string $slug): void { $this->slug = $slug; }
     public function getName(): string { return $this->name; }
     public function setName(string $name): void { $this->name = $name; }
     public function getDescription(): ?string { return $this->description; }

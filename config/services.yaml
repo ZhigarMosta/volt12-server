@@ -213,6 +213,7 @@ services:
         tags: [ 'controller.service_arguments' ]
         arguments:
             $serviceService: '@App\Service\Volt12\ServiceService'
+            $serviceRepository: '@App\Repository\ServiceRepository'
 
     App\Form\Type\ServiceGroupType:
         tags: [ 'form.type' ]

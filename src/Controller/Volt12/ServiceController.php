@@ -2,6 +2,8 @@
 
 namespace App\Controller\Volt12;
 
+use App\Entity\Service;
+use App\Repository\ServiceRepository;
 use App\Service\Volt12\ServiceService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,8 +14,45 @@ use Symfony\Component\Routing\Annotation\Route;
 class ServiceController extends AbstractController
 {
     public function __construct(
-        private ServiceService $serviceService
+        private ServiceService $serviceService,
+        private ServiceRepository $serviceRepository
     ) {}
+
+    #[Route('/{slug}', name: 'volt12_service_by_slug', methods: ['GET'])]
+    public function bySlug(string $slug): JsonResponse
+    {
+        $service = $this->serviceRepository->findBySlug($slug);
+        if (!$service) {
+            return $this->json(['success' => false, 'error' => 'Услуга не найдена'], 404);
+        }
+
+        $related = $this->serviceRepository->findRelatedByName(
+            $service->getName(),
+            $service->getId(),
+            4
+        );
+
+        return $this->json([
+            'success' => true,
+            'item' => [
+                'id' => $service->getId(),
+                'name' => $service->getName(),
+                'slug' => $service->getSlug(),
+                'description' => $service->getDescription(),
+                'short_description' => $service->getShortDescription(),
+                'position' => $service->getPosition(),
+                'img_link' => $service->getImgLink(),
+                'service_group_id' => $service->getServiceGroup()?->getId(),
+            ],
+            'related' => array_map(fn(Service $s) => [
+                'id' => $s->getId(),
+                'name' => $s->getName(),
+                'slug' => $s->getSlug(),
+                'img_link' => $s->getImgLink(),
+                'short_description' => $s->getShortDescription(),
+            ], $related),
+        ]);
+    }
 
     #[Route('', name: 'volt12_services', methods: ['POST'])]
     public function services(Request $request): JsonResponse
@@ -35,6 +74,7 @@ class ServiceController extends AbstractController
             $items[] = [
                 'id' => $service->getId(),
                 'name' => $service->getName(),
+                'slug' => $service->getSlug(),
                 'description' => $service->getDescription(),
                 'short_description' => $service->getShortDescription(),
                 'position' => $service->getPosition(),

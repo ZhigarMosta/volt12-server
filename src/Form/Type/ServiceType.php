@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class ServiceType extends AbstractType
 {
@@ -29,6 +30,19 @@ class ServiceType extends AbstractType
                     new Length([
                         'max' => 255,
                         'maxMessage' => 'Название слишком длинное (макс. {{ limit }} символов)',
+                    ]),
+                ],
+                'required' => true,
+                'empty_data' => '',
+            ])
+            ->add('slug', TextType::class, [
+                'label' => 'Slug',
+                'constraints' => [
+                    new NotBlank(['message' => 'Укажите slug']),
+                    new Length(['max' => 255]),
+                    new Regex([
+                        'pattern' => '/^[a-z0-9-]+$/',
+                        'message' => 'Slug может содержать только маленькие латинские буквы, цифры и дефис.',
                     ]),
                 ],
                 'required' => true,

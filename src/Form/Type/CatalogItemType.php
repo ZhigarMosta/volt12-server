@@ -152,11 +152,37 @@ class CatalogItemType extends AbstractType
                     'class' => 'js-hidden-sort',
                 ],
             ])
+            ->add('short_description', TextareaType::class, [
+                'label' => 'Краткое описание',
+                'required' => false,
+                'empty_data' => '',
+                'attr' => ['class' => 'js-ckeditor'],
+            ])
             ->add('description', TextareaType::class, [
                 'label' => 'Описание',
                 'required' => false,
                 'empty_data' => '',
                 'attr' => ['class' => 'js-ckeditor'],
+            ])
+            ->add('count', IntegerType::class, [
+                'label' => 'Количество',
+                'required' => false,
+                'empty_data' => '0',
+                'constraints' => [
+                    new PositiveOrZero(['message' => 'Количество не может быть отрицательным']),
+                    new Range([
+                        'max' => 2147483647,
+                        'maxMessage' => 'Значение слишком велико для базы данных',
+                    ]),
+                ],
+                'attr' => [
+                    'min' => 0,
+                    'step' => 1,
+                    'placeholder' => '0',
+                    'inputmode' => 'numeric',
+                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 0",
+                    'onpaste' => "let paste = (event.clipboardData || window.clipboardData).getData('text'); if(!/^\d+$/.test(paste)) { event.preventDefault(); }",
+                ],
             ]);
     }
 

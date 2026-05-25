@@ -60,6 +60,12 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private string $description = '';
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $short_description = null;
+
+    #[ORM\Column(type: 'integer')]
+    private int $count = 0;
+
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $slug = '';
 
@@ -121,4 +127,10 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
 
     public function getDescription(): string { return $this->description; }
     public function setDescription(string $description): void { $this->description = $description; }
+
+    public function getShortDescription(): ?string { return $this->short_description; }
+    public function setShortDescription(?string $short_description): void { $this->short_description = $short_description; }
+
+    public function getCount(): int { return $this->count; }
+    public function setCount(int $count): void { $this->count = $count; }
 }

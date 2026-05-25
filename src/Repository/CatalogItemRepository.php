@@ -10,6 +10,67 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CatalogItemRepository extends EntityRepository
 {
+    public function findBySlug(string $slug, array $productCodes): ?CatalogItem
+    {
+        return $this->createQueryBuilder('ci')
+            ->where('ci.slug = :slug')
+            ->andWhere('ci.product_code IN (:productCodes)')
+            ->setParameter('slug', $slug)
+            ->setParameter('productCodes', $productCodes)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findRelatedByName(string $name, int $excludeId, array $productCodes, int $limit = 4): array
+    {
+        $keywords = preg_split('/[\s,.-]+/u', $name, -1, PREG_SPLIT_NO_EMPTY);
+
+        if (empty($keywords)) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('ci')
+            ->where('ci.id != :excludeId')
+            ->andWhere('ci.product_code IN (:productCodes)')
+            ->setParameter('excludeId', $excludeId)
+            ->setParameter('productCodes', $productCodes);
+
+        $conditions = [];
+        foreach ($keywords as $i => $keyword) {
+            if (mb_strlen($keyword) < 2) {
+                continue;
+            }
+            $conditions[] = "ci.name LIKE :keyword{$i}";
+            $qb->setParameter("keyword{$i}", '%' . $keyword . '%');
+        }
+
+        if (empty($conditions)) {
+            return [];
+        }
+
+        $qb->andWhere($qb->expr()->orX(...$conditions))
+            ->orderBy('ci.position', 'ASC')
+            ->setMaxResults($limit);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findByIds(array $ids, array $productCodes): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('ci')
+            ->where('ci.id IN (:ids)')
+            ->andWhere('ci.product_code IN (:productCodes)')
+            ->setParameter('ids', $ids)
+            ->setParameter('productCodes', $productCodes)
+            ->orderBy('ci.position', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function list(array $productCodes, int $catalogId, ?array $filterGroups, ?array $price, ?string $search, ?string $sortPrice, ?int $page, ?int $limit)
     {
         $qb = $this->createQueryBuilder('ci')
