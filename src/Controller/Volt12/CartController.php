@@ -117,16 +117,4 @@ class CartController extends AbstractController
 
         return $this->json(['success' => true]);
     }
-
-    #[Route('/clear', name: 'volt12_cart_clear', methods: ['DELETE'])]
-    public function clear(Request $request): JsonResponse
-    {
-        $user = User::getAppUser($request);
-        if (!$user) {
-            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
-        }
-
-        $this->cartService->clear($user);
-        return $this->json(['success' => true]);
-    }
 }

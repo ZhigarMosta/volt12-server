@@ -91,15 +91,6 @@ class CartService
         return count($items);
     }
 
-    public function clear(User $user): void
-    {
-        $items = $this->cartRepository->findBy(['user' => $user]);
-        foreach ($items as $item) {
-            $this->entityManager->remove($item);
-        }
-        $this->entityManager->flush();
-    }
-
     private function serialize(Cart $cart): array
     {
         $catalogItem = $cart->getCatalogItem();
