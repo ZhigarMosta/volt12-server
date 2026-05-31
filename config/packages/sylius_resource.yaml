@@ -62,6 +62,13 @@ sylius_resource:
                 form: App\Form\Type\CompareType
                 repository: App\Repository\CompareRepository
 
+        app.favorite:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\Favorite
+                form: App\Form\Type\FavoriteType
+                repository: App\Repository\FavoriteRepository
+
         app.service_group:
             driver: doctrine/orm
             classes:

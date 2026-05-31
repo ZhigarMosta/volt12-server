@@ -249,6 +249,9 @@ services:
     App\Service\Volt12\CompareService:
         autowire: true
 
+    App\Service\Volt12\FavoriteService:
+        autowire: true
+
     App\Controller\Volt12\CartController:
         tags: [ 'controller.service_arguments' ]
         arguments:
@@ -259,6 +262,12 @@ services:
         tags: [ 'controller.service_arguments' ]
         arguments:
             $compareService: '@App\Service\Volt12\CompareService'
+            $catalogItemRepository: '@App\Repository\CatalogItemRepository'
+
+    App\Controller\Volt12\FavoriteController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $favoriteService: '@App\Service\Volt12\FavoriteService'
             $catalogItemRepository: '@App\Repository\CatalogItemRepository'
 
     App\Service\ImageUploader:
@@ -298,10 +307,18 @@ services:
         tags: [ 'form.type' ]
         autowire: true
 
+    App\Form\Type\FavoriteType:
+        tags: [ 'form.type' ]
+        autowire: true
+
     App\Menu\CartMenuListener:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
     App\Menu\CompareMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\Menu\FavoriteMenuListener:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }

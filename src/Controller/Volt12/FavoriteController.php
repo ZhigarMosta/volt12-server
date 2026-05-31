@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Controller\Volt12;
+
+use App\Entity\User;
+use App\Repository\CatalogItemRepository;
+use App\Service\Volt12\FavoriteService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[Route('/volt12/favorites')]
+class FavoriteController extends AbstractController
+{
+    public function __construct(
+        private FavoriteService $favoriteService,
+        private CatalogItemRepository $catalogItemRepository
+    ) {}
+
+    #[Route('/list', name: 'volt12_favorites_list', methods: ['GET'])]
+    public function list(Request $request): JsonResponse
+    {
+        $user = User::getAppUser($request);
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+        }
+
+        return $this->json(['success' => true, 'items' => $this->favoriteService->list($user)]);
+    }
+
+    #[Route('/add', name: 'volt12_favorites_add', methods: ['POST'])]
+    public function add(Request $request): JsonResponse
+    {
+        $user = User::getAppUser($request);
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (empty($data['catalog_item_id'])) {
+            return $this->json(['success' => false, 'error' => 'catalog_item_id обязателен'], 400);
+        }
+
+        $catalogItem = $this->catalogItemRepository->find($data['catalog_item_id']);
+        if (!$catalogItem) {
+            return $this->json(['success' => false, 'error' => 'Товар не найден'], 404);
+        }
+
+        $item = $this->favoriteService->add($user, $catalogItem);
+
+        return $this->json(['success' => true, 'item' => $item]);
+    }
+
+    #[Route('/remove-many', name: 'volt12_favorites_remove_many', methods: ['DELETE'])]
+    public function removeMany(Request $request): JsonResponse
+    {
+        $user = User::getAppUser($request);
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $ids = $data['ids'] ?? null;
+
+        if (!is_array($ids) || $ids === []) {
+            return $this->json(['success' => false, 'error' => 'ids обязателен'], 400);
+        }
+
+        $removed = $this->favoriteService->removeMany($user, $ids);
+
+        return $this->json(['success' => true, 'removed' => $removed]);
+    }
+
+    #[Route('/{id}', name: 'volt12_favorites_remove', methods: ['DELETE'])]
+    public function remove(int $id, Request $request): JsonResponse
+    {
+        $user = User::getAppUser($request);
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+        }
+
+        if (!$this->favoriteService->remove($user, $id)) {
+            return $this->json(['success' => false, 'error' => 'Товар не найден в избранном'], 404);
+        }
+
+        return $this->json(['success' => true]);
+    }
+}

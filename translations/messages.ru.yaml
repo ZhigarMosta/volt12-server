@@ -16,6 +16,10 @@ app:
         service_group: 'Группа услуг'
         services: 'Услуги'
         service: 'Услуга'
+        cart: 'Корзины'
+        compare: 'Сравнения'
+        favorites: 'Избранное'
+        favorite: 'Избранное'
 sylius:
     ui:
         this_message_contains_errors: 'Эта форма содержит ошибки'
