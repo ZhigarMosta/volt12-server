@@ -19,7 +19,7 @@ class CartService
     {
         return array_map(
             fn(Cart $item) => $this->serialize($item),
-            $this->cartRepository->findBy(['user' => $user])
+            $this->cartRepository->findByUser($user)
         );
     }
 
@@ -75,6 +75,22 @@ class CartService
         return true;
     }
 
+    public function removeMany(User $user, array $ids): int
+    {
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        if ($ids === []) {
+            return 0;
+        }
+
+        $items = $this->cartRepository->findByIdsForUser($user, $ids);
+        foreach ($items as $item) {
+            $this->entityManager->remove($item);
+        }
+        $this->entityManager->flush();
+
+        return count($items);
+    }
+
     public function clear(User $user): void
     {
         $items = $this->cartRepository->findBy(['user' => $user]);
@@ -86,11 +102,35 @@ class CartService
 
     private function serialize(Cart $cart): array
     {
+        $catalogItem = $cart->getCatalogItem();
+
         return [
             'id' => $cart->getId(),
-            'catalog_item_id' => $cart->getCatalogItem()?->getId(),
+            'catalog_item' => $catalogItem ? $this->serializeCatalogItem($catalogItem) : null,
             'count' => $cart->getCount(),
             'created_at' => $cart->getCreatedAt()?->format('c'),
+        ];
+    }
+
+    private function serializeCatalogItem(CatalogItem $item): array
+    {
+        $images = [];
+        foreach ($item->getCatalogItemImages() as $image) {
+            $images[] = [
+                'id' => $image->getId(),
+                'img_link' => $image->getImgLink(),
+                'alt' => $image->getAlt(),
+                'title' => $image->getTitle(),
+                'position' => $image->getPosition(),
+            ];
+        }
+
+        return [
+            'id' => $item->getId(),
+            'name' => $item->getName(),
+            'slug' => $item->getSlug(),
+            'price' => $item->getPrice(),
+            'images' => $images,
         ];
     }
 }

@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Model\TimestampableInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
+use Symfony\Component\HttpFoundation\Request;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
@@ -61,4 +62,9 @@ class User implements ResourceInterface, TimestampableInterface
 
     public function getAuthToken(): ?string { return $this->auth_token; }
     public function setAuthToken(?string $auth_token): void { $this->auth_token = $auth_token; }
+
+    public static function getAppUser(Request $request): ?User
+    {
+        return $request->attributes->get('_app_user');
+    }
 }

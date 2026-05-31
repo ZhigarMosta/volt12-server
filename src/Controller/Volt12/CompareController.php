@@ -18,15 +18,10 @@ class CompareController extends AbstractController
         private CatalogItemRepository $catalogItemRepository
     ) {}
 
-    private function getAppUser(Request $request): ?User
-    {
-        return $request->attributes->get('_app_user');
-    }
-
     #[Route('/list', name: 'volt12_compare_list', methods: ['GET'])]
     public function list(Request $request): JsonResponse
     {
-        $user = $this->getAppUser($request);
+        $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
@@ -37,7 +32,7 @@ class CompareController extends AbstractController
     #[Route('/add', name: 'volt12_compare_add', methods: ['POST'])]
     public function add(Request $request): JsonResponse
     {
-        $user = $this->getAppUser($request);
+        $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
@@ -61,7 +56,7 @@ class CompareController extends AbstractController
     #[Route('/remove/{id}', name: 'volt12_compare_remove', methods: ['DELETE'])]
     public function remove(int $id, Request $request): JsonResponse
     {
-        $user = $this->getAppUser($request);
+        $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
@@ -76,7 +71,7 @@ class CompareController extends AbstractController
     #[Route('/clear', name: 'volt12_compare_clear', methods: ['DELETE'])]
     public function clear(Request $request): JsonResponse
     {
-        $user = $this->getAppUser($request);
+        $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }

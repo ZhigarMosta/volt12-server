@@ -24,10 +24,10 @@ class CartController extends AbstractController
         return $request->attributes->get('_app_user');
     }
 
-    #[Route('', name: 'volt12_cart_list', methods: ['GET'])]
+    #[Route('/list', name: 'volt12_cart_list', methods: ['GET'])]
     public function list(Request $request): JsonResponse
     {
-        $user = $this->getUser($request);
+        $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
@@ -35,10 +35,10 @@ class CartController extends AbstractController
         return $this->json(['success' => true, 'items' => $this->cartService->list($user)]);
     }
 
-    #[Route('', name: 'volt12_cart_add', methods: ['POST'])]
+    #[Route('/add', name: 'volt12_cart_add', methods: ['POST'])]
     public function add(Request $request): JsonResponse
     {
-        $user = $this->getAppUser($request);
+        $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
@@ -60,10 +60,30 @@ class CartController extends AbstractController
         return $this->json(['success' => true, 'item' => $item]);
     }
 
+    #[Route('/remove-many', name: 'volt12_cart_remove_many', methods: ['DELETE'])]
+    public function removeMany(Request $request): JsonResponse
+    {
+        $user = User::getAppUser($request);
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $ids = $data['ids'] ?? null;
+
+        if (!is_array($ids) || $ids === []) {
+            return $this->json(['success' => false, 'error' => 'ids обязателен'], 400);
+        }
+
+        $removed = $this->cartService->removeMany($user, $ids);
+
+        return $this->json(['success' => true, 'removed' => $removed]);
+    }
+
     #[Route('/{id}', name: 'volt12_cart_update', methods: ['PUT'])]
     public function update(int $id, Request $request): JsonResponse
     {
-        $user = $this->getAppUser($request);
+        $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
@@ -86,7 +106,7 @@ class CartController extends AbstractController
     #[Route('/{id}', name: 'volt12_cart_remove', methods: ['DELETE'])]
     public function remove(int $id, Request $request): JsonResponse
     {
-        $user = $this->getUser($request);
+        $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
@@ -101,7 +121,7 @@ class CartController extends AbstractController
     #[Route('/clear', name: 'volt12_cart_clear', methods: ['DELETE'])]
     public function clear(Request $request): JsonResponse
     {
-        $user = $this->getAppUser($request);
+        $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
