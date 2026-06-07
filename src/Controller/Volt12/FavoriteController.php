@@ -73,15 +73,21 @@ class FavoriteController extends AbstractController
         return $this->json(['success' => true, 'removed' => $removed]);
     }
 
-    #[Route('/{id}', name: 'volt12_favorites_remove', methods: ['DELETE'])]
-    public function remove(int $id, Request $request): JsonResponse
+    #[Route('/remove', name: 'volt12_favorites_remove', methods: ['POST'])]
+    public function remove(Request $request): JsonResponse
     {
         $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
 
-        if (!$this->favoriteService->remove($user, $id)) {
+        $data = json_decode($request->getContent(), true);
+
+        if (empty($data['catalog_item_id'])) {
+            return $this->json(['success' => false, 'error' => 'catalog_item_id обязателен'], 400);
+        }
+
+        if (!$this->favoriteService->remove($user, (int)$data['catalog_item_id'])) {
             return $this->json(['success' => false, 'error' => 'Товар не найден в избранном'], 404);
         }
 

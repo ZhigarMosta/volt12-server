@@ -44,9 +44,9 @@ class FavoriteService
         return $this->serialize($favorite);
     }
 
-    public function remove(User $user, int $id): bool
+    public function remove(User $user, int $catalogItemId): bool
     {
-        $item = $this->favoriteRepository->findOneBy(['id' => $id, 'user' => $user]);
+        $item = $this->favoriteRepository->findOneBy(['catalogItem' => $catalogItemId, 'user' => $user]);
         if (!$item) return false;
 
         $this->entityManager->remove($item);
