@@ -3,6 +3,7 @@
 namespace App\Controller\Volt12;
 
 use App\Entity\CatalogItem;
+use App\Entity\User;
 use App\Provider\ProductCodeProvider;
 use App\Repository\CatalogCharacteristicRepository;
 use App\Repository\CatalogItemRepository;
@@ -41,7 +42,8 @@ class CatalogItemController extends AbstractController
             return $this->json(['success' => false, 'error' => 'Slug не указан'], 400);
         }
 
-        $item = $this->catalogItemRepository->findBySlug($slug, $this->productCodes());
+        $user = User::getAppUser($request);
+        $item = $this->catalogItemRepository->findBySlug($slug, $this->productCodes(), $user?->getId());
         if (!$item) {
             return $this->json(['success' => false, 'error' => 'Товар не найден'], 404);
         }
@@ -89,6 +91,11 @@ class CatalogItemController extends AbstractController
                 'catalog_id' => $item->getCatalog()?->getId(),
                 'images' => $images,
                 'characteristics' => $characteristics,
+                'user_state' => $user ? [
+                    'cart_count' => $item->getCartCount(),
+                    'in_compare' => $item->getInCompare(),
+                    'in_favorite' => $item->getInFavorite(),
+                ] : null,
             ],
             'related' => array_map(fn(CatalogItem $s) => [
                 'id' => $s->getId(),
@@ -167,17 +174,36 @@ class CatalogItemController extends AbstractController
 
 //        $this->logger->info('CatalogItemController: price', ['price' => $price]);
 
-        $paginator = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $price, $search,$sortPrice, $page, $limit);
+        $user = User::getAppUser($request);
+
+        $result = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $price, $search, $sortPrice, $page, $limit, $user?->getId());
+
 
         $facets = $this->catalogItemService->calculateFacets($catalogId, $filterGroups, $price, $search);
 
-        $totalItems = count($paginator);
+        $totalItems = $result['total'];
         $totalPages = ceil($totalItems / $limit);
 
-        $items = [];
-        foreach ($paginator as $item) {
-            $items[] = $item;
-        }
+        $items = array_map(fn(CatalogItem $item) => [
+            'id' => $item->getId(),
+            'name' => $item->getName(),
+            'slug' => $item->getSlug(),
+            'price' => $item->getPrice(),
+            'is_new' => $item->getIsNew(),
+            'is_popular' => $item->getIsPopular(),
+            'position' => $item->getPosition(),
+            'images' => array_map(fn($image) => [
+                'img_link' => $image->getImgLink(),
+                'alt' => $image->getAlt(),
+                'title' => $image->getTitle(),
+                'position' => $image->getPosition(),
+            ], $item->getCatalogItemImages()->toArray()),
+            'user_state' => $user ? [
+                'cart_count' => $item->getCartCount(),
+                'in_compare' => $item->getInCompare(),
+                'in_favorite' => $item->getInFavorite(),
+            ] : null,
+        ], $result['items']);
 
         return $this->json([
             'items' => $items,

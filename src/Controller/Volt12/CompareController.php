@@ -18,12 +18,15 @@ class CompareController extends AbstractController
         private CatalogItemRepository $catalogItemRepository
     ) {}
 
-    #[Route('/list', name: 'volt12_compare_list', methods: ['GET'])]
+    #[Route('/list', name: 'volt12_compare_list', methods: ['POST'])]
     public function list(Request $request): JsonResponse
     {
         $user = User::getAppUser($request);
+
         if (!$user) {
-            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+            $data = json_decode($request->getContent(), true);
+            $ids = $data['ids'] ?? [];
+            return $this->json(['success' => true, 'data' => $this->compareService->listByIds($ids)]);
         }
 
         return $this->json(['success' => true, 'data' => $this->compareService->list($user)]);
@@ -53,15 +56,21 @@ class CompareController extends AbstractController
         return $this->json(['success' => true, 'item' => $item]);
     }
 
-    #[Route('/remove/{id}', name: 'volt12_compare_remove', methods: ['DELETE'])]
-    public function remove(int $id, Request $request): JsonResponse
+    #[Route('/remove', name: 'volt12_compare_remove', methods: ['POST'])]
+    public function remove(Request $request): JsonResponse
     {
         $user = User::getAppUser($request);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
 
-        if (!$this->compareService->remove($user, $id)) {
+        $data = json_decode($request->getContent(), true);
+
+        if (empty($data['catalog_item_id'])) {
+            return $this->json(['success' => false, 'error' => 'catalog_item_id обязателен'], 400);
+        }
+
+        if (!$this->compareService->remove($user, (int)$data['catalog_item_id'])) {
             return $this->json(['success' => false, 'error' => 'Товар не найден в сравнении'], 404);
         }
 

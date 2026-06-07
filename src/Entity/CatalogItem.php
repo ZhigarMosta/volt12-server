@@ -133,4 +133,17 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
 
     public function getCount(): int { return $this->count; }
     public function setCount(int $count): void { $this->count = $count; }
+
+    private ?int $cartCount = null;
+    private ?int $inCompare = null;
+    private ?int $inFavorite = null;
+
+    public function getCartCount(): ?int { return $this->cartCount; }
+    public function setCartCount(?int $cartCount): void { $this->cartCount = $cartCount; }
+
+    public function getInCompare(): bool { return $this->inCompare !== null; }
+    public function setInCompare(?int $inCompare): void { $this->inCompare = $inCompare; }
+
+    public function getInFavorite(): bool { return $this->inFavorite !== null; }
+    public function setInFavorite(?int $inFavorite): void { $this->inFavorite = $inFavorite; }
 }

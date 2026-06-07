@@ -15,4 +15,5 @@ class CompareRepository extends EntityRepository
             ->getQuery()
             ->getSingleColumnResult();
     }
+
 }

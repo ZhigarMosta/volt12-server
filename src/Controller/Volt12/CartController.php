@@ -2,8 +2,8 @@
 
 namespace App\Controller\Volt12;
 
-use App\Entity\CatalogItem;
 use App\Entity\User;
+use App\Provider\ProductCodeProvider;
 use App\Repository\CatalogItemRepository;
 use App\Service\Volt12\CartService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,20 +19,24 @@ class CartController extends AbstractController
         private CatalogItemRepository $catalogItemRepository
     ) {}
 
-    private function getAppUser(Request $request): ?User
-    {
-        return $request->attributes->get('_app_user');
-    }
 
-    #[Route('/list', name: 'volt12_cart_list', methods: ['GET'])]
+    #[Route('/list', name: 'volt12_cart_list', methods: ['POST'])]
     public function list(Request $request): JsonResponse
     {
         $user = User::getAppUser($request);
+
         if (!$user) {
-            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+            $data = json_decode($request->getContent(), true);
+            $items = $this->cartService->listByIds($data['items'] ?? [], $this->productCodes());
+            return $this->json(['success' => true, 'items' => $items]);
         }
 
         return $this->json(['success' => true, 'items' => $this->cartService->list($user)]);
+    }
+
+    private function productCodes(): array
+    {
+        return [ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY];
     }
 
     #[Route('/add', name: 'volt12_cart_add', methods: ['POST'])]
@@ -80,8 +84,8 @@ class CartController extends AbstractController
         return $this->json(['success' => true, 'removed' => $removed]);
     }
 
-    #[Route('/{id}', name: 'volt12_cart_update', methods: ['PUT'])]
-    public function update(int $id, Request $request): JsonResponse
+    #[Route('/update', name: 'volt12_cart_update', methods: ['POST'])]
+    public function update(Request $request): JsonResponse
     {
         $user = User::getAppUser($request);
         if (!$user) {
@@ -90,11 +94,15 @@ class CartController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
+        if (empty($data['catalog_item_id'])) {
+            return $this->json(['success' => false, 'error' => 'catalog_item_id обязателен'], 400);
+        }
+
         if (!isset($data['count'])) {
             return $this->json(['success' => false, 'error' => 'count обязателен'], 400);
         }
 
-        $result = $this->cartService->updateCount($user, $id, (int)$data['count']);
+        $result = $this->cartService->updateCount($user, (int)$data['catalog_item_id'], (int)$data['count']);
 
         if ($result === null) {
             return $this->json(['success' => false, 'error' => 'Товар не найден в корзине'], 404);

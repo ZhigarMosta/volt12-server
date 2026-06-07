@@ -24,8 +24,11 @@ class CompareService
             return [];
         }
 
-        $items = $this->catalogItemRepository->findBy(['id' => $catalogItemIds]);
+        return $this->buildGrouped($this->catalogItemRepository->findBy(['id' => $catalogItemIds]));
+    }
 
+    private function buildGrouped(array $items): array
+    {
         $grouped = [];
         /** @var CatalogItem $item */
         foreach ($items as $item) {
@@ -52,9 +55,9 @@ class CompareService
                         'id' => $catalog->getId(),
                         'name' => $catalog->getName(),
                         'img' => [
-                            "link"=> $catalog->getImgLink(),
-                            "alt"=> $catalog->getImgAlt(),
-                            "title"=> $catalog->getImgTitle()
+                            'link' => $catalog->getImgLink(),
+                            'alt' => $catalog->getImgAlt(),
+                            'title' => $catalog->getImgTitle(),
                         ],
                         'characteristics' => $chars,
                     ],
@@ -99,6 +102,18 @@ class CompareService
         return array_values($grouped);
     }
 
+    public function listByIds(array $ids): array
+    {
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        if ($ids === []) {
+            return [];
+        }
+
+        $items = $this->catalogItemRepository->findBy(['id' => $ids]);
+
+        return $this->buildGrouped($items);
+    }
+
     public function add(User $user, CatalogItem $catalogItem): array
     {
         $existing = $this->compareRepository->findOneBy([
@@ -120,9 +135,9 @@ class CompareService
         return ['id' => $compare->getId(), 'catalog_item_id' => $catalogItem->getId()];
     }
 
-    public function remove(User $user, int $id): bool
+    public function remove(User $user, int $catalogItemId): bool
     {
-        $item = $this->compareRepository->findOneBy(['id' => $id, 'user' => $user]);
+        $item = $this->compareRepository->findOneBy(['catalogItem' => $catalogItemId, 'user' => $user]);
         if (!$item) return false;
 
         $this->entityManager->remove($item);

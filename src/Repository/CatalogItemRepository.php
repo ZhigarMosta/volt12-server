@@ -2,23 +2,48 @@
 
 namespace App\Repository;
 
+use App\Entity\Cart;
 use App\Entity\Catalog;
 use App\Entity\CatalogItem;
+use App\Entity\Compare;
+use App\Entity\Favorite;
 use App\Provider\ProductCodeProvider;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CatalogItemRepository extends EntityRepository
 {
-    public function findBySlug(string $slug, array $productCodes): ?CatalogItem
+    public function findBySlug(string $slug, array $productCodes, ?int $userId = null): ?CatalogItem
     {
-        return $this->createQueryBuilder('ci')
+        $uid = $userId ?? 0;
+
+        $row = $this->createQueryBuilder('ci')
+            ->select('ci')
+            ->addSelect('cart.count AS cart_count')
+            ->addSelect('cmp.id AS in_compare')
+            ->addSelect('fav.id AS in_favorite')
+            ->leftJoin(Cart::class, 'cart', 'WITH', 'cart.catalogItem = ci AND cart.user = :uid')
+            ->leftJoin(Compare::class, 'cmp', 'WITH', 'cmp.catalogItem = ci AND cmp.user = :uid')
+            ->leftJoin(Favorite::class, 'fav', 'WITH', 'fav.catalogItem = ci AND fav.user = :uid')
             ->where('ci.slug = :slug')
             ->andWhere('ci.product_code IN (:productCodes)')
             ->setParameter('slug', $slug)
             ->setParameter('productCodes', $productCodes)
+            ->setParameter('uid', $uid)
             ->getQuery()
             ->getOneOrNullResult();
+
+        if (!$row) {
+            return null;
+        }
+
+        /** @var CatalogItem $item */
+        $item = $row[0];
+        $item->setCartCount($row['cart_count'] !== null ? (int)$row['cart_count'] : null);
+        $item->setInCompare($row['in_compare']);
+        $item->setInFavorite($row['in_favorite']);
+
+        return $item;
     }
 
     public function findRelatedByName(string $name, int $excludeId, array $productCodes, int $limit = 4): array
@@ -71,14 +96,23 @@ class CatalogItemRepository extends EntityRepository
             ->getResult();
     }
 
-    public function list(array $productCodes, int $catalogId, ?array $filterGroups, ?array $price, ?string $search, ?string $sortPrice, ?int $page, ?int $limit)
+    public function list(array $productCodes, int $catalogId, ?array $filterGroups, ?array $price, ?string $search, ?string $sortPrice, ?int $page, ?int $limit, ?int $userId = null): array
     {
+        $uid = $userId ?? 0;
+
         $qb = $this->createQueryBuilder('ci')
             ->select('ci')
+            ->addSelect('cart.count AS cart_count')
+            ->addSelect('cmp.id AS in_compare')
+            ->addSelect('fav.id AS in_favorite')
+            ->leftJoin(Cart::class, 'cart', 'WITH', 'cart.catalogItem = ci AND cart.user = :uid')
+            ->leftJoin(Compare::class, 'cmp', 'WITH', 'cmp.catalogItem = ci AND cmp.user = :uid')
+            ->leftJoin(Favorite::class, 'fav', 'WITH', 'fav.catalogItem = ci AND fav.user = :uid')
             ->where('ci.catalog = :catalogId')
             ->andWhere('ci.product_code IN (:productCodes)')
             ->setParameter('catalogId', $catalogId)
-            ->setParameter('productCodes', $productCodes);
+            ->setParameter('productCodes', $productCodes)
+            ->setParameter('uid', $uid);
 
         if (isset($price['max']) && is_int((int) $price['max'])) {
             $qb->andWhere('ci.price <= (:priceMax)')
@@ -111,10 +145,25 @@ class CatalogItemRepository extends EntityRepository
         if (!empty($limit) && !empty($page)) {
             $qb->setFirstResult(($page - 1) * $limit)
                 ->setMaxResults($limit);
-            return new Paginator($qb, true);
+            $paginator = new Paginator($qb, true);
+            $total = count($paginator);
+            $rows = iterator_to_array($paginator);
         } else {
-            return $qb->getQuery()->getResult();
+            $rows = $qb->getQuery()->getResult();
+            $total = count($rows);
         }
+
+        $items = [];
+        foreach ($rows as $row) {
+            /** @var CatalogItem $item */
+            $item = $row[0];
+            $item->setCartCount($row['cart_count'] !== null ? (int)$row['cart_count'] : null);
+            $item->setInCompare($row['in_compare']);
+            $item->setInFavorite($row['in_favorite']);
+            $items[] = $item;
+        }
+
+        return ['items' => $items, 'total' => $total];
     }
 
     public function findPopular(array $productCodes)

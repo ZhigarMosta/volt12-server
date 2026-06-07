@@ -6,12 +6,14 @@ use App\Entity\Cart;
 use App\Entity\CatalogItem;
 use App\Entity\User;
 use App\Repository\CartRepository;
+use App\Repository\CatalogItemRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CartService
 {
     public function __construct(
         private CartRepository $cartRepository,
+        private CatalogItemRepository $catalogItemRepository,
         private EntityManagerInterface $entityManager
     ) {}
 
@@ -21,6 +23,30 @@ class CartService
             fn(Cart $item) => $this->serialize($item),
             $this->cartRepository->findByUser($user)
         );
+    }
+
+    public function listByIds(array $items, array $productCodes): array
+    {
+        $countMap = [];
+        foreach ($items as $item) {
+            $id = (int)($item['id'] ?? 0);
+            if ($id > 0) {
+                $countMap[$id] = max(1, (int)($item['count'] ?? 1));
+            }
+        }
+
+        if ($countMap === []) {
+            return [];
+        }
+
+        $catalogItems = $this->catalogItemRepository->findByIds(array_keys($countMap), $productCodes);
+
+        return array_map(fn(CatalogItem $catalogItem) => [
+            'id' => null,
+            'catalog_item' => $this->serializeCatalogItem($catalogItem),
+            'count' => $countMap[$catalogItem->getId()] ?? 1,
+            'created_at' => null,
+        ], $catalogItems);
     }
 
     public function add(User $user, CatalogItem $catalogItem, int $count = 1): array
@@ -47,9 +73,9 @@ class CartService
         return $this->serialize($cart);
     }
 
-    public function updateCount(User $user, int $id, int $count): ?array
+    public function updateCount(User $user, int $catalogItemId, int $count): ?array
     {
-        $item = $this->cartRepository->findOneBy(['id' => $id, 'user' => $user]);
+        $item = $this->cartRepository->findOneBy(['catalogItem' => $catalogItemId, 'user' => $user]);
         if (!$item) return null;
 
         if ($count <= 0) {

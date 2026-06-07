@@ -21,6 +21,13 @@ class UserFromCookieListener
         $token = $request->cookies->get('auth_token');
 
         if (!$token) {
+            $authHeader = $request->headers->get('Authorization');
+            if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+                $token = substr($authHeader, 7);
+            }
+        }
+
+        if (!$token) {
             return;
         }
 
