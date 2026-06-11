@@ -207,3 +207,19 @@ app_admin_favorite:
                 icon: 'heart'
     type: sylius.resource
     prefix: /admin
+
+app_admin_user_order:
+    resource: |
+        alias: app.user_order
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show', 'create']
+        redirect: update
+        grid: app_admin_user_order
+        vars:
+            all:
+                subheader: app.ui.user_order
+            index:
+                icon: 'shop'
+    type: sylius.resource
+    prefix: /admin

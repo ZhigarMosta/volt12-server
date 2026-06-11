@@ -223,4 +223,141 @@ HTML;
 
         $this->mailer->send($email);
     }
+
+    public function sendOrderConfirmation(string $toEmail, array $orderData): void
+    {
+        $html = $this->buildOrderHtml($orderData);
+
+        foreach ([$toEmail, $this->mailerFrom] as $recipient) {
+            $email = (new Email())
+                ->from($this->mailerFrom)
+                ->to($recipient)
+                ->subject('Заказ №' . $orderData['id'] . ' — Мастер 12 Вольт')
+                ->html($html);
+
+            $this->mailer->send($email);
+        }
+    }
+
+    private function buildOrderHtml(array $order): string
+    {
+        $id        = htmlspecialchars((string) $order['id'], ENT_QUOTES);
+        $firstName = htmlspecialchars($order['first_name'], ENT_QUOTES);
+        $lastName  = htmlspecialchars($order['last_name'], ENT_QUOTES);
+        $phone     = htmlspecialchars($order['phone'], ENT_QUOTES);
+        $email     = htmlspecialchars($order['email'], ENT_QUOTES);
+        $city      = htmlspecialchars($order['city'], ENT_QUOTES);
+        $region    = htmlspecialchars($order['region'], ENT_QUOTES);
+        $postal    = htmlspecialchars($order['postal_code'], ENT_QUOTES);
+        $address   = htmlspecialchars(implode(', ', array_filter([
+            $order['street'] ?? null,
+            $order['house'] ? 'д. ' . $order['house'] : null,
+            $order['entrance'] ? 'подъезд ' . $order['entrance'] : null,
+            $order['apartment'] ? 'кв. ' . $order['apartment'] : null,
+        ])), ENT_QUOTES);
+        $comment   = $order['comment'] ? htmlspecialchars($order['comment'], ENT_QUOTES) : '—';
+        $total     = number_format($order['total_price'] / 100, 2, '.', ' ') . ' ₽';
+
+        $itemsHtml = '';
+        foreach ($order['items'] as $item) {
+            $name     = htmlspecialchars($item['name'], ENT_QUOTES);
+            $qty      = (int) $item['quantity'];
+            $price    = number_format($item['price'] / 100, 2, '.', ' ');
+            $itemTotal = number_format($item['total_price'] / 100, 2, '.', ' ');
+            $itemsHtml .= "
+                <tr>
+                  <td style='padding:10px 0;border-bottom:1px solid #f0f0f0;font-size:14px;color:#333;'>$name</td>
+                  <td style='padding:10px 8px;border-bottom:1px solid #f0f0f0;font-size:14px;color:#333;text-align:center;'>$qty</td>
+                  <td style='padding:10px 0;border-bottom:1px solid #f0f0f0;font-size:14px;color:#333;text-align:right;'>$price ₽</td>
+                  <td style='padding:10px 0 10px 16px;border-bottom:1px solid #f0f0f0;font-size:14px;font-weight:600;color:#1a1a1a;text-align:right;'>$itemTotal ₽</td>
+                </tr>";
+        }
+
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:40px 0;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+        <tr>
+          <td style="background:#e63535;padding:28px 36px;">
+            <p style="margin:0;color:#ffffff;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;">Мастер 12 Вольт</p>
+            <h1 style="margin:6px 0 0;color:#ffffff;font-size:22px;font-weight:700;">Заказ №$id оформлен</h1>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:32px 36px 0;">
+            <p style="margin:0 0 4px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Покупатель</p>
+            <p style="margin:0 0 20px;font-size:16px;font-weight:600;color:#1a1a1a;">$firstName $lastName</p>
+
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding-bottom:12px;width:50%;vertical-align:top;">
+                  <p style="margin:0 0 2px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Телефон</p>
+                  <p style="margin:0;font-size:14px;color:#333;"><a href="tel:$phone" style="color:#e63535;text-decoration:none;">$phone</a></p>
+                </td>
+                <td style="padding-bottom:12px;vertical-align:top;">
+                  <p style="margin:0 0 2px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Email</p>
+                  <p style="margin:0;font-size:14px;color:#333;"><a href="mailto:$email" style="color:#e63535;text-decoration:none;">$email</a></p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-bottom:12px;vertical-align:top;">
+                  <p style="margin:0 0 2px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Город / Регион</p>
+                  <p style="margin:0;font-size:14px;color:#333;">$city, $region, $postal</p>
+                </td>
+                <td style="padding-bottom:12px;vertical-align:top;">
+                  <p style="margin:0 0 2px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Адрес</p>
+                  <p style="margin:0;font-size:14px;color:#333;">$address</p>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding-bottom:24px;">
+                  <p style="margin:0 0 2px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Комментарий</p>
+                  <p style="margin:0;font-size:14px;color:#333;">$comment</p>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:0 0 12px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Состав заказа</p>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <th style="padding-bottom:8px;font-size:11px;color:#999;font-weight:600;text-align:left;">Товар</th>
+                <th style="padding-bottom:8px;font-size:11px;color:#999;font-weight:600;text-align:center;">Кол-во</th>
+                <th style="padding-bottom:8px;font-size:11px;color:#999;font-weight:600;text-align:right;">Цена</th>
+                <th style="padding-bottom:8px;font-size:11px;color:#999;font-weight:600;text-align:right;padding-left:16px;">Сумма</th>
+              </tr>
+              $itemsHtml
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:20px 36px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="font-size:16px;font-weight:700;color:#1a1a1a;">Итого</td>
+                <td style="font-size:20px;font-weight:700;color:#e63535;text-align:right;">$total</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:20px 36px;background:#fafafa;border-top:1px solid #f0f0f0;">
+            <p style="margin:0;font-size:12px;color:#bbb;text-align:center;">Это автоматическое письмо — отвечать на него не нужно</p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
+HTML;
+    }
 }

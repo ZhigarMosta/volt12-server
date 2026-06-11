@@ -329,3 +329,11 @@ services:
     App\Menu\UserOrderMenuListener:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\Service\Volt12\UserOrderService:
+        autowire: true
+
+    App\Controller\Volt12\UserOrderController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $userOrderService: '@App\Service\Volt12\UserOrderService'
