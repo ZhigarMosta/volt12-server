@@ -25,6 +25,35 @@ class CartService
         );
     }
 
+    public function importFromLocal(User $user, array $cartMap): void
+    {
+        $requestedIds = array_map('intval', array_keys($cartMap));
+
+        $catalogItems = $this->catalogItemRepository->findBy(['id' => $requestedIds]);
+        $foundIds = array_map(fn(CatalogItem $ci) => $ci->getId(), $catalogItems);
+
+        $existingIds = array_flip($this->cartRepository->findExistingCatalogItemIds($user, $foundIds));
+
+        $catalogItemMap = [];
+        foreach ($catalogItems as $catalogItem) {
+            $catalogItemMap[$catalogItem->getId()] = $catalogItem;
+        }
+
+        foreach ($foundIds as $id) {
+            if (isset($existingIds[$id])) {
+                continue;
+            }
+
+            $cart = new Cart();
+            $cart->setUser($user);
+            $cart->setCatalogItem($catalogItemMap[$id]);
+            $cart->setCount(max(1, (int)$cartMap[(string)$id]));
+            $this->entityManager->persist($cart);
+        }
+
+        $this->entityManager->flush();
+    }
+
     public function listByIds(array $items, array $productCodes): array
     {
         $countMap = [];

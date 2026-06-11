@@ -3,6 +3,7 @@
 namespace App\Service\Volt12;
 
 use App\Entity\CatalogItem;
+use App\Entity\Compare;
 use App\Entity\User;
 use App\Repository\CatalogItemRepository;
 use App\Repository\CompareRepository;
@@ -100,6 +101,34 @@ class CompareService
         }
 
         return array_values($grouped);
+    }
+
+    public function importFromLocal(User $user, array $ids): void
+    {
+        $requestedIds = array_values(array_unique(array_map('intval', $ids)));
+
+        $catalogItems = $this->catalogItemRepository->findBy(['id' => $requestedIds]);
+        $foundIds = array_map(fn(CatalogItem $ci) => $ci->getId(), $catalogItems);
+
+        $existingIds = array_flip($this->compareRepository->findExistingCatalogItemIds($user, $foundIds));
+
+        $catalogItemMap = [];
+        foreach ($catalogItems as $catalogItem) {
+            $catalogItemMap[$catalogItem->getId()] = $catalogItem;
+        }
+
+        foreach ($foundIds as $id) {
+            if (isset($existingIds[$id])) {
+                continue;
+            }
+
+            $compare = new Compare();
+            $compare->setUser($user);
+            $compare->setCatalogItem($catalogItemMap[$id]);
+            $this->entityManager->persist($compare);
+        }
+
+        $this->entityManager->flush();
     }
 
     public function listByIds(array $ids): array

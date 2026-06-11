@@ -3,6 +3,7 @@ php bin/console cache:clear
 yarn install
 yarn build
 
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'password';"
 
 composer dump-autoload -o
 

@@ -1,6 +1,7 @@
 parameters:
     catalog_items_directory: '%kernel.project_dir%/public/uploads/items'
     locale: ru
+    mailer_from: '%env(MAILER_FROM)%'
 
 services:
     _defaults:
@@ -232,6 +233,8 @@ services:
 
     App\Service\Volt12\FeedbackService:
         autowire: true
+        arguments:
+            $mailerFrom: '%mailer_from%'
 
     App\Controller\Volt12\AuthController:
         tags: [ 'controller.service_arguments' ]

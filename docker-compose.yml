@@ -43,6 +43,13 @@ services:
       - ./promtail-config.yml:/etc/promtail/config.yml:ro
     command: -config.file=/etc/promtail/config.yml
 
+  # --- Mail catcher (dev only) ---
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"  # Web UI: http://localhost:8025
+      - "1025:1025"  # SMTP порт
+
   # --- Frontend (Nuxt) ---
   client:
     image: node:20-alpine

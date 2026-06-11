@@ -43,8 +43,8 @@ class User implements ResourceInterface, TimestampableInterface
     #[ORM\Column(type: 'string', length: 255)]
     private string $password = '';
 
-    #[ORM\Column(type: 'string', length: 255, unique: true, nullable: true)]
-    private ?string $auth_token = null;
+    #[ORM\Column(name: 'email_verified', type: 'boolean', options: ['default' => false])]
+    private bool $emailVerified = false;
 
     public function getId(): ?int { return $this->id; }
 
@@ -60,8 +60,8 @@ class User implements ResourceInterface, TimestampableInterface
     public function getPassword(): string { return $this->password; }
     public function setPassword(string $password): void { $this->password = $password; }
 
-    public function getAuthToken(): ?string { return $this->auth_token; }
-    public function setAuthToken(?string $auth_token): void { $this->auth_token = $auth_token; }
+    public function isEmailVerified(): bool { return $this->emailVerified; }
+    public function setEmailVerified(bool $emailVerified): void { $this->emailVerified = $emailVerified; }
 
     public static function getAppUser(Request $request): ?User
     {

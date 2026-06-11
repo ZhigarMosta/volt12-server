@@ -69,6 +69,12 @@ sylius_resource:
                 form: App\Form\Type\FavoriteType
                 repository: App\Repository\FavoriteRepository
 
+        app.user_token:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\UserToken
+                repository: App\Repository\UserTokenRepository
+
         app.service_group:
             driver: doctrine/orm
             classes:

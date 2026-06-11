@@ -16,4 +16,18 @@ class CompareRepository extends EntityRepository
             ->getSingleColumnResult();
     }
 
+    public function findExistingCatalogItemIds($user, array $catalogItemIds): array
+    {
+        $rows = $this->createQueryBuilder('c')
+            ->select('IDENTITY(c.catalogItem) as catalogItemId')
+            ->where('c.user = :user')
+            ->andWhere('c.catalogItem IN (:ids)')
+            ->setParameter('user', $user)
+            ->setParameter('ids', $catalogItemIds)
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        return array_map('intval', $rows);
+    }
+
 }

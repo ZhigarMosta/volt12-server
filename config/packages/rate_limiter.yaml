@@ -1,0 +1,19 @@
+framework:
+    rate_limiter:
+        # Форма обратной связи — 10 отправок в час с одного IP
+        feedback_submit:
+            policy: 'sliding_window'
+            limit: 10
+            interval: '1 hour'
+
+        # Глобальный лимит исходящих писем — 400 в сутки (запас от лимита Яндекса 500/день)
+        outgoing_email:
+            policy: 'sliding_window'
+            limit: 400
+            interval: '1 day'
+
+        # Письма верификации — 50 в час на пользователя
+        email_verification:
+            policy: 'sliding_window'
+            limit: 50
+            interval: '1 hour'

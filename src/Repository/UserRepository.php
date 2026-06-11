@@ -12,8 +12,4 @@ class UserRepository extends EntityRepository
         return $this->findOneBy(['email' => $email]);
     }
 
-    public function findByAuthToken(string $token): ?User
-    {
-        return $this->findOneBy(['auth_token' => $token]);
-    }
 }

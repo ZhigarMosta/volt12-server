@@ -7,12 +7,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 
 #[Route('/volt12')]
 class FeedbackController extends AbstractController
 {
     public function __construct(
-        private FeedbackService $feedbackService
+        private FeedbackService $feedbackService,
+        private RateLimiterFactory $feedbackSubmitLimiter
     )
     {
     }
@@ -20,6 +22,11 @@ class FeedbackController extends AbstractController
     #[Route('/feedback', name: 'volt12_feedback', methods: ['POST'])]
     public function feedback(Request $request): JsonResponse
     {
+        $limiter = $this->feedbackSubmitLimiter->create($request->getClientIp());
+        if (!$limiter->consume(1)->isAccepted()) {
+            return $this->json(['success' => false, 'errors' => ['Too many requests']], 429);
+        }
+
         $data = $request->toArray();
 
         $type = trim($data['type'] ?? '');

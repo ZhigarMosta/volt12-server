@@ -3,11 +3,15 @@
 namespace App\Controller\Volt12;
 
 use App\Entity\User;
+use App\Service\Volt12\CartService;
+use App\Service\Volt12\CompareService;
+use App\Service\Volt12\FeedbackService;
 use App\Service\Volt12\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/volt12/auth')]
@@ -17,18 +21,21 @@ class AuthController extends AbstractController
     private const COOKIE_LIFETIME = 2592000;
 
     public function __construct(
-        private UserService $userService
+        private UserService $userService,
+        private CartService $cartService,
+        private CompareService $compareService,
+        private FeedbackService $feedbackService,
+        private RateLimiterFactory $emailVerificationLimiter,
     ) {}
 
-    private function getUserFromRequest(Request $request): ?User
+    private function getTokenFromRequest(Request $request): ?string
     {
-        $user = $request->attributes->get('_app_user');
-        if ($user) return $user;
+        $token = $request->cookies->get(self::COOKIE_NAME);
+        if ($token) return $token;
 
         $authHeader = $request->headers->get('Authorization');
         if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
-            $token = substr($authHeader, 7);
-            return $this->userService->getUserByAuthToken($token);
+            return substr($authHeader, 7);
         }
 
         return null;
@@ -48,7 +55,7 @@ class AuthController extends AbstractController
         }
 
         try {
-            $user = $this->userService->register(
+            [$user, $token] = $this->userService->register(
                 $data['name'],
                 $data['email'],
                 $data['password'],
@@ -58,8 +65,19 @@ class AuthController extends AbstractController
             return $this->json(['success' => false, 'error' => $e->getMessage()], 400);
         }
 
-        $response = $this->json(['success' => true, 'user' => $this->serializeUser($user), 'token' => $user->getAuthToken()]);
-        $response->headers->setCookie($this->createAuthCookie($user->getAuthToken()));
+        $cart = $data['cart'] ?? [];
+        $compare = $data['compare'] ?? [];
+
+        if (!empty($cart) && is_array($cart)) {
+            $this->cartService->importFromLocal($user, $cart);
+        }
+
+        if (!empty($compare) && is_array($compare)) {
+            $this->compareService->importFromLocal($user, $compare);
+        }
+
+        $response = $this->json(['success' => true, 'user' => $this->serializeUser($user), 'token' => $token]);
+        $response->headers->setCookie($this->createAuthCookie($token));
 
         return $response;
     }
@@ -73,13 +91,15 @@ class AuthController extends AbstractController
             return $this->json(['success' => false, 'error' => 'Заполните email и пароль'], 400);
         }
 
-        $user = $this->userService->login($data['email'], $data['password']);
-        if (!$user) {
+        $result = $this->userService->login($data['email'], $data['password']);
+        if (!$result) {
             return $this->json(['success' => false, 'error' => 'Неверный email или пароль'], 401);
         }
 
-        $response = $this->json(['success' => true, 'user' => $this->serializeUser($user), 'token' => $user->getAuthToken()]);
-        $response->headers->setCookie($this->createAuthCookie($user->getAuthToken()));
+        [$user, $token] = $result;
+
+        $response = $this->json(['success' => true, 'user' => $this->serializeUser($user), 'token' => $token]);
+        $response->headers->setCookie($this->createAuthCookie($token));
 
         return $response;
     }
@@ -87,9 +107,9 @@ class AuthController extends AbstractController
     #[Route('/logout', name: 'volt12_auth_logout', methods: ['POST'])]
     public function logout(Request $request): JsonResponse
     {
-        $user = $this->getUserFromRequest($request);
-        if ($user) {
-            $this->userService->logout($user);
+        $token = $this->getTokenFromRequest($request);
+        if ($token) {
+            $this->userService->logout($token);
         }
 
         $response = $this->json(['success' => true]);
@@ -98,15 +118,75 @@ class AuthController extends AbstractController
         return $response;
     }
 
+    #[Route('/update-profile', name: 'volt12_auth_update_profile', methods: ['POST'])]
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->attributes->get('_app_user');
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        try {
+            $this->userService->updateProfile($user, $data);
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()], 400);
+        }
+
+        return $this->json(['success' => true, 'user' => $this->serializeUser($user)]);
+    }
+
     #[Route('/me', name: 'volt12_auth_me', methods: ['GET'])]
     public function me(Request $request): JsonResponse
     {
-        $user = $this->getUserFromRequest($request);
+        $user = $request->attributes->get('_app_user');
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
         }
 
         return $this->json(['success' => true, 'user' => $this->serializeUser($user)]);
+    }
+
+    #[Route('/send-verification', name: 'volt12_auth_send_verification', methods: ['POST'])]
+    public function sendVerification(Request $request): JsonResponse
+    {
+        $user = $request->attributes->get('_app_user');
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+        }
+
+        if ($user->isEmailVerified()) {
+            return $this->json(['success' => false, 'error' => 'Email уже подтверждён'], 400);
+        }
+
+        $limiter = $this->emailVerificationLimiter->create('user_' . $user->getId());
+        if (!$limiter->consume(1)->isAccepted()) {
+            return $this->json(['success' => false, 'error' => 'Слишком много запросов. Попробуйте позже'], 429);
+        }
+
+        $baseUrl = $request->getSchemeAndHttpHost();
+        $this->userService->sendVerificationEmail($user, $this->feedbackService, $baseUrl);
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/verify-email', name: 'volt12_auth_verify_email', methods: ['POST'])]
+    public function verifyEmail(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $token = trim($data['token'] ?? '');
+
+        if ($token === '') {
+            return $this->json(['success' => false, 'error' => 'Токен обязателен'], 400);
+        }
+
+        $verified = $this->userService->verifyEmail($token);
+        if (!$verified) {
+            return $this->json(['success' => false, 'error' => 'Ссылка недействительна или устарела'], 400);
+        }
+
+        return $this->json(['success' => true]);
     }
 
     private function serializeUser(User $user): array
@@ -116,6 +196,7 @@ class AuthController extends AbstractController
             'name' => $user->getName(),
             'email' => $user->getEmail(),
             'phone' => $user->getPhone(),
+            'email_verified' => $user->isEmailVerified(),
         ];
     }
 
