@@ -692,6 +692,65 @@ sylius_grid:
                     update: { type: update }
                     delete: { type: delete }
 
+        app_admin_user_order:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\UserOrder
+            sorting:
+                createdAt: desc
+            filters:
+                firstName:
+                    type: string
+                    label: Имя
+                lastName:
+                    type: string
+                    label: Фамилия
+                phone:
+                    type: string
+                    label: Телефон
+                email:
+                    type: string
+                    label: Email
+                status:
+                    type: string
+                    label: Статус
+            fields:
+                id:
+                    type: string
+                    label: '№'
+                    sortable: ~
+                firstName:
+                    type: string
+                    label: Имя
+                    sortable: ~
+                lastName:
+                    type: string
+                    label: Фамилия
+                    sortable: ~
+                phone:
+                    type: string
+                    label: Телефон
+                email:
+                    type: string
+                    label: Email
+                status:
+                    type: string
+                    label: Статус
+                    sortable: ~
+                totalPrice:
+                    type: string
+                    label: Сумма (коп.)
+                    sortable: ~
+                createdAt:
+                    type: datetime
+                    label: Дата заказа
+                    sortable: ~
+            actions:
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+
     templates:
         filter:
             numeric_range: "admin/grid/filter/numeric_range.html.twig"

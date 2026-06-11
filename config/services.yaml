@@ -325,3 +325,7 @@ services:
     App\Menu\FavoriteMenuListener:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\Menu\UserOrderMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
