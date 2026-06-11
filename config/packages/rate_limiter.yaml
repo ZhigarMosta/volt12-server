@@ -17,3 +17,9 @@ framework:
             policy: 'sliding_window'
             limit: 50
             interval: '1 hour'
+
+        # Сброс пароля — 50 запросов в час с одного IP
+        password_reset:
+            policy: 'sliding_window'
+            limit: 50
+            interval: '1 hour'

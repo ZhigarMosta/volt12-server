@@ -95,6 +95,48 @@ class UserService
         return true;
     }
 
+    public function sendPasswordResetCode(string $email, FeedbackService $feedbackService): bool
+    {
+        $user = $this->userRepository->findByEmail($email);
+        if (!$user || !$user->isEmailVerified()) {
+            return false;
+        }
+
+        $this->userTokenRepository->deleteByUserAndType($user, 'password_reset');
+
+        $code = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        $userToken = new UserToken($user, $code, 'password_reset');
+        $this->entityManager->persist($userToken);
+        $this->entityManager->flush();
+
+        $feedbackService->sendPasswordResetCode($email, $code);
+
+        return true;
+    }
+
+    public function resetPassword(string $email, string $code, string $newPassword): bool
+    {
+        $user = $this->userRepository->findByEmail($email);
+        if (!$user) {
+            return false;
+        }
+
+        $userToken = $this->userTokenRepository->findByTokenAndType($code, 'password_reset');
+        if (!$userToken || $userToken->getUser()->getId() !== $user->getId()) {
+            return false;
+        }
+
+        if (strlen($newPassword) < 6) {
+            throw new \InvalidArgumentException('Пароль должен содержать минимум 6 символов');
+        }
+
+        $user->setPassword(password_hash($newPassword, PASSWORD_ARGON2ID));
+        $this->userTokenRepository->deleteByUserAndType($user, 'password_reset');
+        $this->entityManager->flush();
+
+        return true;
+    }
+
     public function logout(string $token): void
     {
         $this->userTokenRepository->deleteByToken($token);

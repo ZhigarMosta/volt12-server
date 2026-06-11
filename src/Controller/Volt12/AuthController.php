@@ -26,6 +26,7 @@ class AuthController extends AbstractController
         private CompareService $compareService,
         private FeedbackService $feedbackService,
         private RateLimiterFactory $emailVerificationLimiter,
+        private RateLimiterFactory $passwordResetLimiter,
     ) {}
 
     private function getTokenFromRequest(Request $request): ?string
@@ -184,6 +185,51 @@ class AuthController extends AbstractController
         $verified = $this->userService->verifyEmail($token);
         if (!$verified) {
             return $this->json(['success' => false, 'error' => 'Ссылка недействительна или устарела'], 400);
+        }
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/forgot-password', name: 'volt12_auth_forgot_password', methods: ['POST'])]
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $limiter = $this->passwordResetLimiter->create($request->getClientIp());
+        if (!$limiter->consume(1)->isAccepted()) {
+            return $this->json(['success' => false, 'error' => 'Слишком много запросов. Попробуйте позже'], 429);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $email = trim($data['email'] ?? '');
+
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->json(['success' => false, 'error' => 'Некорректный email'], 400);
+        }
+
+        $this->userService->sendPasswordResetCode($email, $this->feedbackService);
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/reset-password', name: 'volt12_auth_reset_password', methods: ['POST'])]
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $email = trim($data['email'] ?? '');
+        $code = trim($data['code'] ?? '');
+        $newPassword = $data['new_password'] ?? '';
+
+        if ($email === '' || $code === '' || $newPassword === '') {
+            return $this->json(['success' => false, 'error' => 'Заполните все поля'], 400);
+        }
+
+        try {
+            $result = $this->userService->resetPassword($email, $code, $newPassword);
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()], 400);
+        }
+
+        if (!$result) {
+            return $this->json(['success' => false, 'error' => 'Неверный код или email'], 400);
         }
 
         return $this->json(['success' => true]);
