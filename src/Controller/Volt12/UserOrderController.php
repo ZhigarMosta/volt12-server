@@ -45,7 +45,7 @@ class UserOrderController extends AbstractController
         }
 
         $page    = max(1, (int) $request->query->get('page', 1));
-        $perPage = min(50, max(1, (int) $request->query->get('per_page', 10)));
+        $perPage = min(15, max(1, (int) $request->query->get('per_page', 10)));
 
         $result = $this->userOrderService->getOrdersPage($user, $page, $perPage);
 
