@@ -59,8 +59,14 @@ class CatalogItemCharacteristicController extends AbstractController
     #[Route('/all_catalog_items_by_catalog_id/{id}', name: 'admin_crud_all_catalog_items_by_catalog_id', methods: ['GET'])]
     public function allProductsByCatalog(Catalog $item): JsonResponse
     {
+        $result = $this->catalogItemService->getCatalogItemByCatalogID(
+            catalogId: $item->getId(),
+            page: null,
+            limit: null
+        );
+
         return $this->json([
-            'items' => $this->crudService->transformSortProduct($this->catalogItemService->getCatalogItemByCatalogID(catalogId: $item->getId(), page: null, limit: null)),
+            'items' => $this->crudService->transformSortProduct($result['items']),
         ]);
     }
 

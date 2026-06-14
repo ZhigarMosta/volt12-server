@@ -69,4 +69,26 @@ class ServiceRepository extends EntityRepository
 
         return new Paginator($qb, true);
     }
+
+    public function findTopForMenu(int $limit): array
+    {
+        return $this->createQueryBuilder('s')
+            ->orderBy('s.position', 'ASC')
+            ->addOrderBy('s.id', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function searchByName(string $name, int $limit): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('LOWER(s.name) LIKE LOWER(:name)')
+            ->setParameter('name', '%' . $name . '%')
+            ->orderBy('s.position', 'ASC')
+            ->addOrderBy('s.id', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

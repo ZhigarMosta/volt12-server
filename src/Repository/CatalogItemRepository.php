@@ -195,6 +195,38 @@ class CatalogItemRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findForMenuByCatalogIds(array $catalogIds, array $productCodes): array
+    {
+        if ($catalogIds === []) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('ci')
+            ->where('ci.catalog IN (:catalogIds)')
+            ->andWhere('ci.product_code IN (:productCodes)')
+            ->setParameter('catalogIds', $catalogIds)
+            ->setParameter('productCodes', $productCodes)
+            ->orderBy('ci.position', 'ASC')
+            ->addOrderBy('ci.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function searchByName(string $name, array $productCodes, int $limit): array
+    {
+        return $this->createQueryBuilder('ci')
+            ->where('LOWER(ci.name) LIKE LOWER(:name)')
+            ->andWhere('ci.product_code IN (:productCodes)')
+            ->setParameter('name', '%' . $name . '%')
+            ->setParameter('productCodes', $productCodes)
+            ->orderBy('ci.position', 'ASC')
+            ->addOrderBy('ci.id', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     /**
      * Универсальный метод для подсчета фасетов.
      *

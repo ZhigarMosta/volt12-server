@@ -62,4 +62,16 @@ class CatalogRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findTopForMenu(array $productCodes, int $limit): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.product_code IN (:productCodes)')
+            ->setParameter('productCodes', $productCodes)
+            ->orderBy('c.position', 'ASC')
+            ->addOrderBy('c.id', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -16,6 +16,15 @@ services:
         
     App\Service\Volt12\CatalogService:
         autowire: true
+
+    App\Service\Volt12\MenuService:
+        autowire: true
+
+    App\Controller\Volt12\CatalogController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $catalogService: '@App\Service\Volt12\CatalogService'
+            $menuService: '@App\Service\Volt12\MenuService'
     
     App\Service\Volt12\CatalogItemService:
         autowire: true
@@ -38,11 +47,6 @@ services:
             $catalogGroupService: '@App\Service\Volt12\CatalogGroupService'
             $catalogService: '@App\Service\Volt12\CatalogService'
     
-    App\Controller\Volt12\CatalogController:
-        tags: [ 'controller.service_arguments' ]
-        arguments:
-            $catalogService: '@App\Service\Volt12\CatalogService'
-
     App\Controller\Volt12\CatalogItemController:
         tags: [ 'controller.service_arguments' ]
         arguments:

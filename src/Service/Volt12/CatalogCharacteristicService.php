@@ -5,7 +5,6 @@ namespace App\Service\Volt12;
 use App\Entity\CatalogCharacteristic;
 use App\Provider\ProductCodeProvider;
 use App\Repository\CatalogCharacteristicRepository;
-use App\Repository\CatalogItemRepository;
 use Psr\Log\LoggerInterface;
 
 class CatalogCharacteristicService
@@ -21,7 +20,7 @@ class CatalogCharacteristicService
     {
         $without_group = [];
         $groups = [];
-        
+
         foreach ($this->catalogCharacteristicRepository->list($catalogId, [ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY]) as $catalogCharacteristic) {
             if (is_null($catalogCharacteristic['group_name'])) {
                 $without_group[] = [
@@ -30,9 +29,9 @@ class CatalogCharacteristicService
                 ];
                 continue;
             }
-            
+
             $groupId = $catalogCharacteristic['group_id'];
-            
+
             if (!isset($groups[$groupId])) {
                 $groups[$groupId] = [
                     'id' => $groupId,
@@ -40,13 +39,13 @@ class CatalogCharacteristicService
                     'items' => []
                 ];
             }
-            
+
             $groups[$groupId]['items'][] = [
                 'id' => $catalogCharacteristic['id'],
                 'name' => $catalogCharacteristic['name']
             ];
         }
-        
+
         return [
             'without_group' => $without_group,
             'with_group' => array_values($groups)

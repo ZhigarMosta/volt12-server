@@ -3,6 +3,7 @@
 namespace App\Service\Admin;
 
 use App\Entity\CatalogItem;
+use App\Entity\CatalogCharacteristic;
 
 class CrudService
 {
@@ -31,6 +32,24 @@ class CrudService
                 'position' => $item->getPosition(),
             ];
         }
+        return $select;
+    }
+
+    public function transformSortCharacteristic(array $data): array
+    {
+        $select = [];
+        foreach ($data as $item) {
+            if (!$item instanceof CatalogCharacteristic) {
+                continue;
+            }
+
+            $select[] = [
+                'id' => $item->getId(),
+                'name' => $item->getName(),
+                'position' => $item->getPosition(),
+            ];
+        }
+
         return $select;
     }
 }

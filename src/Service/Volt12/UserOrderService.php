@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\UserOrder;
 use App\Entity\UserOrderItem;
 use App\Repository\CatalogItemRepository;
+use App\Repository\UserOrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Service\Volt12\FeedbackService;
 
@@ -13,6 +14,7 @@ class UserOrderService
 {
     public function __construct(
         private CatalogItemRepository $catalogItemRepository,
+        private UserOrderRepository $userOrderRepository,
         private EntityManagerInterface $entityManager,
         private FeedbackService $feedbackService
     ) {}
@@ -71,25 +73,86 @@ class UserOrderService
         $this->entityManager->persist($order);
         $this->entityManager->flush();
 
-//        $this->feedbackService->sendOrderConfirmation($order->getEmail(), $this->serializeOrder($order));
+//        $this->feedbackService->sendOrderConfirmation($order->getEmail(), $this->serializeOrderFull($order));
 
         return $order;
     }
 
-    private function serializeOrder(UserOrder $order): array
+    public function getOrdersPage(User $user, int $page, int $perPage): array
+    {
+        $result = $this->userOrderRepository->findPageByUser($user->getId(), $page, $perPage);
+
+        return [
+            'items'    => array_map([$this, 'serializeOrderShort'], $result['items']),
+            'total'    => $result['total'],
+            'page'     => $result['page'],
+            'per_page' => $result['per_page'],
+            'pages'    => $result['pages'],
+        ];
+    }
+
+    public function getOrderForUser(int $orderId, User $user): ?UserOrder
+    {
+        $order = $this->userOrderRepository->find($orderId);
+
+        if (!$order || $order->getUser()?->getId() !== $user->getId()) {
+            return null;
+        }
+
+        return $order;
+    }
+
+    public function serializeOrderShort(UserOrder $order): array
+    {
+        return [
+            'id'          => $order->getId(),
+            'status'      => $order->getStatus(),
+            'total_price' => $order->getTotalPrice(),
+            'items_count' => $order->getItems()->count(),
+            'created_at'  => $order->getCreatedAt()?->format('Y-m-d H:i:s'),
+            'city'        => $order->getCity(),
+            'region'      => $order->getRegion(),
+            'street'      => $order->getStreet(),
+            'house'       => $order->getHouse(),
+            'entrance'    => $order->getEntrance(),
+            'apartment'   => $order->getApartment(),
+            'postal_code' => $order->getPostalCode(),
+        ];
+    }
+
+    public function serializeOrderFull(UserOrder $order): array
     {
         $items = [];
         foreach ($order->getItems() as $item) {
+            $firstImage = null;
+            $catalogImages = $item->getCatalogItem()?->getCatalogItemImages()->toArray() ?? [];
+            usort($catalogImages, fn($a, $b) => $a->getPosition() <=> $b->getPosition());
+            if (!empty($catalogImages)) {
+                $img = $catalogImages[0];
+                $firstImage = [
+                    'id'       => $img->getId(),
+                    'img_link' => $img->getImgLink(),
+                    'alt'      => $img->getAlt(),
+                    'title'    => $img->getTitle(),
+                    'position' => $img->getPosition(),
+                ];
+            }
+
             $items[] = [
-                'name'        => $item->getName(),
-                'quantity'    => $item->getQuantity(),
-                'price'       => $item->getPrice(),
-                'total_price' => $item->getTotalPrice(),
+                'id'              => $item->getId(),
+                'catalog_item_id' => $item->getCatalogItem()?->getId(),
+                'slug'            => $item->getCatalogItem()?->getSlug(),
+                'name'            => $item->getName(),
+                'quantity'        => $item->getQuantity(),
+                'price'           => $item->getPrice(),
+                'total_price'     => $item->getTotalPrice(),
+                'image'           => $firstImage,
             ];
         }
 
         return [
             'id'          => $order->getId(),
+            'status'      => $order->getStatus(),
             'first_name'  => $order->getFirstName(),
             'last_name'   => $order->getLastName(),
             'phone'       => $order->getPhone(),
@@ -103,6 +166,8 @@ class UserOrderService
             'postal_code' => $order->getPostalCode(),
             'comment'     => $order->getComment(),
             'total_price' => $order->getTotalPrice(),
+            'created_at'  => $order->getCreatedAt()?->format('Y-m-d H:i:s'),
+            'updated_at'  => $order->getUpdatedAt()?->format('Y-m-d H:i:s'),
             'items'       => $items,
         ];
     }
