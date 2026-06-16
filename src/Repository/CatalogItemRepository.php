@@ -84,6 +84,7 @@ class CatalogItemRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+    
     /**
      * Универсальный метод для подсчета фасетов.
      *
@@ -150,5 +151,34 @@ class CatalogItemRepository extends EntityRepository
         $qb->groupBy('char_id');
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Получить товары каталога для сортировки
+     */
+    public function findForSortByCatalog(int $catalogId): array
+    {
+        return $this->createQueryBuilder('ci')
+            ->where('ci.catalog = :catalogId')
+            ->setParameter('catalogId', $catalogId)
+            ->orderBy('ci.position', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Получить товары каталога с изображениями для сортировки
+     */
+    public function findForSortByCatalogWithImages(int $catalogId): array
+    {
+        return $this->createQueryBuilder('ci')
+            ->leftJoin('ci.images', 'img')
+            ->addSelect('img')
+            ->where('ci.catalog = :catalogId')
+            ->setParameter('catalogId', $catalogId)
+            ->orderBy('ci.position', 'ASC')
+            ->addOrderBy('img.position', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

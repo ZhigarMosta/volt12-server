@@ -1,0 +1,15 @@
+{% set catalog_id = data.id|default(null) %}
+
+{% if catalog_id is not null %}
+    <a href="{{ path(options.route_to_item, {'criteria': {'catalog': catalog_id}}) }}"
+       class="btn">Товары</a>
+
+    {{ sort_modal(
+        'name',
+        'img.imgLink',
+        false,
+        path('admin_crud_sort_catalog_items'),
+        path('admin_crud_all_catalog_items_by_catalog_id', {'id': catalog_id}),
+        'catalog_items'
+    )|raw }}
+{% endif %}

@@ -1,0 +1,12 @@
+{% set catalog_id = data.id|default(null) %}
+
+{% if catalog_id is not null %}
+    {{ sort_modal(
+        'name',
+        'null',
+        false,
+        path('admin_crud_sort_catalog_characteristics'),
+        path('admin_crud_all_catalog_characteristics_by_catalog_id', {'id': catalog_id}),
+        'catalog_characteristics'
+    )|raw }}
+{% endif %}

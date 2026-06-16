@@ -1,0 +1,12 @@
+{% set catalog_group_id = data.id|default(null) %}
+
+{% if catalog_group_id is not null %}
+    {{ sort_modal(
+        'name',
+        'null',
+        false,
+        path('admin_catalog_group_characteristics_sort', {'id': catalog_group_id}),
+        path('admin_catalog_group_characteristics_index', {'id': catalog_group_id}),
+        'catalog_characteristics'
+    )|raw }}
+{% endif %}     

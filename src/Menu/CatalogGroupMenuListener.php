@@ -13,7 +13,7 @@ final class CatalogGroupMenuListener
         if (null !== $catalog = $menu->getChild('catalog')) {
             $catalog
                 ->addChild('catalog_group', ['route' => 'app_admin_catalog_group_index'])
-                ->setLabel('Группы каталогов')
+                ->setLabel('Группы характеристик')
                 ->setLabelAttribute('icon', 'bell outline')
                 ->setExtra('priority', 0);
         }

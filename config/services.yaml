@@ -13,6 +13,9 @@ services:
     App\Service\Admin\CrudService:
         autowire: true
 
+    App\Service\Admin\SortService:
+        autowire: true
+
     App\Service\Volt12\CatalogService:
         autowire: true
 
@@ -31,16 +34,16 @@ services:
     App\Service\Volt12\CatalogItemImageService:
         autowire: true
 
-    App\Controller\Admin\CatalogItemCharacteristicController:
+    App\Controller\Admin\MainController:
         tags: ["controller.service_arguments"]
         arguments:
             $catalogItemService: '@App\Service\Volt12\CatalogItemService'
             $catalogCharacteristicService: '@App\Service\Volt12\CatalogCharacteristicService'
             $crudService: '@App\Service\Admin\CrudService'
+            $sortService: '@App\Service\Admin\SortService'
             $catalogGroupService: '@App\Service\Volt12\CatalogGroupService'
             $catalogService: '@App\Service\Volt12\CatalogService'
             $catalogItemImageService: '@App\Service\Volt12\CatalogItemImageService'
-            $catalogItemImageRepository: '@App\Repository\CatalogItemImageRepository'
 
     App\Controller\Volt12\CatalogController:
         tags: ["controller.service_arguments"]
