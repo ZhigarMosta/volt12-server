@@ -1,0 +1,8 @@
+{% extends '@!SyliusAdmin/shared/crud/update.html.twig' %}
+
+{% block body %}
+    {{ parent() }}
+    {% if resource is defined and entity_has_history(resource) %}
+        {% include 'admin/entity_history/_history_table.html.twig' with { entity: resource } only %}
+    {% endif %}
+{% endblock %}

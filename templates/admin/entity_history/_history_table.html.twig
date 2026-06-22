@@ -1,0 +1,107 @@
+{% set per_page = 3 %}
+{% set current_page = app.request.query.get('history_page', 1) %}
+{% set current_page = current_page < 1 ? 1 : current_page %}
+{% set total = get_entity_history_count(entity) %}
+{% set total_pages = total > 0 ? ((total / per_page)|round(0, 'ceil')) : 1 %}
+{% set current_page = current_page > total_pages ? total_pages : current_page %}
+{% set histories = get_entity_history(entity, current_page) %}
+
+{% if total > 0 %}
+<div class="container-xl mt-4">
+    <div class="card">
+        <div class="card-header d-flex align-items-center gap-2">
+            {{ ux_icon('tabler:clock', {class: 'icon'}) }}
+            <span class="fw-semibold">История изменений</span>
+            <span class="badge bg-secondary ms-1">{{ total }}</span>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-sm table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3" style="width:60px">#</th>
+                        <th>Дата изменения</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for history in histories %}
+                    <tr>
+                        <td class="ps-3 text-muted">{{ history.id }}</td>
+                        <td>{{ history.createdAt|date('d.m.Y H:i:s') }}</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#hm-{{ history.id }}">
+                                {{ ux_icon('tabler:eye', {class: 'icon'}) }} Посмотреть данные
+                            </button>
+                            <form method="post"
+                                  action="{{ path('app_admin_entity_history_restore', {id: history.id}) }}"
+                                  class="d-inline-block ms-1">
+                                <input type="hidden" name="_token" value="{{ csrf_token('restore_' ~ history.id) }}">
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-warning"
+                                        onclick="return confirm('Восстановить версию от {{ history.createdAt|date('d.m.Y H:i:s') }}?')">
+                                    {{ ux_icon('tabler:arrow-back-up', {class: 'icon'}) }} Восстановить
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if total_pages > 1 %}
+        <div class="card-footer d-flex justify-content-center">
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item {{ current_page <= 1 ? 'disabled' }}">
+                    <a class="page-link"
+                       href="{{ app.request.path }}?{{ app.request.query.all|merge({history_page: current_page - 1})|url_encode }}">
+                        {{ ux_icon('tabler:chevron-left', {class: 'icon'}) }}
+                    </a>
+                </li>
+                {% for p in 1..total_pages %}
+                <li class="page-item {{ p == current_page ? 'active' }}">
+                    <a class="page-link"
+                       href="{{ app.request.path }}?{{ app.request.query.all|merge({history_page: p})|url_encode }}">
+                        {{ p }}
+                    </a>
+                </li>
+                {% endfor %}
+                <li class="page-item {{ current_page >= total_pages ? 'disabled' }}">
+                    <a class="page-link"
+                       href="{{ app.request.path }}?{{ app.request.query.all|merge({history_page: current_page + 1})|url_encode }}">
+                        {{ ux_icon('tabler:chevron-right', {class: 'icon'}) }}
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# Отдельный модал для каждой записи — данные рендерятся сервером, без JS #}
+{% for history in histories %}
+<div class="modal fade" id="hm-{{ history.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                {{ ux_icon('tabler:clock', {class: 'icon me-2'}) }}
+                <h5 class="modal-title">
+                    Версия от {{ history.createdAt|date('d.m.Y H:i:s') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <pre class="bg-light p-3 rounded border overflow-auto mb-0"
+                     style="max-height:60vh; font-size:13px;">{{ history.fields|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}

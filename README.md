@@ -4,7 +4,7 @@ yarn install
 yarn build
 
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'password';"
-
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';" -- для тз гена
 composer dump-autoload -o
 
 

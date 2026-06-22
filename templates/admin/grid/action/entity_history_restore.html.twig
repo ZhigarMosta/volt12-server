@@ -1,0 +1,10 @@
+<form method="post"
+      action="{{ path('app_admin_entity_history_restore', {id: resource.id}) }}"
+      class="d-inline-block">
+    <input type="hidden" name="_token" value="{{ csrf_token('restore_' ~ resource.id) }}">
+    <button type="submit"
+            class="btn btn-sm btn-outline-warning"
+            onclick="return confirm('Восстановить эту версию?')">
+        {{ ux_icon('tabler:arrow-back-up', {class: 'icon'}) }} Восстановить
+    </button>
+</form>
