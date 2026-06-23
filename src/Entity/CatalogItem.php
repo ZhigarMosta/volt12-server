@@ -19,6 +19,10 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     const POPULAR = true;
     const LIMIT_POPULAR = 12;
 
+    public bool $hasHistory = true;
+
+    public function hasHistory(): bool { return true; }
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();

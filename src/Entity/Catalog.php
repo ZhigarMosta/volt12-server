@@ -20,6 +20,8 @@ class Catalog implements ResourceInterface, TimestampableInterface
     const POPULAR = true;
     const LIMIT_POPULAR = 3;
     const FIRST_POPULAR = 1;
+    public bool $hasHistory = true;
+    public function hasHistory(): bool { return true; }
 
     use TimestampableTrait;
     public function __construct()

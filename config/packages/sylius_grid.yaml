@@ -751,6 +751,49 @@ sylius_grid:
                     update: { type: update }
                     delete: { type: delete }
 
+        app_admin_entity_history:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\EntityHistory
+            sorting:
+                createdAt: desc
+            filters:
+                entity:
+                    type: string
+                    label: Тип сущности
+                entityId:
+                    type: string
+                    label: ID сущности
+            fields:
+                id:
+                    type: string
+                    label: '#'
+                    sortable: ~
+                entity:
+                    type: string
+                    label: Тип
+                    sortable: ~
+                entityId:
+                    type: string
+                    label: ID
+                    sortable: ~
+                createdAt:
+                    type: datetime
+                    label: Дата
+                    sortable: ~
+            actions:
+                item:
+                    view:
+                        type: default
+                        label: Данные
+                        template: "admin/grid/action/entity_history_view.html.twig"
+                    restore:
+                        type: default
+                        label: Восстановить
+                        template: "admin/grid/action/entity_history_restore.html.twig"
+                    delete: { type: delete }
+
     templates:
         filter:
             numeric_range: "admin/grid/filter/numeric_range.html.twig"

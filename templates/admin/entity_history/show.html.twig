@@ -1,0 +1,34 @@
+{% extends '@SyliusAdmin/shared/layout/base.html.twig' %}
+
+{% block title %}История #{{ history.id }} | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="p-4">
+    <div class="d-flex align-items-center gap-2 mb-1">
+        {{ ux_icon('tabler:clock', {class: 'icon'}) }}
+        <h4 class="mb-0">История #{{ history.id }}</h4>
+    </div>
+    <p class="text-muted mb-4">
+        {{ history.entity }} / ID: {{ history.entityId }} / {{ history.createdAt|date('d.m.Y H:i:s') }}
+    </p>
+
+    <div class="d-flex gap-2 mb-4">
+        <a href="{{ path('app_admin_entity_history_index') }}" class="btn btn-secondary">
+            {{ ux_icon('tabler:arrow-left', {class: 'icon'}) }} К списку
+        </a>
+        <form method="post"
+              action="{{ path('app_admin_entity_history_restore', {id: history.id}) }}"
+              class="d-inline-block">
+            <input type="hidden" name="_token" value="{{ csrf_token('restore_' ~ history.id) }}">
+            <button type="submit"
+                    class="btn btn-warning"
+                    onclick="return confirm('Восстановить эту версию?')">
+                {{ ux_icon('tabler:arrow-back-up', {class: 'icon'}) }} Восстановить
+            </button>
+        </form>
+    </div>
+
+    <h6 class="mb-2">Поля сущности</h6>
+    <pre class="bg-light p-3 rounded border overflow-auto" style="font-size:13px;">{{ history.fields|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}</pre>
+</div>
+{% endblock %}

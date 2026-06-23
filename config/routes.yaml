@@ -223,3 +223,19 @@ app_admin_user_order:
                 icon: 'shop'
     type: sylius.resource
     prefix: /admin
+
+app_admin_entity_history:
+    resource: |
+        alias: app.entity_history
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show', 'create', 'update']
+        redirect: index
+        grid: app_admin_entity_history
+        vars:
+            all:
+                subheader: История изменений сущностей
+            index:
+                icon: 'clock outline'
+    type: sylius.resource
+    prefix: /admin

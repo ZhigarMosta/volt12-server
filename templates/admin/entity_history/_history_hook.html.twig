@@ -1,0 +1,4 @@
+{% set resource = hookable_metadata.context.resource|default(null) %}
+{% if resource is not null and entity_has_history(resource) %}
+    {% include 'admin/entity_history/_history_table.html.twig' with { entity: resource } only %}
+{% endif %}

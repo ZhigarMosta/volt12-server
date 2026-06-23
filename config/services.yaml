@@ -334,6 +334,20 @@ services:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
+    App\Menu\EntityHistoryMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
+
+    App\EventListener\EntityHistorySubscriber:
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+
+    App\Twig\EntityHistoryExtension:
+        tags: ['twig.extension']
+
+    App\Controller\Admin\EntityHistoryController:
+        tags: [ 'controller.service_arguments' ]
+
     App\Service\Volt12\UserOrderService:
         autowire: true
 

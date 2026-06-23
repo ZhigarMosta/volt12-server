@@ -273,6 +273,11 @@ sylius_twig_hooks:
             app_javascripts:
                 template: 'admin/javascripts.html.twig'
 
+        'sylius_admin.common.update.content':
+            entity_history:
+                template: 'admin/entity_history/_history_hook.html.twig'
+                priority: -50
+
         'sylius_shop.base#stylesheets':
             app_styles:
                 template: 'shop/stylesheets.html.twig'
