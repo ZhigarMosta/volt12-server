@@ -1,0 +1,12 @@
+{% set service_group_id = resource.id|default(data.id|default(null)) %}
+{% if service_group_id is not null %}
+    {{ sort_modal(
+        'name',
+        'img.imgLink',
+        false,
+        '/admin/crud/sort_services',
+        '/admin/crud/all_services_by_service_group_id/' ~ service_group_id,
+        'services',
+        'Услуги'
+    )|raw }}
+{% endif %}

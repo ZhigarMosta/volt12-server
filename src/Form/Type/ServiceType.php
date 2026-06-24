@@ -4,14 +4,17 @@ namespace App\Form\Type;
 
 use App\Entity\Service;
 use App\Entity\ServiceGroup;
+use App\Utils\Sort;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -20,8 +23,15 @@ use Symfony\Component\Validator\Constraints\Regex;
 
 class ServiceType extends AbstractType
 {
+    public function __construct(
+        private RouterInterface $router,
+    ) {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $urlAllServices = $this->router->generate('admin_crud_all_services_by_service_group_id', ['id' => 0]);
+        $urlSortServices = $this->router->generate('admin_crud_sort_services');
+
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Название',
@@ -72,6 +82,18 @@ class ServiceType extends AbstractType
                     'step' => 1,
                     'placeholder' => '0',
                     'inputmode' => 'numeric',
+                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 0",
+                    'onpaste' => "let paste = (event.clipboardData || window.clipboardData).getData('text'); if(!/^\d+$/.test(paste)) { event.preventDefault(); }",
+                    'class' => 'js-position-select',
+                ],
+                'help' => Sort::getModal('name', 'img.imgLink', true, $urlSortServices, $urlAllServices, 'services'),
+                'help_html' => true,
+                'row_attr' => [
+                    'class' => 'mb-3',
+                    'style' => 'display: grid; grid-template-areas: "label label" "image input"; grid-template-columns: 1fr auto; align-items: center; column-gap:15px;',
+                ],
+                'label_attr' => [
+                    'style' => 'grid-area: label;',
                 ],
             ])
             ->add('serviceGroup', EntityType::class, [
@@ -83,6 +105,15 @@ class ServiceType extends AbstractType
                     new NotBlank(['message' => 'Укажите группу услуг']),
                 ],
                 'required' => true,
+                'attr' => [
+                    'class' => 'js-entity-select',
+                ],
+            ])
+            ->add('sort', HiddenType::class, [
+                'mapped' => false,
+                'attr' => [
+                    'class' => 'js-hidden-sort',
+                ],
             ]);
 
         $item = $builder->getData();

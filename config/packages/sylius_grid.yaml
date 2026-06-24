@@ -87,6 +87,10 @@ sylius_grid:
                 item:
                     update: { type: update }
                     delete: { type: delete }
+                    sort_catalog_item_images:
+                        type: default
+                        label: Картинки
+                        template: "admin/grid/action/sort_catalog_item_images.html.twig"
 
         app_admin_catalog:
             driver:
@@ -158,6 +162,14 @@ sylius_grid:
                         template: "admin/grid/action/show_catalog_items.html.twig"
                         options:
                             route_to_item: app_admin_catalog_item_index
+                    sort_catalog_groups:
+                        type: default
+                        label: Группы
+                        template: "admin/grid/action/sort_catalog_groups.html.twig"
+                    sort_catalog_characteristics:
+                        type: default
+                        label: Характеристики
+                        template: "admin/grid/action/sort_catalog_characteristics.html.twig"
 
 
         app_admin_catalog_characteristic:
@@ -489,8 +501,16 @@ sylius_grid:
                     sortable: ~
             actions:
                 main:
+                    sort_service_groups:
+                        type: default
+                        label: Сортировка
+                        template: "admin/grid/action/sort_service_groups.html.twig"
                     create: { type: create }
                 item:
+                    sort_services:
+                        type: default
+                        label: Услуги
+                        template: "admin/grid/action/sort_services.html.twig"
                     update: { type: update }
                     delete: { type: delete }
 

@@ -13,6 +13,9 @@ services:
     
     App\Service\Admin\CrudService:
         autowire: true
+
+    App\Service\Admin\SortService:
+        autowire: true
         
     App\Service\Volt12\CatalogService:
         autowire: true
@@ -46,6 +49,10 @@ services:
             $crudService: '@App\Service\Admin\CrudService'
             $catalogGroupService: '@App\Service\Volt12\CatalogGroupService'
             $catalogService: '@App\Service\Volt12\CatalogService'
+            $sortService: '@App\Service\Admin\SortService'
+            $feedbackFromMapRepository: '@App\Repository\FeedbackFromMapRepository'
+            $serviceGroupRepository: '@App\Repository\ServiceGroupRepository'
+            $catalogCharacteristicRepository: '@App\Repository\CatalogCharacteristicRepository'
     
     App\Controller\Volt12\CatalogItemController:
         tags: [ 'controller.service_arguments' ]
@@ -281,15 +288,27 @@ services:
         arguments:
             $targetDirectory: '%catalog_items_directory%'
 
+    App\Form\Type\CatalogGroupType:
+        tags: [ 'form.type' ]
+        autowire: true
+
     App\Form\Type\CatalogItemCharacteristicType:
         tags: [ 'form.type' ]
         autowire: true
-        
+
     App\Form\Type\CatalogCharacteristicType:
         tags: [ 'form.type' ]
         autowire: true
 
     App\Form\Type\CatalogItemType:
+        tags: [ 'form.type' ]
+        autowire: true
+
+    App\Form\Type\CatalogItemImageType:
+        tags: [ 'form.type' ]
+        autowire: true
+
+    App\Form\Type\FeedbackFromMapType:
         tags: [ 'form.type' ]
         autowire: true
 

@@ -1,9 +1,9 @@
-{#{{ sort_modal(#}
-{#    'user_name',#}
-{#    '',#}
-{#    false,#}
-{#    '/admin/crud/sort_feedback_from_map',#}
-{#    '/admin/crud/all_feedback_from_map',#}
-{#    'null'#}
-{#)|raw }}#}
-для максима
+{{ sort_modal(
+    'name',
+    'img.imgLink',
+    false,
+    '/admin/crud/sort_feedback_from_map',
+    '/admin/crud/all_feedback_from_map',
+    'feedback_from_map',
+    'Сортировка отзывов'
+)|raw }}

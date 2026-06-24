@@ -2,14 +2,12 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Catalog;
 use App\Entity\CatalogItem;
 use App\Entity\CatalogItemImage;
-use App\Provider\ProductCodeProvider;
+use App\Utils\Sort;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,12 +16,18 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
+use Symfony\Component\Routing\RouterInterface;
 
-class
-CatalogItemImageType extends AbstractType
+class CatalogItemImageType extends AbstractType
 {
+    public function __construct(
+        private RouterInterface $router,
+    ) {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $urlAllImages = $this->router->generate('admin_crud_all_catalog_item_images_by_catalog_item_id', ['id' => 0]);
+        $urlSortImages = $this->router->generate('admin_crud_sort_catalog_item_images');
         $item = $builder->getData();
         $constraints = [
             new File([
@@ -71,12 +75,22 @@ CatalogItemImageType extends AbstractType
                     'inputmode' => 'numeric',
                     'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 0",
                     'onpaste' => "let paste = (event.clipboardData || window.clipboardData).getData('text'); if(!/^\d+$/.test(paste)) { event.preventDefault(); }",
+                    'class' => 'js-position-select',
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'Укажите позицию']),
                 ],
                 'required' => true,
                 'empty_data' => '',
+                'help' => Sort::getModal('name', 'img.imgLink', true, $urlSortImages, $urlAllImages, 'catalog_item_images'),
+                'help_html' => true,
+                'row_attr' => [
+                    'class' => 'mb-3',
+                    'style' => 'display: grid; grid-template-areas: "label label" "image input"; grid-template-columns: 1fr auto; align-items: center; column-gap:15px;',
+                ],
+                'label_attr' => [
+                    'style' => 'grid-area: label;',
+                ],
             ])
             ->add('catalogItem', EntityType::class, [
                 'class' => CatalogItem::class,
@@ -88,6 +102,9 @@ CatalogItemImageType extends AbstractType
                 ],
                 'required' => true,
                 'empty_data' => '',
+                'attr' => [
+                    'class' => 'js-entity-select',
+                ],
             ])->add('file', FileType::class, [
                 'label' => 'Изображение (WebP)',
                 'required' => $isEdit,
@@ -107,6 +124,12 @@ CatalogItemImageType extends AbstractType
                 'help_html' => true,
                 'help_attr' => [
                     'style' => 'grid-area: image; margin: 0;',
+                ],
+            ])
+            ->add('sort', HiddenType::class, [
+                'mapped' => false,
+                'attr' => [
+                    'class' => 'js-hidden-sort',
                 ],
             ]);
     }

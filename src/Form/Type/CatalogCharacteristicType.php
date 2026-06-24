@@ -6,9 +6,11 @@ use App\Entity\Catalog;
 use App\Entity\CatalogCharacteristic;
 use App\Entity\CatalogGroup;
 use App\Provider\ProductCodeProvider;
+use App\Utils\Sort;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -33,6 +35,9 @@ class CatalogCharacteristicType extends AbstractType
         $urlAllGroup = $this->router->generate('admin_crud_all_catalog_group');
         $urlAllCatalogs = $this->router->generate('admin_crud_all_catalog');
         $urlCheckCatalogMatch = $this->router->generate('admin_crud_check_catalog_match_between_catalog_group_and_catalog');
+        $urlCharsByGroup = $this->router->generate('admin_crud_all_catalog_characteristics_by_group_id', ['id' => 0]);
+        $urlCharsByCatalogNoGroup = $this->router->generate('admin_crud_all_catalog_characteristics_without_group_by_catalog_id', ['id' => 0]);
+        $urlSortChars = $this->router->generate('admin_crud_sort_catalog_characteristics');
         $builder->add('info_block', TextType::class, [
             'mapped' => false,
             'required' => false,
@@ -68,7 +73,31 @@ class CatalogCharacteristicType extends AbstractType
                     'step' => 1,
                     'placeholder' => '0',
                     'inputmode' => 'numeric',
+                    'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 0",
+                    'onpaste' => "let paste = (event.clipboardData || window.clipboardData).getData('text'); if(!/^\d+$/.test(paste)) { event.preventDefault(); }",
+                    'class' => 'js-position-select',
                 ],
+                'help' => Sort::getModalTwoMode(
+                    'name', 'img.imgLink', true,
+                    $urlSortChars,
+                    $urlCharsByCatalogNoGroup,
+                    $urlCharsByGroup,
+                    '.js-catalog-select',
+                    '.js-group-select',
+                    'catalog_characteristics'
+                ),
+                'help_html' => true,
+                'row_attr' => [
+                    'class' => 'mb-3',
+                    'style' => 'display: grid; grid-template-areas: "label label" "image input"; grid-template-columns: 1fr auto; align-items: center; column-gap:15px;',
+                ],
+                'label_attr' => [
+                    'style' => 'grid-area: label;',
+                ],
+            ])
+            ->add('sort', HiddenType::class, [
+                'mapped' => false,
+                'attr' => ['class' => 'js-hidden-sort'],
             ])
             ->add('product_code', ChoiceType::class, [
                 'label' => 'Код продукта',

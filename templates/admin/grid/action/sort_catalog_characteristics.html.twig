@@ -1,0 +1,12 @@
+{% set catalog_id = resource.id|default(data.id|default(null)) %}
+{% if catalog_id is not null %}
+    {{ sort_modal(
+        'name',
+        'img.imgLink',
+        false,
+        '/admin/crud/sort_catalog_characteristics',
+        '/admin/crud/all_catalog_characteristics_without_group_by_catalog_id/' ~ catalog_id,
+        'catalog_characteristics',
+        'Характеристики'
+    )|raw }}
+{% endif %}
