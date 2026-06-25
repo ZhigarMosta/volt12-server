@@ -9,7 +9,7 @@ class ServiceGroupRepository extends EntityRepository
     public function findAllWithServiceCount(): array
     {
         return $this->createQueryBuilder('sg')
-            ->select('sg.id, sg.name, sg.position, sg.img_link, COUNT(s.id) as service_count')
+            ->select('sg.id, sg.name, sg.position, COUNT(s.id) as service_count')
             ->leftJoin('sg.services', 's')
             ->groupBy('sg.id')
             ->orderBy('sg.position', 'ASC')

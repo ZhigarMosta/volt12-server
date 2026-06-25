@@ -109,10 +109,6 @@ services:
         tags:
             - { name: doctrine.orm.entity_listener }
 
-    App\EventListener\ServiceGroupImageListener:
-        tags:
-            - { name: doctrine.orm.entity_listener }
-
     App\EventListener\ServiceImageListener:
         tags:
             - { name: doctrine.orm.entity_listener }

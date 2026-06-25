@@ -128,7 +128,7 @@ class CrudService
             $items[] = [
                 'id' => $item->getId(),
                 'name' => $item->getName(),
-                'img' => ['imgLink' => $item->getImgLink() ?? ''],
+                'img' => ['imgLink' => ''],
                 'position' => $item->getPosition(),
             ];
         }

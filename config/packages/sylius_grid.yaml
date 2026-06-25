@@ -480,13 +480,6 @@ sylius_grid:
                     form_options:
                         label: Позиция
             fields:
-                image:
-                    type: twig
-                    label: Изобр.
-                    path: .
-                    sortable: ~
-                    options:
-                        template: "admin/grid/field/image.html.twig"
                 name:
                     type: string
                     label: Название
