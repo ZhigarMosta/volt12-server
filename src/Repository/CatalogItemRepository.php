@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Cart;
 use App\Entity\Catalog;
 use App\Entity\CatalogItem;
+use App\Entity\CatalogItemImage;
 use App\Entity\Compare;
 use App\Entity\Favorite;
 use App\Provider\ProductCodeProvider;
@@ -108,8 +109,10 @@ class CatalogItemRepository extends EntityRepository
             ->leftJoin(Cart::class, 'cart', 'WITH', 'cart.catalogItem = ci AND cart.user = :uid')
             ->leftJoin(Compare::class, 'cmp', 'WITH', 'cmp.catalogItem = ci AND cmp.user = :uid')
             ->leftJoin(Favorite::class, 'fav', 'WITH', 'fav.catalogItem = ci AND fav.user = :uid')
+            ->leftJoin(CatalogItemImage::class, 'cii', 'WITH', 'cii.catalogItem = ci.id')
             ->where('ci.catalog = :catalogId')
             ->andWhere('ci.product_code IN (:productCodes)')
+            ->andWhere('cii.id IS NOT NULL')
             ->setParameter('catalogId', $catalogId)
             ->setParameter('productCodes', $productCodes)
             ->setParameter('uid', $uid);
@@ -250,7 +253,9 @@ class CatalogItemRepository extends EntityRepository
         $qb = $this->createQueryBuilder('ci')
             ->select('IDENTITY(cc.catalogCharacteristic) as char_id', 'COUNT(DISTINCT ci.id) as item_count')
             ->innerJoin('ci.characteristics', 'cc')
+            ->leftJoin(CatalogItemImage::class, 'cii', 'WITH', 'cii.catalogItem = ci.id')
             ->where('ci.catalog = :catalogId')
+            ->andWhere('cii.id IS NOT NULL')
             ->andWhere('ci.product_code IN (:productCodes)')
             ->setParameter('catalogId', $catalogId)
             ->setParameter('productCodes', $productCodes);
