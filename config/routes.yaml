@@ -1,3 +1,10 @@
+# Переопределяем стандартный дашборд Sylius: своя версия без требования канала.
+sylius_admin_dashboard:
+    path: /admin/
+    methods: [GET]
+    defaults:
+        _controller: App\Controller\Admin\DashboardController
+
 app_admin_catalog_item:
     resource: |
         alias: app.catalog_item
@@ -237,5 +244,37 @@ app_admin_entity_history:
                 subheader: История изменений сущностей
             index:
                 icon: 'clock outline'
+    type: sylius.resource
+    prefix: /admin
+
+app_admin_user_order_item:
+    resource: |
+        alias: app.user_order_item
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show', 'create', 'update']
+        redirect: index
+        grid: app_admin_user_order_item
+        vars:
+            all:
+                subheader: Позиции заказов
+            index:
+                icon: 'list'
+    type: sylius.resource
+    prefix: /admin
+
+app_admin_user_token:
+    resource: |
+        alias: app.user_token
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show', 'create', 'update']
+        redirect: index
+        grid: app_admin_user_token
+        vars:
+            all:
+                subheader: Токены пользователей
+            index:
+                icon: 'key'
     type: sylius.resource
     prefix: /admin

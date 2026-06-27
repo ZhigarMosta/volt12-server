@@ -1,0 +1,22 @@
+<div class="mb-4">
+    <h3 class="mb-3">Инструменты</h3>
+    <div class="card">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h4 class="mb-1">Выгрузка базы данных</h4>
+                    <p class="text-secondary mb-0">
+                        Полный дамп базы данных PostgreSQL в SQL-файл (со структурой и данными,
+                        с командами <code>DROP ... IF EXISTS</code> для чистого восстановления).
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{{ path('app_admin_db_export') }}" class="btn btn-primary">
+                        {{ ux_icon('tabler:database-export') }}
+                        Скачать дамп БД (.sql)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

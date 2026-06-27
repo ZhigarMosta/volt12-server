@@ -39,4 +39,5 @@ class UserToken implements ResourceInterface
     public function getUser(): User { return $this->user; }
     public function getToken(): string { return $this->token; }
     public function getType(): string { return $this->type; }
+    public function getCreatedAt(): \DateTime { return $this->createdAt; }
 }

@@ -1,0 +1,7 @@
+{% if data.order is not null %}
+    <a href="{{ path('app_admin_user_order_update', {'id': data.order.id}) }}"
+       style="text-decoration: none;">№{{ data.order.id }}
+    </a>
+{% else %}
+    <span style="color: grey">-</span>
+{% endif %}

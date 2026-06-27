@@ -2,6 +2,7 @@
 
 namespace App\Menu;
 
+use Knp\Menu\ItemInterface;
 use Sylius\Bundle\UiBundle\Menu\Event\MenuBuilderEvent;
 
 class AdminMenuListener
@@ -10,9 +11,71 @@ class AdminMenuListener
     {
         $menu = $event->getMenu();
 
-        $catalog = $menu->getChild('catalog');
+        $this->removeDefaultItems($menu);
 
-        if ($catalog) {
+        // ===== Каталог =====
+        $catalog = $menu->getChild('catalog') ?? $menu->addChild('catalog');
+        $catalog
+            ->setLabel('Каталог')
+            ->setLabelAttribute('icon', 'tabler:cube');
+
+        $this->item($catalog, 'catalog_list', 'app_admin_catalog_index', 'Каталоги');
+        $this->item($catalog, 'catalog_group', 'app_admin_catalog_group_index', 'Группы каталогов');
+        $this->item($catalog, 'catalog_item', 'app_admin_catalog_item_index', 'Продукты');
+        $this->item($catalog, 'catalog_item_image', 'app_admin_catalog_item_image_index', 'Изображения продуктов');
+        $this->item($catalog, 'catalog_characteristic', 'app_admin_catalog_characteristic_index', 'Характеристики каталога');
+        $this->item($catalog, 'catalog_item_characteristic', 'app_admin_catalog_item_characteristic_index', 'Характеристики продукта');
+
+        // ===== Услуги =====
+        $services = $menu->addChild('app_services')
+            ->setLabel('Услуги')
+            ->setLabelAttribute('icon', 'tabler:briefcase');
+
+        $this->item($services, 'service_group', 'app_admin_service_group_index', 'Группы услуг');
+        $this->item($services, 'service', 'app_admin_service_index', 'Услуги');
+
+        // ===== Продажи =====
+        $sales = $menu->addChild('app_sales')
+            ->setLabel('Продажи')
+            ->setLabelAttribute('icon', 'tabler:shopping-cart');
+
+        $this->item($sales, 'user_order', 'app_admin_user_order_index', 'Заказы');
+        $this->item($sales, 'user_order_item', 'app_admin_user_order_item_index', 'Позиции заказов');
+        $this->item($sales, 'cart', 'app_admin_cart_index', 'Корзины');
+
+        // ===== Клиенты =====
+        $customers = $menu->addChild('app_customers')
+            ->setLabel('Клиенты')
+            ->setLabelAttribute('icon', 'tabler:users');
+
+        $this->item($customers, 'client_users', 'app_admin_user_index', 'Клиенты');
+        $this->item($customers, 'favorites', 'app_admin_favorite_index', 'Избранное');
+        $this->item($customers, 'compare', 'app_admin_compare_index', 'Сравнения');
+
+        // ===== Отзывы =====
+        $reviews = $menu->addChild('app_reviews')
+            ->setLabel('Отзывы')
+            ->setLabelAttribute('icon', 'tabler:star');
+
+        $this->item($reviews, 'feedback_from_map', 'app_admin_feedback_from_map_index', 'Отзывы с карт');
+
+        // ===== Система =====
+        $system = $menu->addChild('app_system')
+            ->setLabel('Система')
+            ->setLabelAttribute('icon', 'tabler:settings');
+
+        $this->item($system, 'entity_history', 'app_admin_entity_history_index', 'История изменений');
+        $this->item($system, 'user_token', 'app_admin_user_token_index', 'Токены');
+    }
+
+    private function item(ItemInterface $parent, string $key, string $route, string $label): void
+    {
+        $parent->addChild($key, ['route' => $route])->setLabel($label);
+    }
+
+    private function removeDefaultItems(ItemInterface $menu): void
+    {
+        if (null !== $catalog = $menu->getChild('catalog')) {
             $catalog->removeChild('taxons');
             $catalog->removeChild('products');
             $catalog->removeChild('inventory');
@@ -21,12 +84,8 @@ class AdminMenuListener
             $catalog->removeChild('association_types');
         }
 
-        $menu->removeChild('sales');
-        $menu->removeChild('customer');
-        $menu->removeChild('marketing');
-        $menu->removeChild('customers');
-        $menu->removeChild('configuration');
-        $menu->removeChild('official_support');
-        $menu->removeChild('sylius.ui.administration');
+        foreach (['sales', 'customer', 'marketing', 'customers', 'configuration', 'official_support', 'sylius.ui.administration'] as $child) {
+            $menu->removeChild($child);
+        }
     }
 }

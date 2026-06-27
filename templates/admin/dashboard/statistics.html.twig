@@ -1,0 +1,41 @@
+{% set s = app_dashboard_stats() %}
+
+{% macro stat(label, value, icon, color) %}
+    <div class="col-sm-6 col-lg-3">
+        <div class="card card-sm">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <span class="bg-{{ color|default('primary') }} text-white avatar">
+                            {{ ux_icon(icon|default('tabler:chart-bar')) }}
+                        </span>
+                    </div>
+                    <div class="col">
+                        <div class="font-weight-medium h2 mb-0">{{ value }}</div>
+                        <div class="text-secondary">{{ label }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+{% import _self as cards %}
+
+<div class="mb-2">
+    <h3 class="mb-3">Сводка</h3>
+    <div class="row row-cards mb-2">
+        {{ cards.stat('Заказы', s.orders, 'tabler:shopping-cart', 'primary') }}
+        {{ cards.stat('Заказы за 7 дней', s.orders_last_7, 'tabler:calendar-stats', 'azure') }}
+        {{ cards.stat('Выручка, ₽', (s.revenue / 100)|number_format(2, ',', ' '), 'tabler:cash', 'green') }}
+        {{ cards.stat('Пользователи', s.users, 'tabler:users', 'purple') }}
+    </div>
+    <div class="row row-cards mb-4">
+        {{ cards.stat('Продукты', s.products, 'tabler:cube', 'orange') }}
+        {{ cards.stat('Каталоги', s.catalogs, 'tabler:folders', 'yellow') }}
+        {{ cards.stat('Услуги', s.services, 'tabler:briefcase', 'teal') }}
+        {{ cards.stat('Отзывы', s.feedback, 'tabler:star', 'pink') }}
+        {{ cards.stat('Корзины', s.carts, 'tabler:basket', 'cyan') }}
+        {{ cards.stat('Избранное', s.favorites, 'tabler:heart', 'red') }}
+        {{ cards.stat('Сравнения', s.compares, 'tabler:scale', 'indigo') }}
+    </div>
+</div>

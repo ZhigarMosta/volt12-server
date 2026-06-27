@@ -615,15 +615,19 @@ sylius_grid:
                     label: ID
                     sortable: ~
                 user:
-                    type: string
+                    type: twig
                     label: Пользователь
-                    path: user.name
-                    sortable: ~
+                    path: .
+                    sortable: user.name
+                    options:
+                        template: 'admin/grid/field/user.html.twig'
                 catalogItem:
-                    type: string
+                    type: twig
                     label: Товар
-                    path: catalogItem.name
-                    sortable: ~
+                    path: .
+                    sortable: catalogItem.name
+                    options:
+                        template: 'admin/grid/field/catalogItem.html.twig'
                 count:
                     type: string
                     label: Количество
@@ -652,15 +656,19 @@ sylius_grid:
                     label: ID
                     sortable: ~
                 user:
-                    type: string
+                    type: twig
                     label: Пользователь
-                    path: user.name
-                    sortable: ~
+                    path: .
+                    sortable: user.name
+                    options:
+                        template: 'admin/grid/field/user.html.twig'
                 catalogItem:
-                    type: string
+                    type: twig
                     label: Товар
-                    path: catalogItem.name
-                    sortable: ~
+                    path: .
+                    sortable: catalogItem.name
+                    options:
+                        template: 'admin/grid/field/catalogItem.html.twig'
                 created_at:
                     type: datetime
                     label: Дата добавления
@@ -685,15 +693,19 @@ sylius_grid:
                     label: ID
                     sortable: ~
                 user:
-                    type: string
+                    type: twig
                     label: Пользователь
-                    path: user.name
-                    sortable: ~
+                    path: .
+                    sortable: user.name
+                    options:
+                        template: 'admin/grid/field/user.html.twig'
                 catalogItem:
-                    type: string
+                    type: twig
                     label: Товар
-                    path: catalogItem.name
-                    sortable: ~
+                    path: .
+                    sortable: catalogItem.name
+                    options:
+                        template: 'admin/grid/field/catalogItem.html.twig'
                 created_at:
                     type: datetime
                     label: Дата добавления
@@ -733,6 +745,13 @@ sylius_grid:
                     type: string
                     label: '№'
                     sortable: ~
+                user:
+                    type: twig
+                    label: Пользователь
+                    path: .
+                    sortable: user.name
+                    options:
+                        template: 'admin/grid/field/user.html.twig'
                 firstName:
                     type: string
                     label: Имя
@@ -805,6 +824,98 @@ sylius_grid:
                         type: default
                         label: Восстановить
                         template: "admin/grid/action/entity_history_restore.html.twig"
+                    delete: { type: delete }
+
+        app_admin_user_order_item:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\UserOrderItem
+            sorting:
+                id: desc
+            filters:
+                name:
+                    type: string
+                    label: Название
+            fields:
+                id:
+                    type: string
+                    label: '#'
+                    sortable: ~
+                order:
+                    type: twig
+                    label: Заказ
+                    path: .
+                    sortable: order.id
+                    options:
+                        template: 'admin/grid/field/userOrder.html.twig'
+                name:
+                    type: string
+                    label: Название
+                    sortable: ~
+                catalogItem:
+                    type: twig
+                    label: Товар
+                    path: .
+                    sortable: catalogItem.name
+                    options:
+                        template: 'admin/grid/field/catalogItem.html.twig'
+                price:
+                    type: string
+                    label: Цена (коп.)
+                    sortable: ~
+                quantity:
+                    type: string
+                    label: Кол-во
+                    sortable: ~
+                totalPrice:
+                    type: string
+                    label: Сумма (коп.)
+                    sortable: ~
+            actions:
+                item:
+                    delete: { type: delete }
+
+        app_admin_user_token:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\UserToken
+            sorting:
+                createdAt: desc
+            filters:
+                type:
+                    type: string
+                    label: Тип
+                token:
+                    type: string
+                    label: Токен
+            fields:
+                id:
+                    type: string
+                    label: '#'
+                    sortable: ~
+                user:
+                    type: twig
+                    label: Пользователь
+                    path: .
+                    sortable: user.name
+                    options:
+                        template: 'admin/grid/field/user.html.twig'
+                token:
+                    type: string
+                    label: Токен
+                    sortable: ~
+                type:
+                    type: string
+                    label: Тип
+                    sortable: ~
+                createdAt:
+                    type: datetime
+                    label: Создан
+                    sortable: ~
+            actions:
+                item:
                     delete: { type: delete }
 
     templates:

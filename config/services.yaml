@@ -72,34 +72,6 @@ services:
     App\Menu\AdminMenuListener:
         tags:
             - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
-    
-    App\Menu\CatalogItemMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
-    App\Menu\CatalogMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-    
-    App\Menu\FeedbackFromMapListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
-    App\Menu\CatalogCharacteristicMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
-    App\Menu\CatalogItemCharacteristicMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
-    App\Menu\CatalogGroupMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
-    App\Menu\CatalogItemImageMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
     App\EventListener\CatalogItemImageListener:
         tags:
@@ -184,14 +156,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: app.catalog_group.pre_create, method: onPreCreate }
             - { name: kernel.event_listener, event: app.catalog_group.pre_update, method: onPreUpdate }
-
-    App\Menu\ServiceGroupMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
-    App\Menu\ServiceMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
     App\EventListener\ServiceGroupDeletionListener:
         tags:
@@ -317,10 +281,6 @@ services:
         tags: [ 'form.type' ]
         autowire: true
 
-    App\Menu\UserMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
     App\Form\Type\CartType:
         tags: [ 'form.type' ]
         autowire: true
@@ -333,25 +293,6 @@ services:
         tags: [ 'form.type' ]
         autowire: true
 
-    App\Menu\CartMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
-    App\Menu\CompareMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
-    App\Menu\FavoriteMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
-    App\Menu\UserOrderMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
-
-    App\Menu\EntityHistoryMenuListener:
-        tags:
-            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addToMain }
 
     App\EventListener\EntityHistorySubscriber:
         tags:
@@ -361,6 +302,15 @@ services:
         tags: ['twig.extension']
 
     App\Controller\Admin\EntityHistoryController:
+        tags: [ 'controller.service_arguments' ]
+
+    App\Twig\DashboardExtension:
+        tags: ['twig.extension']
+
+    App\Controller\Admin\DashboardToolsController:
+        tags: [ 'controller.service_arguments' ]
+
+    App\Controller\Admin\DashboardController:
         tags: [ 'controller.service_arguments' ]
 
     App\Service\Volt12\UserOrderService:

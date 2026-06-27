@@ -278,6 +278,27 @@ sylius_twig_hooks:
                 template: 'admin/entity_history/_history_hook.html.twig'
                 priority: -50
 
+        'sylius_admin.dashboard.index.content':
+            statistics:
+                enabled: false
+            latest_statistics:
+                enabled: false
+            app_statistics:
+                template: 'admin/dashboard/statistics.html.twig'
+                priority: 150
+            app_tools:
+                template: 'admin/dashboard/tools.html.twig'
+                priority: 100
+
+        'sylius_admin.dashboard.index.content.header.title_block':
+            actions:
+                enabled: false
+
+        # Убираем поиск из шапки админки
+        'sylius_admin.common.component.navbar.menu':
+            search:
+                enabled: false
+
         'sylius_shop.base#stylesheets':
             app_styles:
                 template: 'shop/stylesheets.html.twig'
