@@ -173,7 +173,9 @@ class CatalogItemRepository extends EntityRepository
     {
         return $this->createQueryBuilder('ci')
             ->select('ci')
+            ->leftJoin(CatalogItemImage::class, 'cii', 'WITH', 'cii.catalogItem = ci.id')
             ->where('ci.product_code IN (:productCodes)')
+            ->andWhere('cii.id IS NOT NULL')
             ->andWhere('ci.is_popular = :isPopular')
             ->setParameter('productCodes', $productCodes)
             ->setParameter('isPopular', CatalogItem::POPULAR)
@@ -187,9 +189,11 @@ class CatalogItemRepository extends EntityRepository
     {
         return $this->createQueryBuilder('ci')
             ->select('ci')
+            ->leftJoin(CatalogItemImage::class, 'cii', 'WITH', 'cii.catalogItem = ci.id')
             ->where('ci.product_code IN (:productCodes)')
             ->andWhere('ci.is_popular = :isPopular')
             ->andWhere('ci.catalog = :catalog')
+            ->andWhere('cii.id IS NOT NULL')
             ->setParameter('productCodes', $productCodes)
             ->setParameter('isPopular', CatalogItem::POPULAR)
             ->setParameter('catalog', $catalog)
