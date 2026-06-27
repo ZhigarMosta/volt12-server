@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/crud')]
-class CatalogItemCharacteristicController extends AbstractController
+class SortController extends AbstractController
 {
     public function __construct(
         private CatalogItemService $catalogItemService,

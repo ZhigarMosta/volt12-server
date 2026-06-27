@@ -11,6 +11,7 @@ use App\Entity\FeedbackFromMap;
 use App\Entity\Service;
 use App\Entity\User;
 use App\Entity\UserOrder;
+use App\Service\DatabaseBackupService;
 use Doctrine\ORM\EntityManagerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -19,13 +20,41 @@ class DashboardExtension extends AbstractExtension
 {
     public function __construct(
         private EntityManagerInterface $em,
+        private DatabaseBackupService $backupService,
     ) {}
 
     public function getFunctions(): array
     {
         return [
             new TwigFunction('app_dashboard_stats', [$this, 'getStats']),
+            new TwigFunction('app_db_backups', [$this, 'getBackups']),
         ];
+    }
+
+    /**
+     * Список файловых дампов БД (от свежего к старому).
+     *
+     * @return array<int, array{name: string, size: int, mtime: int}>
+     */
+    public function getBackups(): array
+    {
+        $backups = [];
+        foreach ($this->backupService->listBackups() as $path) {
+            $name = basename($path);
+            // db-dump-20260627-171757.sql -> 20260627-171757
+            $stamp = preg_match('/^db-dump-(\d{8}-\d{6})\.sql$/', $name, $m) ? $m[1] : null;
+            if ($stamp === null) {
+                continue;
+            }
+            $backups[] = [
+                'name'  => $name,
+                'stamp' => $stamp,
+                'size'  => (int) (@filesize($path) ?: 0),
+                'mtime' => (int) (@filemtime($path) ?: 0),
+            ];
+        }
+
+        return $backups;
     }
 
     /**

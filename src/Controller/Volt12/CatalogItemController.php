@@ -184,7 +184,42 @@ class CatalogItemController extends AbstractController
         $totalItems = $result['total'];
         $totalPages = ceil($totalItems / $limit);
 
-        $items = array_map(fn(CatalogItem $item) => [
+        return $this->json([
+            'items' => $this->mapCatalogItems($result['items'], $user),
+            'facets' => $facets,
+            'meta' => [
+                'total_items' => $totalItems,
+                'total_pages' => $totalPages,
+                'current_page' => $page,
+                'limit' => $limit,
+            ]
+        ]);
+    }
+
+    #[Route('/popular_catalog_items', name: 'volt12_popular_catalog_items', methods: ['GET'])]
+    public function popular_catalog_items(): JsonResponse
+    {
+        $result = $this->catalogItemService->getCatalogItemByCatalogID(
+            catalogId: null,
+            page: null,
+            limit: CatalogItem::LIMIT_POPULAR,
+            isPopular: true,
+        );
+
+        return $this->json([
+            'items' => $this->mapCatalogItems($result['items'], null),
+        ]);
+    }
+
+    /**
+     * Единый формат товара для выдачи (используется обычным и популярным списком).
+     *
+     * @param CatalogItem[] $items
+     * @return array<int, array<string, mixed>>
+     */
+    private function mapCatalogItems(array $items, ?User $user): array
+    {
+        return array_map(fn(CatalogItem $item) => [
             'id' => $item->getId(),
             'name' => $item->getName(),
             'slug' => $item->getSlug(),
@@ -203,24 +238,7 @@ class CatalogItemController extends AbstractController
                 'in_compare' => $item->getInCompare(),
                 'in_favorite' => $item->getInFavorite(),
             ] : null,
-        ], $result['items']);
-
-        return $this->json([
-            'items' => $items,
-            'facets' => $facets,
-            'meta' => [
-                'total_items' => $totalItems,
-                'total_pages' => $totalPages,
-                'current_page' => $page,
-                'limit' => $limit,
-            ]
-        ]);
-    }
-
-    #[Route('/popular_catalog_items', name: 'volt12_popular_catalog_items', methods: ['GET'])]
-    public function popular_catalog_items(): JsonResponse
-    {
-        return $this->json($this->catalogItemService->getPopularCatalogItemList());
+        ], $items);
     }
 
     #[Route('/popular_catalog_items_by_first_popular_catalog', name: 'volt12_popular_catalog_items_by_first_popular_catalog', methods: ['GET'])]

@@ -17,6 +17,46 @@
                     </a>
                 </div>
             </div>
+
+            {% set backups = app_db_backups() %}
+            <hr class="my-3">
+            <h4 class="mb-1">Автоматические дампы</h4>
+            <p class="text-secondary mb-3">
+                Создаются по расписанию (раз в 7 дней), хранится не более 10 последних.
+            </p>
+
+            {% if backups is empty %}
+                <p class="text-secondary mb-0">Пока нет ни одного сохранённого дампа.</p>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table">
+                        <thead>
+                            <tr>
+                                <th>Файл</th>
+                                <th>Дата</th>
+                                <th class="text-end">Размер</th>
+                                <th class="w-1"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in backups %}
+                                <tr>
+                                    <td class="text-secondary">{{ b.name }}</td>
+                                    <td>{{ b.mtime|date('d.m.Y H:i') }}</td>
+                                    <td class="text-end">{{ (b.size / 1024)|number_format(0, '.', ' ') }} КБ</td>
+                                    <td>
+                                        <a href="{{ path('app_admin_db_backup_download', {stamp: b.stamp}) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            {{ ux_icon('tabler:download') }}
+                                            Скачать
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

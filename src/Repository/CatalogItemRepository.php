@@ -97,7 +97,7 @@ class CatalogItemRepository extends EntityRepository
             ->getResult();
     }
 
-    public function list(array $productCodes, int $catalogId, ?array $filterGroups, ?array $price, ?string $search, ?string $sortPrice, ?int $page, ?int $limit, ?int $userId = null): array
+    public function list(array $productCodes, ?int $catalogId, ?array $filterGroups, ?array $price, ?string $search, ?string $sortPrice, ?int $page, ?int $limit, ?int $userId = null, bool $isPopular = false): array
     {
         $uid = $userId ?? 0;
 
@@ -110,12 +110,20 @@ class CatalogItemRepository extends EntityRepository
             ->leftJoin(Compare::class, 'cmp', 'WITH', 'cmp.catalogItem = ci AND cmp.user = :uid')
             ->leftJoin(Favorite::class, 'fav', 'WITH', 'fav.catalogItem = ci AND fav.user = :uid')
             ->leftJoin(CatalogItemImage::class, 'cii', 'WITH', 'cii.catalogItem = ci.id')
-            ->where('ci.catalog = :catalogId')
             ->andWhere('ci.product_code IN (:productCodes)')
             ->andWhere('cii.id IS NOT NULL')
-            ->setParameter('catalogId', $catalogId)
             ->setParameter('productCodes', $productCodes)
             ->setParameter('uid', $uid);
+
+        if (!empty($catalogId)) {
+            $qb->andWhere('ci.catalog = :catalogId')
+                ->setParameter('catalogId', $catalogId);
+        }
+
+        if ($isPopular) {
+            $qb->andWhere('ci.is_popular = :isPopularFlag')
+                ->setParameter('isPopularFlag', CatalogItem::POPULAR);
+        }
 
         if (isset($price['max']) && is_int((int) $price['max'])) {
             $qb->andWhere('ci.price <= (:priceMax)')

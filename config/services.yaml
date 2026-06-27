@@ -41,7 +41,7 @@ services:
     App\Service\Volt12\FeedbackFromMapService:
         autowire: true
         
-    App\Controller\Admin\CatalogItemCharacteristicController:
+    App\Controller\Admin\SortController:
         tags: [ 'controller.service_arguments' ]
         arguments:
             $catalogItemService: '@App\Service\Volt12\CatalogItemService'
@@ -312,6 +312,14 @@ services:
 
     App\Controller\Admin\DashboardController:
         tags: [ 'controller.service_arguments' ]
+
+    App\Service\DatabaseBackupService:
+        arguments:
+            $backupDir: '%kernel.project_dir%/var/backups'
+            $logger: '@logger'
+
+    App\Command\DatabaseBackupCommand:
+        tags: [ 'console.command' ]
 
     App\Service\Volt12\UserOrderService:
         autowire: true
