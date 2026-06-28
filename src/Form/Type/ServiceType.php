@@ -152,6 +152,18 @@ class ServiceType extends AbstractType
                 'style' => 'grid-area: image; margin: 0;',
             ],
         ]);
+
+        $builder
+            ->add('imgAlt', TextType::class, [
+                'label' => 'Alt',
+                'required' => false,
+                'empty_data' => '',
+            ])
+            ->add('imgTitle', TextType::class, [
+                'label' => 'Title',
+                'required' => false,
+                'empty_data' => '',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

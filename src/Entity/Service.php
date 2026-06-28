@@ -51,6 +51,12 @@ class Service implements ResourceInterface, TimestampableInterface
     #[ORM\Column(name: 'img_link', type: 'string', length: 2048, nullable: true)]
     private ?string $img_link = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $imgAlt = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $imgTitle = null;
+
     private ?File $file = null;
 
     #[ORM\ManyToOne(targetEntity: ServiceGroup::class, inversedBy: 'services')]
@@ -85,6 +91,10 @@ class Service implements ResourceInterface, TimestampableInterface
         $this->img_link = $img_link;
         $this->updatedAt = new \DateTime();
     }
+    public function getImgAlt(): ?string { return $this->imgAlt; }
+    public function setImgAlt(string $imgAlt): void { $this->imgAlt = $imgAlt; }
+    public function getImgTitle(): ?string { return $this->imgTitle; }
+    public function setImgTitle(string $imgTitle): void { $this->imgTitle = $imgTitle; }
     public function getServiceGroup(): ?ServiceGroup { return $this->serviceGroup; }
     public function setServiceGroup(?ServiceGroup $serviceGroup): void { $this->serviceGroup = $serviceGroup; }
 

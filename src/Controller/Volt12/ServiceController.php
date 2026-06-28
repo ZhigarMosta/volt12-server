@@ -42,6 +42,8 @@ class ServiceController extends AbstractController
                 'short_description' => $service->getShortDescription(),
                 'position' => $service->getPosition(),
                 'img_link' => $service->getImgLink(),
+                'img_alt' => $service->getImgAlt(),
+                'img_title' => $service->getImgTitle(),
                 'service_group_id' => $service->getServiceGroup()?->getId(),
             ],
             'related' => array_map(fn(Service $s) => [
@@ -49,6 +51,8 @@ class ServiceController extends AbstractController
                 'name' => $s->getName(),
                 'slug' => $s->getSlug(),
                 'img_link' => $s->getImgLink(),
+                'img_alt' => $s->getImgAlt(),
+                'img_title' => $s->getImgTitle(),
                 'short_description' => $s->getShortDescription(),
             ], $related),
         ]);
@@ -79,6 +83,8 @@ class ServiceController extends AbstractController
                 'short_description' => $service->getShortDescription(),
                 'position' => $service->getPosition(),
                 'img_link' => $service->getImgLink(),
+                'img_alt' => $service->getImgAlt(),
+                'img_title' => $service->getImgTitle(),
                 'service_group_id' => $service->getServiceGroup()?->getId(),
             ];
         }
