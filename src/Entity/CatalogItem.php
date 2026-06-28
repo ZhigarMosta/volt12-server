@@ -62,7 +62,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     private string $product_code = '';
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private string $description = '';
+    private ?string $description = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $short_description = null;
@@ -103,25 +103,25 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     public function getName(): string { return $this->name; }
     public function setName(string $name): void { $this->name = $name; }
 
-    public function getSlug(): string { return $this->slug; }
+    public function getSlug(): ?string { return $this->slug; }
     public function setSlug(string $slug): void { $this->slug = $slug; }
 
-    public function getPrice(): int { return $this->price; }
+    public function getPrice(): ?int { return $this->price; }
     public function setPrice(int $price): void { $this->price = $price; }
 
     public function getPosition(): ?int { return $this->position; }
     public function setPosition(?int $position): void { $this->position = $position; }
 
-    public function getIsNew(): bool { return $this->is_new; }
+    public function getIsNew(): ?bool { return $this->is_new; }
     public function setIsNew( bool $is_new): void { $this->is_new = $is_new; }
 
-    public function getIsPopular(): bool { return $this->is_popular; }
+    public function getIsPopular(): ?bool { return $this->is_popular; }
     public function setIsPopular( bool $is_popular): void { $this->is_popular = $is_popular; }
 
-    public function getIsPublished(): bool { return $this->is_published; }
+    public function getIsPublished(): ?bool { return $this->is_published; }
     public function setIsPublished( bool $is_published): void { $this->is_published = $is_published; }
 
-    public function getProductCode(): string { return $this->product_code; }
+    public function getProductCode(): ?string { return $this->product_code; }
     public function setProductCode(?string $product_code): void { $this->product_code = (string) $product_code; }
 
     public function getCatalog(): ?Catalog {
@@ -129,13 +129,13 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     }
     public function setCatalog(?Catalog $catalog): void { $this->catalog = $catalog; }
 
-    public function getDescription(): string { return $this->description; }
+    public function getDescription(): ?string { return $this->description; }
     public function setDescription(string $description): void { $this->description = $description; }
 
     public function getShortDescription(): ?string { return $this->short_description; }
     public function setShortDescription(?string $short_description): void { $this->short_description = $short_description; }
 
-    public function getCount(): int { return $this->count; }
+    public function getCount(): ?int { return $this->count; }
     public function setCount(int $count): void { $this->count = $count; }
 
     private ?int $cartCount = null;
@@ -145,9 +145,9 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
     public function getCartCount(): ?int { return $this->cartCount; }
     public function setCartCount(?int $cartCount): void { $this->cartCount = $cartCount; }
 
-    public function getInCompare(): bool { return $this->inCompare !== null; }
+    public function getInCompare(): ?bool { return $this->inCompare !== null; }
     public function setInCompare(?int $inCompare): void { $this->inCompare = $inCompare; }
 
-    public function getInFavorite(): bool { return $this->inFavorite !== null; }
+    public function getInFavorite(): ?bool { return $this->inFavorite !== null; }
     public function setInFavorite(?int $inFavorite): void { $this->inFavorite = $inFavorite; }
 }

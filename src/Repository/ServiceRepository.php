@@ -64,7 +64,10 @@ class ServiceRepository extends EntityRepository
                 ->setParameter('search', '%' . $search . '%');
         }
 
-        $qb->setFirstResult(($page - 1) * $limit)
+        $qb->andWhere('s.img_link IS NOT NULL')
+            ->andWhere('s.img_link != :empty')
+            ->setParameter('empty', '')
+            ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
 
         return new Paginator($qb, true);

@@ -1,4 +1,4 @@
-
+php -S 127.0.0.1:8100 -t public
 php bin/console cache:clear
 yarn install
 yarn build

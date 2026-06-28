@@ -176,7 +176,7 @@ class CatalogItemController extends AbstractController
 
         $user = User::getAppUser($request);
 
-        $result = $this->catalogItemService->getCatalogItemByCatalogID($catalogId, $filterGroups, $price, $search, $sortPrice, $page, $limit, $user?->getId());
+        $result = $this->catalogItemService->getCatalogItemByParams($catalogId, $filterGroups, $price, $search, $sortPrice, $page, $limit, $user?->getId());
 
 
         $facets = $this->catalogItemService->calculateFacets($catalogId, $filterGroups, $price, $search);
@@ -199,7 +199,7 @@ class CatalogItemController extends AbstractController
     #[Route('/popular_catalog_items', name: 'volt12_popular_catalog_items', methods: ['GET'])]
     public function popular_catalog_items(): JsonResponse
     {
-        $result = $this->catalogItemService->getCatalogItemByCatalogID(
+        $result = $this->catalogItemService->getCatalogItemByParams(
             catalogId: null,
             page: null,
             limit: CatalogItem::LIMIT_POPULAR,

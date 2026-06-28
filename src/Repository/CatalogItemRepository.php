@@ -97,7 +97,7 @@ class CatalogItemRepository extends EntityRepository
             ->getResult();
     }
 
-    public function list(array $productCodes, ?int $catalogId, ?array $filterGroups, ?array $price, ?string $search, ?string $sortPrice, ?int $page, ?int $limit, ?int $userId = null, bool $isPopular = false): array
+    public function list(array $productCodes, ?int $catalogId, ?array $filterGroups, ?array $price, ?string $search, ?string $sortPrice, ?int $page, ?int $limit, ?int $userId = null, bool $isPopular = false, ?bool $onlyWithImage = true): array
     {
         $uid = $userId ?? 0;
 
@@ -109,11 +109,14 @@ class CatalogItemRepository extends EntityRepository
             ->leftJoin(Cart::class, 'cart', 'WITH', 'cart.catalogItem = ci AND cart.user = :uid')
             ->leftJoin(Compare::class, 'cmp', 'WITH', 'cmp.catalogItem = ci AND cmp.user = :uid')
             ->leftJoin(Favorite::class, 'fav', 'WITH', 'fav.catalogItem = ci AND fav.user = :uid')
-            ->leftJoin(CatalogItemImage::class, 'cii', 'WITH', 'cii.catalogItem = ci.id')
             ->andWhere('ci.product_code IN (:productCodes)')
-            ->andWhere('cii.id IS NOT NULL')
             ->setParameter('productCodes', $productCodes)
             ->setParameter('uid', $uid);
+
+        if($onlyWithImage){
+            $qb->leftJoin(CatalogItemImage::class, 'cii', 'WITH', 'cii.catalogItem = ci.id')
+                ->andWhere('cii.id IS NOT NULL');
+        }
 
         if (!empty($catalogId)) {
             $qb->andWhere('ci.catalog = :catalogId')

@@ -50,7 +50,7 @@ class SortController extends AbstractController
         ]);
     }
 
-    #[Route('/catalogs_by_group/{id}', name: 'admin_crud_catalogs_by_group', methods: ['GET'])] //2
+    #[Route('/catalogs_by_group/{id}', name: 'admin_crud_catalogs_by_group', methods: ['GET'])]
     public function catalogCharacteristicsByGroup(CatalogGroup $item): JsonResponse
     {
         $catalog = $item->getCatalog();
@@ -71,10 +71,11 @@ class SortController extends AbstractController
     #[Route('/all_catalog_items_by_catalog_id/{id}', name: 'admin_crud_all_catalog_items_by_catalog_id', methods: ['GET'])]
     public function allProductsByCatalog(Catalog $item): JsonResponse
     {
-        $result = $this->catalogItemService->getCatalogItemByCatalogID(
+        $result = $this->catalogItemService->getCatalogItemByParams(
             catalogId: $item->getId(),
             page: null,
-            limit: null
+            limit: null,
+            onlyWithImage: false
         );
 
         return $this->json([
