@@ -87,6 +87,9 @@ class ServiceRepository extends EntityRepository
     {
         return $this->createQueryBuilder('s')
             ->where('LOWER(s.name) LIKE LOWER(:name)')
+            ->andWhere('s.img_link IS NOT NULL')
+            ->andWhere('s.img_link != :empty')
+            ->setParameter('empty', '')
             ->setParameter('name', '%' . $name . '%')
             ->orderBy('s.position', 'ASC')
             ->addOrderBy('s.id', 'ASC')

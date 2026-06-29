@@ -234,7 +234,9 @@ class CatalogItemRepository extends EntityRepository
     public function searchByName(string $name, array $productCodes, int $limit): array
     {
         return $this->createQueryBuilder('ci')
+            ->leftJoin(CatalogItemImage::class, 'cii', 'WITH', 'cii.catalogItem = ci.id')
             ->where('LOWER(ci.name) LIKE LOWER(:name)')
+            ->andWhere('cii.id IS NOT NULL')
             ->andWhere('ci.product_code IN (:productCodes)')
             ->setParameter('name', '%' . $name . '%')
             ->setParameter('productCodes', $productCodes)
