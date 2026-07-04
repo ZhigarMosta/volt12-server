@@ -23,3 +23,9 @@ framework:
             policy: 'sliding_window'
             limit: 50
             interval: '1 hour'
+
+        # Подтверждение email кодом — защита от подбора 6-значного кода
+        email_verify_attempt:
+            policy: 'sliding_window'
+            limit: 20
+            interval: '1 hour'

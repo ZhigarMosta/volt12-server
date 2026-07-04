@@ -9,8 +9,11 @@ services:
       APP_ENV: dev
       # Пароль БД 'sylius', хост 'database'
       DATABASE_URL: postgresql://sylius:sylius@database:5432/sylius?serverVersion=15&charset=utf8
+      # Письма улетают в mailpit, смотреть на http://localhost:8025
+      MAILER_DSN: smtp://mailpit:1025
     depends_on:
       - database
+      - mailpit
 
   # --- Web Server (Nginx) ---
   web:

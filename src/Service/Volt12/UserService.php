@@ -69,27 +69,28 @@ class UserService
         $this->entityManager->flush();
     }
 
-    public function sendVerificationEmail(User $user, FeedbackService $feedbackService, string $baseUrl): void
+    public function sendVerificationEmail(User $user, FeedbackService $feedbackService): void
     {
-        $token = $this->generateToken();
-        $userToken = new UserToken($user, $token, 'email_verify');
+        $this->userTokenRepository->deleteByUserAndType($user, 'email_verify');
+
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $userToken = new UserToken($user, $code, 'email_verify');
         $this->entityManager->persist($userToken);
         $this->entityManager->flush();
 
-        $verifyUrl = rtrim($baseUrl, '/') . '/verify-email?token=' . $token;
-        $feedbackService->sendEmailVerification($user->getEmail(), $verifyUrl);
+        $feedbackService->sendEmailVerification($user->getEmail(), $code);
     }
 
-    public function verifyEmail(string $token): bool
+    public function verifyEmail(string $code): bool
     {
-        $userToken = $this->userTokenRepository->findByTokenAndType($token, 'email_verify');
+        $userToken = $this->userTokenRepository->findByTokenAndType($code, 'email_verify');
         if (!$userToken) {
             return false;
         }
 
         $user = $userToken->getUser();
         $user->setEmailVerified(true);
-        $this->userTokenRepository->deleteByToken($token);
+        $this->userTokenRepository->deleteByToken($code);
         $this->entityManager->flush();
 
         return true;
@@ -144,7 +145,7 @@ class UserService
 
     public function getUserByAuthToken(string $token): ?User
     {
-        return $this->userTokenRepository->findByToken($token)?->getUser();
+        return $this->userTokenRepository->findByTokenAndType($token, 'auth')?->getUser();
     }
 
     private function generateToken(): string

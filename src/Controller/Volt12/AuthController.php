@@ -27,6 +27,7 @@ class AuthController extends AbstractController
         private FeedbackService $feedbackService,
         private RateLimiterFactory $emailVerificationLimiter,
         private RateLimiterFactory $passwordResetLimiter,
+        private RateLimiterFactory $emailVerifyAttemptLimiter,
     ) {}
 
     private function getTokenFromRequest(Request $request): ?string
@@ -166,8 +167,7 @@ class AuthController extends AbstractController
             return $this->json(['success' => false, 'error' => 'Слишком много запросов. Попробуйте позже'], 429);
         }
 
-        $baseUrl = $request->getSchemeAndHttpHost();
-        $this->userService->sendVerificationEmail($user, $this->feedbackService, $baseUrl);
+        $this->userService->sendVerificationEmail($user, $this->feedbackService);
 
         return $this->json(['success' => true]);
     }
@@ -175,16 +175,21 @@ class AuthController extends AbstractController
     #[Route('/verify-email', name: 'volt12_auth_verify_email', methods: ['POST'])]
     public function verifyEmail(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $token = trim($data['token'] ?? '');
-
-        if ($token === '') {
-            return $this->json(['success' => false, 'error' => 'Токен обязателен'], 400);
+        $limiter = $this->emailVerifyAttemptLimiter->create($request->getClientIp());
+        if (!$limiter->consume(1)->isAccepted()) {
+            return $this->json(['success' => false, 'error' => 'Слишком много попыток. Попробуйте позже'], 429);
         }
 
-        $verified = $this->userService->verifyEmail($token);
+        $data = json_decode($request->getContent(), true);
+        $code = trim($data['code'] ?? '');
+
+        if ($code === '') {
+            return $this->json(['success' => false, 'error' => 'Код обязателен'], 400);
+        }
+
+        $verified = $this->userService->verifyEmail($code);
         if (!$verified) {
-            return $this->json(['success' => false, 'error' => 'Ссылка недействительна или устарела'], 400);
+            return $this->json(['success' => false, 'error' => 'Неверный или устаревший код'], 400);
         }
 
         return $this->json(['success' => true]);

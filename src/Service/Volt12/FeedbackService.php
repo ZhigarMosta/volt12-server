@@ -107,10 +107,8 @@ class FeedbackService
 HTML;
     }
 
-    public function sendEmailVerification(string $toEmail, string $verifyUrl): void
+    public function sendEmailVerification(string $toEmail, string $code): void
     {
-        $escapedUrl = htmlspecialchars($verifyUrl, ENT_QUOTES);
-
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="ru">
@@ -132,26 +130,17 @@ HTML;
           <tr>
             <td style="padding:32px 36px;">
               <p style="margin:0 0 24px;font-size:15px;color:#333;line-height:1.6;">
-                Нажмите на кнопку ниже, чтобы подтвердить ваш email-адрес.
+                Ваш код для подтверждения email:
               </p>
-              <table cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="border-radius:8px;background:#e63535;">
-                    <a href="$escapedUrl" style="display:inline-block;padding:14px 32px;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;font-family:Arial,sans-serif;">
-                      Подтвердить почту
-                    </a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin:24px 0 0;font-size:13px;color:#999;line-height:1.6;">
-                Если кнопка не работает, скопируйте эту ссылку в браузер:<br>
-                <a href="$escapedUrl" style="color:#e63535;word-break:break-all;">$escapedUrl</a>
+              <p style="margin:0 0 24px;font-size:40px;font-weight:700;color:#e63535;letter-spacing:10px;text-align:center;">$code</p>
+              <p style="margin:0;font-size:13px;color:#999;line-height:1.6;">
+                Введите этот код на сайте, чтобы подтвердить почту. Если вы не запрашивали подтверждение — проигнорируйте это письмо.
               </p>
             </td>
           </tr>
           <tr>
             <td style="padding:20px 36px;background:#fafafa;border-top:1px solid #f0f0f0;">
-              <p style="margin:0;font-size:12px;color:#bbb;text-align:center;">Если вы не запрашивали подтверждение — просто проигнорируйте это письмо</p>
+              <p style="margin:0;font-size:12px;color:#bbb;text-align:center;">Это автоматическое письмо — отвечать на него не нужно</p>
             </td>
           </tr>
         </table>
@@ -165,7 +154,7 @@ HTML;
         $email = (new Email())
             ->from($this->mailerFrom)
             ->to($toEmail)
-            ->subject('Подтверждение email — Мастер 12 Вольт')
+            ->subject('Код подтверждения email — Мастер 12 Вольт')
             ->html($html);
 
         $this->mailer->send($email);
