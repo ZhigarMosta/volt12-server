@@ -27,6 +27,9 @@ class UserToken implements ResourceInterface
     #[ORM\Column(type: 'string', length: 32)]
     private string $type;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $payload = null;
+
     public function __construct(User $user, string $token, string $type = 'auth')
     {
         $this->user = $user;
@@ -40,4 +43,6 @@ class UserToken implements ResourceInterface
     public function getToken(): string { return $this->token; }
     public function getType(): string { return $this->type; }
     public function getCreatedAt(): \DateTime { return $this->createdAt; }
+    public function getPayload(): ?string { return $this->payload; }
+    public function setPayload(?string $payload): void { $this->payload = $payload; }
 }

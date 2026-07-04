@@ -58,6 +58,10 @@ class UserService
 
     public function updateProfile(User $user, array $data): void
     {
+        if ((!empty($data['name']) || array_key_exists('phone', $data)) && !$user->isEmailVerified()) {
+            throw new \InvalidArgumentException('Подтвердите почту, чтобы изменить данные профиля');
+        }
+
         if (!empty($data['name'])) {
             $user->setName($data['name']);
         }
@@ -96,6 +100,16 @@ class UserService
         return true;
     }
 
+    public function checkPasswordResetEligibility(string $email): string
+    {
+        $user = $this->userRepository->findByEmail($email);
+        if (!$user) {
+            return 'not_found';
+        }
+
+        return $user->isEmailVerified() ? 'eligible' : 'unverified';
+    }
+
     public function sendPasswordResetCode(string $email, FeedbackService $feedbackService): bool
     {
         $user = $this->userRepository->findByEmail($email);
@@ -127,12 +141,67 @@ class UserService
             return false;
         }
 
+        if ($userToken->getCreatedAt() < new \DateTime('-15 minutes')) {
+            $this->userTokenRepository->deleteByUserAndType($user, 'password_reset');
+            return false;
+        }
+
         if (strlen($newPassword) < 6) {
             throw new \InvalidArgumentException('Пароль должен содержать минимум 6 символов');
         }
 
         $user->setPassword(password_hash($newPassword, PASSWORD_ARGON2ID));
         $this->userTokenRepository->deleteByUserAndType($user, 'password_reset');
+        $this->entityManager->flush();
+
+        return true;
+    }
+
+    public function changePassword(User $user, string $newPassword): void
+    {
+        if (strlen($newPassword) < 6) {
+            throw new \InvalidArgumentException('Пароль должен содержать минимум 6 символов');
+        }
+
+        $user->setPassword(password_hash($newPassword, PASSWORD_ARGON2ID));
+        $this->entityManager->flush();
+    }
+
+    public function requestPasswordChange(User $user, string $newPassword, FeedbackService $feedbackService): void
+    {
+        if (!$user->isEmailVerified()) {
+            throw new \InvalidArgumentException('Подтвердите почту, чтобы изменить пароль');
+        }
+
+        if (strlen($newPassword) < 6) {
+            throw new \InvalidArgumentException('Пароль должен содержать минимум 6 символов');
+        }
+
+        $this->userTokenRepository->deleteByUserAndType($user, 'password_change');
+
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $userToken = new UserToken($user, $code, 'password_change');
+        $userToken->setPayload(password_hash($newPassword, PASSWORD_ARGON2ID));
+        $this->entityManager->persist($userToken);
+        $this->entityManager->flush();
+
+        $feedbackService->sendPasswordChangeCode($user->getEmail(), $code);
+    }
+
+    public function confirmPasswordChange(User $user, string $code): bool
+    {
+        $userToken = $this->userTokenRepository->findByTokenAndType($code, 'password_change');
+        if (!$userToken || $userToken->getUser()->getId() !== $user->getId()) {
+            return false;
+        }
+
+        if ($userToken->getCreatedAt() < new \DateTime('-15 minutes')) {
+            $this->userTokenRepository->deleteByUserAndType($user, 'password_change');
+            return false;
+        }
+
+        $user->setPassword($userToken->getPayload());
+        $this->userTokenRepository->deleteByUserAndType($user, 'password_change');
         $this->entityManager->flush();
 
         return true;

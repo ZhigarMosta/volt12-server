@@ -29,3 +29,46 @@ framework:
             policy: 'sliding_window'
             limit: 20
             interval: '1 hour'
+
+        # Запрос кода смены пароля — 10 запросов в час на пользователя
+        password_change_request:
+            policy: 'sliding_window'
+            limit: 10
+            interval: '1 hour'
+
+        # Подтверждение смены пароля кодом — защита от подбора 6-значного кода
+        password_change_attempt:
+            policy: 'sliding_window'
+            limit: 20
+            interval: '1 hour'
+
+        # Сброс пароля — предел писем на один email-адрес получателя
+        # (защита от email-бомбинга жертвы, отдельно от лимита по IP отправителя)
+        password_reset_target:
+            policy: 'sliding_window'
+            limit: 5
+            interval: '1 hour'
+
+        # Регистрация — ограничение создания аккаунтов с одного IP
+        register:
+            policy: 'sliding_window'
+            limit: 10
+            interval: '1 hour'
+
+        # Вход — защита от брутфорса пароля с одного IP
+        login:
+            policy: 'sliding_window'
+            limit: 30
+            interval: '1 hour'
+
+        # Вход — защита конкретного аккаунта от подбора пароля с разных IP
+        login_target:
+            policy: 'sliding_window'
+            limit: 10
+            interval: '1 hour'
+
+        # Применение кода сброса пароля — защита от подбора 4-значного кода
+        password_reset_attempt:
+            policy: 'sliding_window'
+            limit: 20
+            interval: '1 hour'

@@ -1,0 +1,5 @@
+{% set user_id = resource.id|default(data.id|default(null)) %}
+{% if user_id is not null %}
+    <a href="{{ path(options.route_to_item, {'criteria': {'user': user_id}}) }}"
+       class="btn">Сессии</a>
+{% endif %}

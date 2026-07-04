@@ -2,20 +2,32 @@
 
 namespace App\Service\Volt12;
 
+use App\Exception\EmailLimitExceededException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 
 class FeedbackService
 {
     public function __construct(
         private MailerInterface $mailer,
-        private string $mailerFrom
+        private string $mailerFrom,
+        private RateLimiterFactory $outgoingEmailLimiter
     )
     {
     }
 
+    private function assertOutgoingEmailAllowed(): void
+    {
+        if (!$this->outgoingEmailLimiter->create('global')->consume(1)->isAccepted()) {
+            throw new EmailLimitExceededException('Достигнут дневной лимит отправки писем. Попробуйте позже.');
+        }
+    }
+
     public function send(string $type, string $userName, string $userPhone, string $userEmail, string $description): void
     {
+        $this->assertOutgoingEmailAllowed();
+
         $email = (new Email())
             ->from($this->mailerFrom)
             ->to($this->mailerFrom)
@@ -109,6 +121,8 @@ HTML;
 
     public function sendEmailVerification(string $toEmail, string $code): void
     {
+        $this->assertOutgoingEmailAllowed();
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="ru">
@@ -162,6 +176,8 @@ HTML;
 
     public function sendPasswordResetCode(string $toEmail, string $code): void
     {
+        $this->assertOutgoingEmailAllowed();
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="ru">
@@ -213,8 +229,65 @@ HTML;
         $this->mailer->send($email);
     }
 
+    public function sendPasswordChangeCode(string $toEmail, string $code): void
+    {
+        $this->assertOutgoingEmailAllowed();
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <tr>
+            <td style="background:#e63535;padding:28px 36px;">
+              <p style="margin:0;color:#ffffff;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;">Мастер 12 Вольт</p>
+              <h1 style="margin:6px 0 0;color:#ffffff;font-size:22px;font-weight:700;">Смена пароля</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 36px;">
+              <p style="margin:0 0 24px;font-size:15px;color:#333;line-height:1.6;">
+                Ваш код для смены пароля:
+              </p>
+              <p style="margin:0 0 24px;font-size:48px;font-weight:700;color:#e63535;letter-spacing:12px;text-align:center;">$code</p>
+              <p style="margin:0;font-size:13px;color:#999;line-height:1.6;">
+                Код действителен в течение 15 минут. Если вы не запрашивали смену пароля — проигнорируйте это письмо.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 36px;background:#fafafa;border-top:1px solid #f0f0f0;">
+              <p style="margin:0;font-size:12px;color:#bbb;text-align:center;">Это автоматическое письмо — отвечать на него не нужно</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+HTML;
+
+        $email = (new Email())
+            ->from($this->mailerFrom)
+            ->to($toEmail)
+            ->subject('Код смены пароля — Мастер 12 Вольт')
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
+
     public function sendOrderConfirmation(string $toEmail, array $orderData): void
     {
+        $this->assertOutgoingEmailAllowed();
+
         $html = $this->buildOrderHtml($orderData);
 
         foreach ([$toEmail, $this->mailerFrom] as $recipient) {

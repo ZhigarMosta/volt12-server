@@ -3,6 +3,7 @@
 namespace App\Controller\Volt12;
 
 use App\Entity\User;
+use App\Exception\EmailLimitExceededException;
 use App\Service\Volt12\CartService;
 use App\Service\Volt12\CompareService;
 use App\Service\Volt12\FeedbackService;
@@ -28,6 +29,13 @@ class AuthController extends AbstractController
         private RateLimiterFactory $emailVerificationLimiter,
         private RateLimiterFactory $passwordResetLimiter,
         private RateLimiterFactory $emailVerifyAttemptLimiter,
+        private RateLimiterFactory $passwordChangeRequestLimiter,
+        private RateLimiterFactory $passwordChangeAttemptLimiter,
+        private RateLimiterFactory $passwordResetTargetLimiter,
+        private RateLimiterFactory $registerLimiter,
+        private RateLimiterFactory $loginLimiter,
+        private RateLimiterFactory $loginTargetLimiter,
+        private RateLimiterFactory $passwordResetAttemptLimiter,
     ) {}
 
     private function getTokenFromRequest(Request $request): ?string
@@ -46,6 +54,11 @@ class AuthController extends AbstractController
     #[Route('/register', name: 'volt12_auth_register', methods: ['POST'])]
     public function register(Request $request): JsonResponse
     {
+        $limiter = $this->registerLimiter->create($request->getClientIp());
+        if (!$limiter->consume(1)->isAccepted()) {
+            return $this->json(['success' => false, 'error' => 'Слишком много регистраций. Попробуйте позже'], 429);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
@@ -87,10 +100,20 @@ class AuthController extends AbstractController
     #[Route('/login', name: 'volt12_auth_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
+        $ipLimiter = $this->loginLimiter->create($request->getClientIp());
+        if (!$ipLimiter->consume(1)->isAccepted()) {
+            return $this->json(['success' => false, 'error' => 'Слишком много попыток. Попробуйте позже'], 429);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         if (empty($data['email']) || empty($data['password'])) {
             return $this->json(['success' => false, 'error' => 'Заполните email и пароль'], 400);
+        }
+
+        $targetLimiter = $this->loginTargetLimiter->create(strtolower($data['email']));
+        if (!$targetLimiter->consume(1)->isAccepted()) {
+            return $this->json(['success' => false, 'error' => 'Слишком много попыток. Попробуйте позже'], 429);
         }
 
         $result = $this->userService->login($data['email'], $data['password']);
@@ -167,7 +190,11 @@ class AuthController extends AbstractController
             return $this->json(['success' => false, 'error' => 'Слишком много запросов. Попробуйте позже'], 429);
         }
 
-        $this->userService->sendVerificationEmail($user, $this->feedbackService);
+        try {
+            $this->userService->sendVerificationEmail($user, $this->feedbackService);
+        } catch (EmailLimitExceededException $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()], 429);
+        }
 
         return $this->json(['success' => true]);
     }
@@ -210,7 +237,19 @@ class AuthController extends AbstractController
             return $this->json(['success' => false, 'error' => 'Некорректный email'], 400);
         }
 
-        $this->userService->sendPasswordResetCode($email, $this->feedbackService);
+        if ($this->userService->checkPasswordResetEligibility($email) === 'unverified') {
+            return $this->json(['success' => false, 'error' => 'Мы не можем отправить код, так как не уверены, что почта корректна. Обратитесь в поддержку для восстановления пароля.'], 400);
+        }
+
+        $targetLimiter = $this->passwordResetTargetLimiter->create(strtolower($email));
+        if ($targetLimiter->consume(1)->isAccepted()) {
+            try {
+                $this->userService->sendPasswordResetCode($email, $this->feedbackService);
+            } catch (EmailLimitExceededException $e) {
+                // Глобальный лимит писем исчерпан — не раскрываем это отправителю,
+                // чтобы не ломать защиту от перебора email на этом эндпоинте.
+            }
+        }
 
         return $this->json(['success' => true]);
     }
@@ -218,6 +257,11 @@ class AuthController extends AbstractController
     #[Route('/reset-password', name: 'volt12_auth_reset_password', methods: ['POST'])]
     public function resetPassword(Request $request): JsonResponse
     {
+        $limiter = $this->passwordResetAttemptLimiter->create($request->getClientIp());
+        if (!$limiter->consume(1)->isAccepted()) {
+            return $this->json(['success' => false, 'error' => 'Слишком много попыток. Попробуйте позже'], 429);
+        }
+
         $data = json_decode($request->getContent(), true);
         $email = trim($data['email'] ?? '');
         $code = trim($data['code'] ?? '');
@@ -235,6 +279,65 @@ class AuthController extends AbstractController
 
         if (!$result) {
             return $this->json(['success' => false, 'error' => 'Неверный код или email'], 400);
+        }
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/request-password-change', name: 'volt12_auth_request_password_change', methods: ['POST'])]
+    public function requestPasswordChange(Request $request): JsonResponse
+    {
+        $user = $request->attributes->get('_app_user');
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+        }
+
+        $limiter = $this->passwordChangeRequestLimiter->create('user_' . $user->getId());
+        if (!$limiter->consume(1)->isAccepted()) {
+            return $this->json(['success' => false, 'error' => 'Слишком много запросов. Попробуйте позже'], 429);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $newPassword = $data['new_password'] ?? '';
+
+        if ($newPassword === '') {
+            return $this->json(['success' => false, 'error' => 'Введите новый пароль'], 400);
+        }
+
+        try {
+            $this->userService->requestPasswordChange($user, $newPassword, $this->feedbackService);
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()], 400);
+        } catch (EmailLimitExceededException $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()], 429);
+        }
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/confirm-password-change', name: 'volt12_auth_confirm_password_change', methods: ['POST'])]
+    public function confirmPasswordChange(Request $request): JsonResponse
+    {
+        $user = $request->attributes->get('_app_user');
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Не авторизован'], 401);
+        }
+
+        $limiter = $this->passwordChangeAttemptLimiter->create($request->getClientIp());
+        if (!$limiter->consume(1)->isAccepted()) {
+            return $this->json(['success' => false, 'error' => 'Слишком много попыток. Попробуйте позже'], 429);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $code = trim($data['code'] ?? '');
+
+        if ($code === '') {
+            return $this->json(['success' => false, 'error' => 'Код обязателен'], 400);
+        }
+
+        $confirmed = $this->userService->confirmPasswordChange($user, $code);
+        if (!$confirmed) {
+            return $this->json(['success' => false, 'error' => 'Неверный или устаревший код'], 400);
         }
 
         return $this->json(['success' => true]);

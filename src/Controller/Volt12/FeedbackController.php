@@ -2,6 +2,7 @@
 
 namespace App\Controller\Volt12;
 
+use App\Exception\EmailLimitExceededException;
 use App\Service\Volt12\FeedbackService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -53,7 +54,11 @@ class FeedbackController extends AbstractController
             return $this->json(['success' => false, 'errors' => $errors], 400);
         }
 
-        $this->feedbackService->send($type, $userName, $userPhone, $userEmail, $description);
+        try {
+            $this->feedbackService->send($type, $userName, $userPhone, $userEmail, $description);
+        } catch (EmailLimitExceededException $e) {
+            return $this->json(['success' => false, 'errors' => [$e->getMessage()]], 429);
+        }
 
         return $this->json(['success' => true]);
     }

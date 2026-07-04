@@ -313,6 +313,9 @@ services:
     App\Controller\Admin\DashboardController:
         tags: [ 'controller.service_arguments' ]
 
+    App\Controller\Admin\UserPasswordController:
+        tags: [ 'controller.service_arguments' ]
+
     App\Service\DatabaseBackupService:
         arguments:
             $backupDir: '%kernel.project_dir%/var/backups'
