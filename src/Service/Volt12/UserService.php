@@ -124,7 +124,7 @@ class UserService
         $this->entityManager->persist($userToken);
         $this->entityManager->flush();
 
-        $feedbackService->sendPasswordResetCode($email, $code);
+        $feedbackService->sendPasswordResetCode($user->getEmail(), $code);
 
         return true;
     }

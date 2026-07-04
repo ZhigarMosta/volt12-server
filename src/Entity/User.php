@@ -55,7 +55,7 @@ class User implements ResourceInterface, TimestampableInterface
     public function setPhone(?string $phone): void { $this->phone = $phone; }
 
     public function getEmail(): string { return $this->email; }
-    public function setEmail(string $email): void { $this->email = $email; }
+    public function setEmail(string $email): void { $this->email = strtolower(trim($email)); }
 
     public function getPassword(): string { return $this->password; }
     public function setPassword(string $password): void { $this->password = $password; }
