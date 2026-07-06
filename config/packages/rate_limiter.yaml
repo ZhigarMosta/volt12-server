@@ -6,6 +6,12 @@ framework:
             limit: 10
             interval: '1 hour'
 
+        # Форма записи на услугу — 10 отправок в час с одного IP
+        booking_submit:
+            policy: 'sliding_window'
+            limit: 10
+            interval: '1 hour'
+
         # Глобальный лимит исходящих писем — 400 в сутки (запас от лимита Яндекса 500/день)
         outgoing_email:
             policy: 'sliding_window'

@@ -217,6 +217,16 @@ services:
         arguments:
             $feedbackService: '@App\Service\Volt12\FeedbackService'
 
+    App\Service\Volt12\BookingService:
+        autowire: true
+        arguments:
+            $mailerFrom: '%mailer_from%'
+
+    App\Controller\Volt12\BookingController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $bookingService: '@App\Service\Volt12\BookingService'
+
     App\Service\Volt12\CartService:
         autowire: true
 

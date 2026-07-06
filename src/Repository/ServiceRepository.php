@@ -26,6 +26,9 @@ class ServiceRepository extends EntityRepository
 
         $qb = $this->createQueryBuilder('s')
             ->where('s.id != :excludeId')
+            ->andWhere('s.img_link IS NOT NULL')
+            ->andWhere('s.img_link != :empty')
+            ->setParameter('empty', '')
             ->setParameter('excludeId', $excludeId);
 
         $conditions = [];
