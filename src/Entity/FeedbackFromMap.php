@@ -10,6 +10,7 @@ use Sylius\Component\Resource\Model\TimestampableTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: FeedbackFromMapRepository::class)]
 #[ORM\Table(name: 'feedback_from_map')]
+#[ORM\Index(columns: ['product_code'], name: 'idx_feedback_from_map_product_code')]
 class FeedbackFromMap implements ResourceInterface, TimestampableInterface
 {
 

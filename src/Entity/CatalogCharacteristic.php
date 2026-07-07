@@ -11,6 +11,7 @@ use Sylius\Component\Resource\Model\TimestampableTrait;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'catalog_characteristics')]
+#[ORM\Index(columns: ['product_code'], name: 'idx_catalog_characteristics_product_code')]
 class CatalogCharacteristic implements ResourceInterface, TimestampableInterface
 {
     public function __construct()

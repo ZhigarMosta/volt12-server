@@ -13,6 +13,12 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'catalog_items')]
+#[ORM\Index(columns: ['slug'], name: 'idx_catalog_items_slug')]
+#[ORM\Index(columns: ['product_code'], name: 'idx_catalog_items_product_code')]
+#[ORM\Index(columns: ['is_popular'], name: 'idx_catalog_items_is_popular')]
+#[ORM\Index(columns: ['name'], name: 'idx_catalog_items_name')]
+#[ORM\Index(columns: ['price'], name: 'idx_catalog_items_price')]
+#[ORM\Index(columns: ['is_published'], name: 'idx_catalog_items_is_published')]
 class CatalogItem implements ResourceInterface, TimestampableInterface
 {
 

@@ -14,6 +14,10 @@ use App\EventListener\CatalogImageListener;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'catalogs')]
+#[ORM\Index(columns: ['product_code'], name: 'idx_catalogs_product_code')]
+#[ORM\Index(columns: ['is_popular'], name: 'idx_catalogs_is_popular')]
+#[ORM\Index(columns: ['slug'], name: 'idx_catalogs_slug')]
+#[ORM\Index(columns: ['position'], name: 'idx_position')]
 #[ORM\EntityListeners([CatalogImageListener::class])]
 class Catalog implements ResourceInterface, TimestampableInterface
 {

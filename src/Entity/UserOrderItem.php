@@ -7,6 +7,8 @@ use Sylius\Component\Resource\Model\ResourceInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'user_order_items')]
+#[ORM\Index(columns: ['order_id'], name: 'idx_user_order_items_order_id')]
+#[ORM\Index(columns: ['catalog_item_id'], name: 'idx_user_order_items_catalog_item_id')]
 class UserOrderItem implements ResourceInterface
 {
     #[ORM\Id]

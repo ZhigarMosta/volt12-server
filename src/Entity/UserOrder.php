@@ -11,6 +11,7 @@ use Sylius\Component\Resource\Model\TimestampableTrait;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'user_orders')]
+#[ORM\Index(columns: ['user_id', 'created_at'], name: 'idx_user_orders_user_created')]
 class UserOrder implements ResourceInterface, TimestampableInterface
 {
     use TimestampableTrait;

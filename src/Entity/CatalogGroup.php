@@ -11,6 +11,7 @@ use Sylius\Component\Resource\Model\TimestampableTrait;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity]
+
 #[ORM\Table(name: 'catalog_groups')]
 class CatalogGroup implements ResourceInterface, TimestampableInterface
 {

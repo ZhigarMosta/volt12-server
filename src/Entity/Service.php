@@ -11,6 +11,8 @@ use App\EventListener\ServiceImageListener;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'services')]
+#[ORM\Index(columns: ['position'], name: 'idx_services_position')]
+#[ORM\Index(columns: ['name'], name: 'idx_services_name')]
 #[ORM\EntityListeners([ServiceImageListener::class])]
 class Service implements ResourceInterface, TimestampableInterface
 {
