@@ -14,6 +14,16 @@ use Sylius\Component\Resource\Model\TimestampableTrait;
 #[ORM\Index(columns: ['user_id', 'created_at'], name: 'idx_user_orders_user_created')]
 class UserOrder implements ResourceInterface, TimestampableInterface
 {
+    public const STATUS_NEW = 'new';
+    public const STATUS_PROCESSING = 'processing';
+    public const STATUS_DONE = 'done';
+
+    public const STATUSES = [
+        self::STATUS_NEW => 'Новый',
+        self::STATUS_PROCESSING => 'Обрабатывается',
+        self::STATUS_DONE => 'Выполнен',
+    ];
+
     use TimestampableTrait;
 
     #[ORM\Id]
@@ -26,7 +36,7 @@ class UserOrder implements ResourceInterface, TimestampableInterface
     private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 32)]
-    private string $status = 'new';
+    private string $status = self::STATUS_NEW;
 
     #[ORM\Column(name: 'first_name', type: 'string', length: 255)]
     private string $firstName = '';
@@ -90,6 +100,7 @@ class UserOrder implements ResourceInterface, TimestampableInterface
 
     public function getStatus(): string { return $this->status; }
     public function setStatus(string $status): void { $this->status = $status; }
+    public function getStatusLabel(): string { return self::STATUSES[$this->status] ?? $this->status; }
 
     public function getFirstName(): string { return $this->firstName; }
     public function setFirstName(string $firstName): void { $this->firstName = $firstName; }

@@ -20,6 +20,21 @@ class CartRepository extends EntityRepository
             ->getResult();
     }
 
+    public function findByUserAndCatalogItemIds(User $user, array $catalogItemIds): array
+    {
+        if ($catalogItemIds === []) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('c')
+            ->where('c.user = :user')
+            ->andWhere('c.catalogItem IN (:catalogItemIds)')
+            ->setParameter('user', $user)
+            ->setParameter('catalogItemIds', $catalogItemIds)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findByIdsForUser(User $user, array $ids): array
     {
         return $this->createQueryBuilder('c')

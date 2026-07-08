@@ -1,0 +1,46 @@
+{% set order_id = data.id %}
+{% set current_status = data.status %}
+{% set field_id = 'order-status-' ~ order_id %}
+
+<select class="js-order-status-select form-select form-select-sm" id="{{ field_id }}" style="width:auto;" data-current-status="{{ current_status }}">
+    {% for value, label in constant('App\\Entity\\UserOrder::STATUSES') %}
+        <option value="{{ value }}" {% if value == current_status %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+</select>
+
+<script>
+    (function() {
+        const select = document.getElementById({{ field_id|json_encode|raw }});
+        if (!select || select.dataset.bound === '1') return;
+        select.dataset.bound = '1';
+
+        const changeStatusUrl = {{ path('app_admin_user_order_change_status', {id: order_id})|json_encode|raw }};
+
+        select.addEventListener('change', function() {
+            const newStatus = select.value;
+            select.disabled = true;
+
+            fetch(changeStatusUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            })
+                .then(function(r) { return r.json().then(function(body) { return { ok: r.ok, body: body }; }); })
+                .then(function(result) {
+                    if (!result.ok || !result.body.success) {
+                        alert((result.body && result.body.error) || 'Не удалось обновить статус');
+                        select.value = select.dataset.currentStatus;
+                        return;
+                    }
+                    select.dataset.currentStatus = result.body.status;
+                })
+                .catch(function() {
+                    alert('Ошибка сети');
+                    select.value = select.dataset.currentStatus;
+                })
+                .finally(function() {
+                    select.disabled = false;
+                });
+        });
+    })();
+</script>

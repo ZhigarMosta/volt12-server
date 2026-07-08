@@ -5,6 +5,7 @@ namespace App\Service\Volt12;
 use App\Entity\User;
 use App\Entity\UserOrder;
 use App\Entity\UserOrderItem;
+use App\Repository\CartRepository;
 use App\Repository\CatalogItemRepository;
 use App\Repository\UserOrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,6 +16,7 @@ class UserOrderService
     public function __construct(
         private CatalogItemRepository $catalogItemRepository,
         private UserOrderRepository $userOrderRepository,
+        private CartRepository $cartRepository,
         private EntityManagerInterface $entityManager,
         private FeedbackService $feedbackService
     ) {}
@@ -23,7 +25,7 @@ class UserOrderService
     {
         $order = new UserOrder();
         $order->setUser($user);
-        $order->setStatus('new');
+        $order->setStatus(UserOrder::STATUS_NEW);
 
         $order->setFirstName(trim($data['first_name'] ?? ''));
         $order->setLastName(trim($data['last_name'] ?? ''));
@@ -40,6 +42,7 @@ class UserOrderService
 
         $items = $data['items'] ?? [];
         $totalPrice = 0;
+        $orderedCatalogItemIds = [];
 
         foreach ($items as $itemData) {
             $catalogItemId = (int) ($itemData['catalog_item_id'] ?? 0);
@@ -66,11 +69,19 @@ class UserOrderService
 
             $order->addItem($orderItem);
             $totalPrice += $itemTotal;
+            $orderedCatalogItemIds[] = $catalogItemId;
         }
 
         $order->setTotalPrice($totalPrice);
 
         $this->entityManager->persist($order);
+
+        if ($user !== null && $orderedCatalogItemIds !== []) {
+            foreach ($this->cartRepository->findByUserAndCatalogItemIds($user, $orderedCatalogItemIds) as $cartItem) {
+                $this->entityManager->remove($cartItem);
+            }
+        }
+
         $this->entityManager->flush();
 
 //        $this->feedbackService->sendOrderConfirmation($order->getEmail(), $this->serializeOrderFull($order));
