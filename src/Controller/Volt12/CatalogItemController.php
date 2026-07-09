@@ -201,7 +201,7 @@ class CatalogItemController extends AbstractController
     {
         $result = $this->catalogItemService->getCatalogItemByParams(
             catalogId: null,
-            page: null,
+            page: 1,
             limit: CatalogItem::LIMIT_POPULAR,
             isPopular: true,
         );

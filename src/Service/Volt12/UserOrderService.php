@@ -84,7 +84,7 @@ class UserOrderService
 
         $this->entityManager->flush();
 
-//        $this->feedbackService->sendOrderConfirmation($order->getEmail(), $this->serializeOrderFull($order));
+        $this->feedbackService->sendOrderConfirmation($order->getEmail(), $this->serializeOrderFull($order));
 
         return $order;
     }

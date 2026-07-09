@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ServiceResourceListener
 {
+    private const MAX_IN_FOOTER = 7;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private RequestStack $requestStack
@@ -38,6 +40,10 @@ class ServiceResourceListener
             $errors[] = $error;
         }
 
+        if ($error = $this->getInFooterError($service)) {
+            $errors[] = $error;
+        }
+
         if (empty($errors)) {
             return;
         }
@@ -47,8 +53,8 @@ class ServiceResourceListener
         $event->stop($message);
 
         $request = $this->requestStack->getCurrentRequest();
-        if ($request) {
-            $referer = $request->headers->get('referer');
+        $referer = $request?->headers->get('referer');
+        if ($referer !== null) {
             $event->setResponse(new RedirectResponse($referer));
         }
     }
@@ -75,6 +81,32 @@ class ServiceResourceListener
                 $position,
                 $existing->getName(),
                 $existing->getServiceGroup()->getName()
+            );
+        }
+
+        return null;
+    }
+
+    private function getInFooterError(Service $service): ?string
+    {
+        if (!$service->getInFooter()) {
+            return null;
+        }
+
+        $repository = $this->entityManager->getRepository(Service::class);
+
+        $count = (int) $repository->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->where('s.in_footer = true')
+            ->andWhere('s.id != :id')
+            ->setParameter('id', $service->getId() ?? 0)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        if ($count >= self::MAX_IN_FOOTER) {
+            return sprintf(
+                'Ошибка! Лимит в %d услуг для футера уже исчерпан.',
+                self::MAX_IN_FOOTER
             );
         }
 

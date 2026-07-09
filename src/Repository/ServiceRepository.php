@@ -2,20 +2,46 @@
 
 namespace App\Repository;
 
+use App\Provider\ProductCodeProvider;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use App\Entity\Service;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 
 class ServiceRepository extends EntityRepository
 {
+    /**
+     * Витринные коды: услуги наследуют код продукта своей группы,
+     * записи с кодом «Пандора» на этом сайте не показываются.
+     */
+    private const STOREFRONT_CODES = [ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY];
+
+    private function applyStorefrontCodes(QueryBuilder $qb): QueryBuilder
+    {
+        return $qb
+            ->join('s.serviceGroup', 'sg')
+            ->andWhere('sg.product_code IN (:storefrontCodes)')
+            ->setParameter('storefrontCodes', self::STOREFRONT_CODES);
+    }
+
+    private function applyPublished(QueryBuilder $qb): QueryBuilder
+    {
+        return $qb->andWhere('s.is_published = true');
+    }
+
     public function findBySlug(string $slug): ?Service
     {
-        return $this->createQueryBuilder('s')
+        $qb = $this->createQueryBuilder('s')
             ->where('s.slug = :slug')
-            ->setParameter('slug', $slug)
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->setParameter('slug', $slug);
+
+        // страница услуги открывается и для неопубликованной (витрина покажет пометку),
+        // но услуги «чужого» кода продукта скрыты полностью
+        $this->applyStorefrontCodes($qb);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
+
     public function findRelatedByName(string $name, int $excludeId, int $limit = 4): array
     {
         $keywords = preg_split('/[\s,.-]+/u', $name, -1, PREG_SPLIT_NO_EMPTY);
@@ -30,6 +56,9 @@ class ServiceRepository extends EntityRepository
             ->andWhere('s.img_link != :empty')
             ->setParameter('empty', '')
             ->setParameter('excludeId', $excludeId);
+
+        $this->applyStorefrontCodes($qb);
+        $this->applyPublished($qb);
 
         $conditions = [];
         foreach ($keywords as $i => $keyword) {
@@ -57,6 +86,9 @@ class ServiceRepository extends EntityRepository
             ->select('s')
             ->orderBy('s.position', 'ASC');
 
+        $this->applyStorefrontCodes($qb);
+        $this->applyPublished($qb);
+
         if ($serviceGroupId !== null) {
             $qb->andWhere('s.serviceGroup = :serviceGroupId')
                 ->setParameter('serviceGroupId', $serviceGroupId);
@@ -76,19 +108,37 @@ class ServiceRepository extends EntityRepository
         return new Paginator($qb, true);
     }
 
+    public function findFooterServices(): array
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->join('s.serviceGroup', 'g')
+            ->where('s.in_footer = true')
+            ->andWhere('g.product_code IN (:storefrontCodes)')
+            ->setParameter('storefrontCodes', self::STOREFRONT_CODES)
+            ->orderBy('g.position', 'ASC')
+            ->addOrderBy('s.position', 'ASC');
+
+        $this->applyPublished($qb);
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function findTopForMenu(int $limit): array
     {
-        return $this->createQueryBuilder('s')
+        $qb = $this->createQueryBuilder('s')
             ->orderBy('s.position', 'ASC')
             ->addOrderBy('s.id', 'ASC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+
+        $this->applyStorefrontCodes($qb);
+        $this->applyPublished($qb);
+
+        return $qb->getQuery()->getResult();
     }
 
     public function searchByName(string $name, int $limit): array
     {
-        return $this->createQueryBuilder('s')
+        $qb = $this->createQueryBuilder('s')
             ->where('LOWER(s.name) LIKE LOWER(:name)')
             ->andWhere('s.img_link IS NOT NULL')
             ->andWhere('s.img_link != :empty')
@@ -96,8 +146,11 @@ class ServiceRepository extends EntityRepository
             ->setParameter('name', '%' . $name . '%')
             ->orderBy('s.position', 'ASC')
             ->addOrderBy('s.id', 'ASC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+
+        $this->applyStorefrontCodes($qb);
+        $this->applyPublished($qb);
+
+        return $qb->getQuery()->getResult();
     }
 }

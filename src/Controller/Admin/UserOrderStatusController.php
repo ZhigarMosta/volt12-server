@@ -6,6 +6,7 @@ use App\Entity\UserOrder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -33,6 +34,17 @@ class UserOrderStatusController extends AbstractController
             'success' => true,
             'status' => $status,
             'label' => UserOrder::STATUSES[$status],
+        ]);
+    }
+
+    #[Route('/{id}/set-processing', name: 'app_admin_user_order_set_processing', methods: ['GET'])]
+    public function setProcessing(UserOrder $userOrder): RedirectResponse
+    {
+        $userOrder->setStatus(UserOrder::STATUS_PROCESSING);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_admin_user_order_index', [
+            'criteria' => ['id' => $userOrder->getId()],
         ]);
     }
 }

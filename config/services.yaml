@@ -2,6 +2,7 @@ parameters:
     catalog_items_directory: '%kernel.project_dir%/public/uploads/items'
     locale: ru
     mailer_from: '%env(MAILER_FROM)%'
+    frontend_url: '%env(FRONTEND_URL)%'
 
 services:
     _defaults:
@@ -206,6 +207,7 @@ services:
         autowire: true
         arguments:
             $mailerFrom: '%mailer_from%'
+            $frontendUrl: '%frontend_url%'
 
     App\Controller\Volt12\AuthController:
         tags: [ 'controller.service_arguments' ]
@@ -327,6 +329,9 @@ services:
         tags: [ 'controller.service_arguments' ]
 
     App\Controller\Admin\UserOrderStatusController:
+        tags: [ 'controller.service_arguments' ]
+
+    App\Controller\Admin\DocsController:
         tags: [ 'controller.service_arguments' ]
 
     App\Service\DatabaseBackupService:

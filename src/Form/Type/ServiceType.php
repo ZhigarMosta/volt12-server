@@ -7,6 +7,7 @@ use App\Entity\ServiceGroup;
 use App\Utils\Sort;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -95,6 +96,14 @@ class ServiceType extends AbstractType
                 'label_attr' => [
                     'style' => 'grid-area: label;',
                 ],
+            ])
+            ->add('in_footer', CheckboxType::class, [
+                'label' => 'В футере?',
+                'required' => false,
+            ])
+            ->add('is_published', CheckboxType::class, [
+                'label' => 'Опубликована?',
+                'required' => false,
             ])
             ->add('serviceGroup', EntityType::class, [
                 'class' => ServiceGroup::class,

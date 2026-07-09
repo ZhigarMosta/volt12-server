@@ -1,0 +1,50 @@
+{% extends '@SyliusAdmin/shared/layout/base.html.twig' %}
+
+{% block title %}Документация | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="doc-page">
+
+    <div class="doc-topbar">
+        <a href="{{ path('sylius_admin_dashboard') }}" class="doc-topbar__back">
+            {{ ux_icon('tabler:arrow-left') }}
+            Панель управления
+        </a>
+        <div class="doc-topbar__title">
+            {{ ux_icon('tabler:book-2') }}
+            Документация по админ-панели
+        </div>
+        <div class="doc-topbar__spacer"></div>
+        <div class="doc-topbar__date">Актуально на 10.07.2026</div>
+    </div>
+
+    <div class="doc-layout">
+        {% include 'admin/docs/_toc.html.twig' %}
+
+        <main class="doc-content">
+            {% include 'admin/docs/_intro.html.twig' %}
+            {% include 'admin/docs/_dashboard.html.twig' %}
+            {% include 'admin/docs/_entities.html.twig' %}
+            {% include 'admin/docs/_utils.html.twig' %}
+            {% include 'admin/docs/_scenarios.html.twig' %}
+            {% include 'admin/docs/_errors.html.twig' %}
+            {% include 'admin/docs/_emails.html.twig' %}
+            {% include 'admin/docs/_sitemap.html.twig' %}
+            {% include 'admin/docs/_admins.html.twig' %}
+            {% include 'admin/docs/_danger.html.twig' %}
+            {% include 'admin/docs/_help.html.twig' %}
+            {% include 'admin/docs/_glossary.html.twig' %}
+            {% include 'admin/docs/_site.html.twig' %}
+
+            <div class="doc-footer">
+                Если чего-то не хватает в этой документации — создайте задачу (<a class="doc-xref" href="#help">блок 10</a>), дополним.
+            </div>
+        </main>
+    </div>
+
+    <button type="button" class="doc-up" id="docUp" aria-label="Наверх">{{ ux_icon('tabler:arrow-up') }}</button>
+</div>
+
+{% include 'admin/docs/_styles.html.twig' %}
+{% include 'admin/docs/_scripts.html.twig' %}
+{% endblock %}

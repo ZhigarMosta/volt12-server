@@ -1,0 +1,33 @@
+{# Контекстная ссылка «как работает этот раздел» — ведёт на якорь сущности в документации #}
+{% set route = app.request.attributes.get('_route') ?? '' %}
+{% set base = route|replace({'_index': '', '_create': '', '_update': ''}) %}
+{% set map = {
+    'app_admin_catalog': 'ent-catalog',
+    'app_admin_catalog_group': 'ent-catalog-group',
+    'app_admin_catalog_item': 'ent-catalog-item',
+    'app_admin_catalog_item_image': 'ent-catalog-item-image',
+    'app_admin_catalog_characteristic': 'ent-catalog-characteristic',
+    'app_admin_catalog_item_characteristic': 'ent-catalog-item-characteristic',
+    'app_admin_service_group': 'ent-service-group',
+    'app_admin_service': 'ent-service',
+    'app_admin_user_order': 'ent-user-order',
+    'app_admin_user_order_item': 'ent-user-order-item',
+    'app_admin_cart': 'ent-cart',
+    'app_admin_user': 'ent-user',
+    'app_admin_favorite': 'ent-favorite',
+    'app_admin_compare': 'ent-compare',
+    'app_admin_feedback_from_map': 'ent-feedback',
+    'app_admin_entity_history': 'ent-history',
+    'app_admin_user_token': 'ent-user-token',
+} %}
+{% if map[base] is defined %}
+    {# container-xl — та же обёртка, что у остальных блоков контента: без неё ссылка выпадает из сетки #}
+    <div class="container-xl mt-3">
+        <div class="text-end">
+            <a href="{{ path('app_admin_docs') }}#{{ map[base] }}" target="_blank" rel="noopener" class="btn btn-sm">
+                {{ ux_icon('tabler:help', {class: 'icon icon-sm me-1'}) }}
+                Как работает этот раздел
+            </a>
+        </div>
+    </div>
+{% endif %}

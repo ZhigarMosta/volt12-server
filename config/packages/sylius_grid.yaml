@@ -531,6 +531,12 @@ sylius_grid:
                     type: numeric_range
                     form_options:
                         label: Позиция
+                in_footer:
+                    label: В футере?
+                    type: boolean
+                is_published:
+                    label: Опубликована?
+                    type: boolean
             fields:
                 image:
                     type: twig
@@ -554,6 +560,20 @@ sylius_grid:
                     type: string
                     label: Позиция
                     sortable: ~
+                in_footer:
+                    type: twig
+                    label: В футере?
+                    path: in_footer
+                    sortable: ~
+                    options:
+                        template: 'admin/grid/field/boolean.html.twig'
+                is_published:
+                    type: twig
+                    label: Опубликована?
+                    path: is_published
+                    sortable: ~
+                    options:
+                        template: 'admin/grid/field/boolean.html.twig'
             actions:
                 main:
                     create: { type: create }
@@ -735,6 +755,11 @@ sylius_grid:
             sorting:
                 createdAt: desc
             filters:
+                id:
+                    type: string
+                    label: '№'
+                    options:
+                        type: equal
                 firstName:
                     type: string
                     label: Имя
@@ -790,7 +815,7 @@ sylius_grid:
                         template: 'admin/grid/field/userOrderStatus.html.twig'
                 totalPrice:
                     type: string
-                    label: Сумма
+                    label: Сумма, ₽
                     sortable: ~
                 createdAt:
                     type: datetime
@@ -799,6 +824,12 @@ sylius_grid:
             actions:
                 item:
                     update: { type: update }
+                    show_order_items:
+                        type: default
+                        label: Продукты
+                        template: "admin/grid/action/show_user_order_items.html.twig"
+                        options:
+                            route_to_item: app_admin_user_order_item_index
                     delete: { type: delete }
 
         app_admin_entity_history:
@@ -852,6 +883,14 @@ sylius_grid:
             sorting:
                 id: desc
             filters:
+                order:
+                    type: entity
+                    label: Заказ
+                    options:
+                        fields: [ order ]
+                    form_options:
+                        class: App\Entity\UserOrder
+                        choice_label: id
                 name:
                     type: string
                     label: Название
@@ -880,7 +919,7 @@ sylius_grid:
                         template: 'admin/grid/field/catalogItem.html.twig'
                 price:
                     type: string
-                    label: Цена (коп.)
+                    label: Цена, ₽
                     sortable: ~
                 quantity:
                     type: string
@@ -888,7 +927,7 @@ sylius_grid:
                     sortable: ~
                 totalPrice:
                     type: string
-                    label: Сумма
+                    label: Сумма, ₽
                     sortable: ~
             actions:
                 item:

@@ -75,7 +75,8 @@ class SortController extends AbstractController
             catalogId: $item->getId(),
             page: null,
             limit: null,
-            onlyWithImage: false
+            onlyWithImage: false,
+            onlyPublished: false
         );
 
         return $this->json([

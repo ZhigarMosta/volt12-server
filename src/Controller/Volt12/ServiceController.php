@@ -18,6 +18,19 @@ class ServiceController extends AbstractController
         private ServiceRepository $serviceRepository
     ) {}
 
+    #[Route('/footer', name: 'volt12_services_footer', methods: ['GET'])]
+    public function footer(): JsonResponse
+    {
+        $services = $this->serviceRepository->findFooterServices();
+
+        return $this->json([
+            'items' => array_map(fn(Service $s) => [
+                'slug' => $s->getSlug(),
+                'name' => $s->getName(),
+            ], $services),
+        ]);
+    }
+
     #[Route('/{slug}', name: 'volt12_service_by_slug', methods: ['GET'])]
     public function bySlug(string $slug): JsonResponse
     {
@@ -41,6 +54,7 @@ class ServiceController extends AbstractController
                 'description' => $service->getDescription(),
                 'short_description' => $service->getShortDescription(),
                 'position' => $service->getPosition(),
+                'is_published' => $service->getIsPublished(),
                 'img_link' => $service->getImgLink(),
                 'img_alt' => $service->getImgAlt(),
                 'img_title' => $service->getImgTitle(),

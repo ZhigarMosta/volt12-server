@@ -58,6 +58,7 @@ class CatalogItemRepository extends EntityRepository
         $qb = $this->createQueryBuilder('ci')
             ->where('ci.id != :excludeId')
             ->andWhere('ci.product_code IN (:productCodes)')
+            ->andWhere('ci.is_published = true')
             ->setParameter('excludeId', $excludeId)
             ->setParameter('productCodes', $productCodes);
 
@@ -90,6 +91,7 @@ class CatalogItemRepository extends EntityRepository
         return $this->createQueryBuilder('ci')
             ->where('ci.id IN (:ids)')
             ->andWhere('ci.product_code IN (:productCodes)')
+            ->andWhere('ci.is_published = true')
             ->setParameter('ids', $ids)
             ->setParameter('productCodes', $productCodes)
             ->orderBy('ci.position', 'ASC')
@@ -97,7 +99,7 @@ class CatalogItemRepository extends EntityRepository
             ->getResult();
     }
 
-    public function list(array $productCodes, ?int $catalogId, ?array $filterGroups, ?array $price, ?string $search, ?string $sortPrice, ?int $page, ?int $limit, ?int $userId = null, bool $isPopular = false, ?bool $onlyWithImage = true): array
+    public function list(array $productCodes, ?int $catalogId, ?array $filterGroups, ?array $price, ?string $search, ?string $sortPrice, ?int $page, ?int $limit, ?int $userId = null, bool $isPopular = false, ?bool $onlyWithImage = true, bool $onlyPublished = true): array
     {
         $uid = $userId ?? 0;
 
@@ -112,6 +114,11 @@ class CatalogItemRepository extends EntityRepository
             ->andWhere('ci.product_code IN (:productCodes)')
             ->setParameter('productCodes', $productCodes)
             ->setParameter('uid', $uid);
+
+        // админская сортировка передаёт false: там нужны все товары, включая неопубликованные
+        if ($onlyPublished) {
+            $qb->andWhere('ci.is_published = true');
+        }
 
         if($onlyWithImage){
             $qb->leftJoin(CatalogItemImage::class, 'cii', 'WITH', 'cii.catalogItem = ci.id')
@@ -188,6 +195,7 @@ class CatalogItemRepository extends EntityRepository
             ->where('ci.product_code IN (:productCodes)')
             ->andWhere('cii.id IS NOT NULL')
             ->andWhere('ci.is_popular = :isPopular')
+            ->andWhere('ci.is_published = true')
             ->setParameter('productCodes', $productCodes)
             ->setParameter('isPopular', CatalogItem::POPULAR)
             ->orderBy('ci.position', 'ASC')
@@ -205,6 +213,7 @@ class CatalogItemRepository extends EntityRepository
             ->andWhere('ci.is_popular = :isPopular')
             ->andWhere('ci.catalog = :catalog')
             ->andWhere('cii.id IS NOT NULL')
+            ->andWhere('ci.is_published = true')
             ->setParameter('productCodes', $productCodes)
             ->setParameter('isPopular', CatalogItem::POPULAR)
             ->setParameter('catalog', $catalog)
@@ -223,6 +232,7 @@ class CatalogItemRepository extends EntityRepository
         return $this->createQueryBuilder('ci')
             ->where('ci.catalog IN (:catalogIds)')
             ->andWhere('ci.product_code IN (:productCodes)')
+            ->andWhere('ci.is_published = true')
             ->setParameter('catalogIds', $catalogIds)
             ->setParameter('productCodes', $productCodes)
             ->orderBy('ci.position', 'ASC')
@@ -237,6 +247,7 @@ class CatalogItemRepository extends EntityRepository
             ->leftJoin(CatalogItemImage::class, 'cii', 'WITH', 'cii.catalogItem = ci.id')
             ->where('LOWER(ci.name) LIKE LOWER(:name)')
             ->andWhere('cii.id IS NOT NULL')
+            ->andWhere('ci.is_published = true')
             ->andWhere('ci.product_code IN (:productCodes)')
             ->setParameter('name', '%' . $name . '%')
             ->setParameter('productCodes', $productCodes)
@@ -274,6 +285,7 @@ class CatalogItemRepository extends EntityRepository
             ->where('ci.catalog = :catalogId')
             ->andWhere('cii.id IS NOT NULL')
             ->andWhere('ci.product_code IN (:productCodes)')
+            ->andWhere('ci.is_published = true')
             ->setParameter('catalogId', $catalogId)
             ->setParameter('productCodes', $productCodes);
 

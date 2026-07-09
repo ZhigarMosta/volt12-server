@@ -16,6 +16,7 @@ class CatalogRepository extends EntityRepository
             FROM App\Entity\CatalogItem i2
             WHERE i2.catalog = c.id
             AND i2.product_code IN (:product_code)
+            AND i2.is_published = true
             AND EXISTS (
                 SELECT 1
                 FROM App\Entity\CatalogItemImage img2

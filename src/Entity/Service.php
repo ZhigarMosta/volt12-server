@@ -13,6 +13,8 @@ use App\EventListener\ServiceImageListener;
 #[ORM\Table(name: 'services')]
 #[ORM\Index(columns: ['position'], name: 'idx_services_position')]
 #[ORM\Index(columns: ['name'], name: 'idx_services_name')]
+#[ORM\Index(columns: ['in_footer'], name: 'idx_services_in_footer')]
+#[ORM\Index(columns: ['is_published'], name: 'idx_services_is_published')]
 #[ORM\EntityListeners([ServiceImageListener::class])]
 class Service implements ResourceInterface, TimestampableInterface
 {
@@ -49,6 +51,12 @@ class Service implements ResourceInterface, TimestampableInterface
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $position = null;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $in_footer = false;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    private bool $is_published = true;
 
     #[ORM\Column(name: 'img_link', type: 'string', length: 2048, nullable: true)]
     private ?string $img_link = null;
@@ -87,6 +95,10 @@ class Service implements ResourceInterface, TimestampableInterface
     public function setShortDescription(?string $short_description): void { $this->short_description = $short_description; }
     public function getPosition(): ?int { return $this->position; }
     public function setPosition(?int $position): void { $this->position = $position; }
+    public function getInFooter(): bool { return $this->in_footer; }
+    public function setInFooter(bool $in_footer): void { $this->in_footer = $in_footer; }
+    public function getIsPublished(): bool { return $this->is_published; }
+    public function setIsPublished(bool $is_published): void { $this->is_published = $is_published; }
     public function getImgLink(): ?string { return $this->img_link; }
     public function setImgLink(string $img_link): void
     {

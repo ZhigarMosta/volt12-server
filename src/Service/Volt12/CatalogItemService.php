@@ -22,7 +22,7 @@ class CatalogItemService
     }
     private array $productCodes = [ProductCodeProvider::CODE_VOLT12, ProductCodeProvider::CODE_ANY];
 
-    public function getCatalogItemByParams(?int $catalogId, ?array $filterGroups = [], ?array $price = [], ?string $search = null, ?int $sortPrice = null, ?int $page = 1, ?int $limit = 10, ?int $userId = null, bool $isPopular = false, ?bool $onlyWithImage = true): array
+    public function getCatalogItemByParams(?int $catalogId, ?array $filterGroups = [], ?array $price = [], ?string $search = null, ?int $sortPrice = null, ?int $page = 1, ?int $limit = 10, ?int $userId = null, bool $isPopular = false, ?bool $onlyWithImage = true, bool $onlyPublished = true): array
     {
         if ($sortPrice === 1) {
             $sortPrice = 'ASC';
@@ -30,7 +30,7 @@ class CatalogItemService
             $sortPrice = 'DESC';
         }
 
-        return $this->catalogItemRepository->list($this->productCodes, $catalogId, $filterGroups, $price, $search, $sortPrice, $page, $limit, $userId, $isPopular, $onlyWithImage);
+        return $this->catalogItemRepository->list($this->productCodes, $catalogId, $filterGroups, $price, $search, $sortPrice, $page, $limit, $userId, $isPopular, $onlyWithImage, $onlyPublished);
     }
 
     /**

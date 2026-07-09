@@ -1,0 +1,83 @@
+<script>
+    (function () {
+        var tocInner = document.querySelector('.doc-toc__inner');
+        var links = Array.prototype.slice.call(document.querySelectorAll('.doc-toc__link'));
+        var sections = links
+            .map(function (l) { return document.querySelector(l.getAttribute('href')); })
+            .filter(Boolean);
+
+        /* --- скролл-спай + автопрокрутка оглавления к активному пункту --- */
+        if (sections.length && 'IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    var id = '#' + entry.target.id;
+                    links.forEach(function (l) {
+                        var active = l.getAttribute('href') === id;
+                        l.classList.toggle('is-active', active);
+                        if (active && tocInner && window.innerWidth > 900) {
+                            var lt = l.offsetTop;
+                            if (lt < tocInner.scrollTop + 70) {
+                                tocInner.scrollTop = Math.max(0, lt - 70);
+                            } else if (lt > tocInner.scrollTop + tocInner.clientHeight - 80) {
+                                tocInner.scrollTop = lt - tocInner.clientHeight + 80;
+                            }
+                        }
+                    });
+                });
+            }, { rootMargin: '-100px 0px -70% 0px' });
+            sections.forEach(function (s) { observer.observe(s); });
+        }
+
+        /* --- поиск по документации: фильтрует оглавление по тексту разделов --- */
+        var input = document.getElementById('docSearch');
+        var counter = document.getElementById('docSearchCount');
+        if (input && counter) {
+            var texts = {};
+            sections.forEach(function (s) { texts[s.id] = (s.textContent || '').toLowerCase(); });
+            input.addEventListener('input', function () {
+                var q = input.value.trim().toLowerCase();
+                if (q.length < 2) {
+                    links.forEach(function (l) { l.classList.remove('is-hidden'); });
+                    counter.textContent = '';
+                    return;
+                }
+                var found = 0;
+                links.forEach(function (l) {
+                    var id = (l.getAttribute('href') || '').slice(1);
+                    var hit = (texts[id] || '').indexOf(q) !== -1
+                        || l.textContent.toLowerCase().indexOf(q) !== -1;
+                    l.classList.toggle('is-hidden', !hit);
+                    if (hit) found++;
+                });
+                counter.textContent = found ? 'Найдено разделов: ' + found : 'Ничего не найдено';
+            });
+        }
+
+        /* --- кнопка «наверх» --- */
+        var up = document.getElementById('docUp');
+        if (up) {
+            var onScroll = function () {
+                up.classList.toggle('is-visible', window.scrollY > 600);
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+            up.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        /* --- мобильное сворачивание оглавления --- */
+        var toggle = document.getElementById('docTocToggle');
+        if (toggle && tocInner) {
+            toggle.addEventListener('click', function () {
+                if (window.innerWidth <= 900) tocInner.classList.toggle('is-open');
+            });
+            links.forEach(function (l) {
+                l.addEventListener('click', function () {
+                    if (window.innerWidth <= 900) tocInner.classList.remove('is-open');
+                });
+            });
+        }
+    })();
+</script>

@@ -277,12 +277,28 @@ sylius_twig_hooks:
             entity_history:
                 template: 'admin/entity_history/_history_hook.html.twig'
                 priority: -50
+            app_docs_help:
+                template: 'admin/docs/_help_link.html.twig'
+                priority: 150
+
+        'sylius_admin.common.index.content':
+            app_docs_help:
+                template: 'admin/docs/_help_link.html.twig'
+                priority: 150
+
+        'sylius_admin.common.create.content':
+            app_docs_help:
+                template: 'admin/docs/_help_link.html.twig'
+                priority: 150
 
         'sylius_admin.dashboard.index.content':
             statistics:
                 enabled: false
             latest_statistics:
                 enabled: false
+            app_docs_button:
+                template: 'admin/dashboard/docs_button.html.twig'
+                priority: 200
             app_statistics:
                 template: 'admin/dashboard/statistics.html.twig'
                 priority: 150

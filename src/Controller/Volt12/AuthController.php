@@ -123,6 +123,19 @@ class AuthController extends AbstractController
 
         [$user, $token] = $result;
 
+        // гостевые корзина и сравнение переносятся в аккаунт (как при регистрации);
+        // одинаковые товары объединяются на стороне CartService
+        $cart = $data['cart'] ?? [];
+        $compare = $data['compare'] ?? [];
+
+        if (!empty($cart) && is_array($cart)) {
+            $this->cartService->importFromLocal($user, $cart);
+        }
+
+        if (!empty($compare) && is_array($compare)) {
+            $this->compareService->importFromLocal($user, $compare);
+        }
+
         $response = $this->json(['success' => true, 'user' => $this->serializeUser($user), 'token' => $token]);
         $response->headers->setCookie($this->createAuthCookie($token));
 

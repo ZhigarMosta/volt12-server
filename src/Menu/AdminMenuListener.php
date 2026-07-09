@@ -66,6 +66,7 @@ class AdminMenuListener
 
         $this->item($system, 'entity_history', 'app_admin_entity_history_index', 'История изменений');
         $this->item($system, 'user_token', 'app_admin_user_token_index', 'Токены');
+        $this->item($system, 'docs', 'app_admin_docs', 'Документация');
     }
 
     private function item(ItemInterface $parent, string $key, string $route, string $label): void

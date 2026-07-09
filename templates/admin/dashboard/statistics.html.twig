@@ -21,21 +21,23 @@
 {% endmacro %}
 {% import _self as cards %}
 
-<div class="mb-2">
-    <h3 class="mb-3">Сводка</h3>
-    <div class="row row-cards mb-2">
-        {{ cards.stat('Заказы', s.orders, 'tabler:shopping-cart', 'primary') }}
-        {{ cards.stat('Заказы за 7 дней', s.orders_last_7, 'tabler:calendar-stats', 'azure') }}
-        {{ cards.stat('Выручка, ₽', (s.revenue / 100)|number_format(2, ',', ' '), 'tabler:cash', 'green') }}
-        {{ cards.stat('Пользователи', s.users, 'tabler:users', 'purple') }}
-    </div>
-    <div class="row row-cards mb-4">
-        {{ cards.stat('Продукты', s.products, 'tabler:cube', 'orange') }}
-        {{ cards.stat('Каталоги', s.catalogs, 'tabler:folders', 'yellow') }}
-        {{ cards.stat('Услуги', s.services, 'tabler:briefcase', 'teal') }}
-        {{ cards.stat('Отзывы', s.feedback, 'tabler:star', 'pink') }}
-        {{ cards.stat('Корзины', s.carts, 'tabler:basket', 'cyan') }}
-        {{ cards.stat('Избранное', s.favorites, 'tabler:heart', 'red') }}
-        {{ cards.stat('Сравнения', s.compares, 'tabler:scale', 'indigo') }}
+<div class="container-xl">
+    <div class="mb-2">
+        <h3 class="mb-3">Сводка</h3>
+        <div class="row row-cards mb-2">
+            {{ cards.stat('Заказы', s.orders, 'tabler:shopping-cart', 'primary') }}
+            {{ cards.stat('Заказы за 7 дней', s.orders_last_7, 'tabler:calendar-stats', 'azure') }}
+            {{ cards.stat('Выручка, ₽', s.revenue|number_format(0, ',', ' '), 'tabler:cash', 'green') }}
+            {{ cards.stat('Пользователи', s.users, 'tabler:users', 'purple') }}
+        </div>
+        <div class="row row-cards mb-4">
+            {{ cards.stat('Продукты', s.products, 'tabler:cube', 'orange') }}
+            {{ cards.stat('Каталоги', s.catalogs, 'tabler:folders', 'yellow') }}
+            {{ cards.stat('Услуги', s.services, 'tabler:briefcase', 'teal') }}
+            {{ cards.stat('Отзывы', s.feedback, 'tabler:star', 'pink') }}
+            {{ cards.stat('Корзины', s.carts, 'tabler:basket', 'cyan') }}
+            {{ cards.stat('Избранное', s.favorites, 'tabler:heart', 'red') }}
+            {{ cards.stat('Сравнения', s.compares, 'tabler:scale', 'indigo') }}
+        </div>
     </div>
 </div>
