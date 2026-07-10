@@ -23,7 +23,8 @@
             <hr class="my-3">
             <h4 class="mb-1">Автоматические дампы</h4>
             <p class="text-secondary mb-3">
-                Создаются по расписанию (раз в 7 дней), хранится не более 10 последних.
+                Создаются по расписанию (раз в 7 дней), хранится не более 14 последних.
+                Восстановление всегда идёт через страницу проверки дампа и подтверждение.
             </p>
 
             {% if backups is empty %}
@@ -45,11 +46,16 @@
                                     <td class="text-secondary">{{ b.name }}</td>
                                     <td>{{ b.mtime|date('d.m.Y H:i') }}</td>
                                     <td class="text-end">{{ (b.size / 1024)|number_format(0, '.', ' ') }} КБ</td>
-                                    <td>
+                                    <td class="text-nowrap">
                                         <a href="{{ path('app_admin_db_backup_download', {stamp: b.stamp}) }}"
                                            class="btn btn-sm btn-outline-primary">
                                             {{ ux_icon('tabler:download') }}
                                             Скачать
+                                        </a>
+                                        <a href="{{ path('app_admin_db_restore_check', {kind: 'dump', stamp: b.stamp}) }}"
+                                           class="btn btn-sm btn-outline-danger">
+                                            {{ ux_icon('tabler:database-import') }}
+                                            Восстановить…
                                         </a>
                                     </td>
                                 </tr>
@@ -58,7 +64,107 @@
                     </table>
                 </div>
             {% endif %}
+
+            <hr class="my-3">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h4 class="mb-1">Восстановление из своего файла</h4>
+                    <p class="text-secondary mb-0">
+                        Загрузите SQL-дамп (созданный кнопкой «Скачать дамп БД» или автодампом).
+                        Файл пройдёт полную проверку безопасности, восстановление — только после подтверждения.
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <form method="post" action="{{ path('app_admin_db_restore_upload') }}" enctype="multipart/form-data" class="d-flex gap-2">
+                        <input type="hidden" name="_token" value="{{ csrf_token('db-restore-upload') }}">
+                        <input type="file" name="dump" accept=".sql" required class="form-control" style="max-width: 280px;">
+                        <button type="submit" class="btn btn-outline-danger text-nowrap">
+                            {{ ux_icon('tabler:file-search') }}
+                            Проверить дамп…
+                        </button>
+                    </form>
+                </div>
+            </div>
+            </div>
         </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h4 class="mb-1">Картинки сайта</h4>
+                        <p class="text-secondary mb-0">
+                            Дамп БД не содержит файлов изображений — их нужно выгружать и восстанавливать отдельно.
+                            Архив включает всё из <code>public/uploads</code> (товары, каталоги, услуги).
+                        </p>
+                    </div>
+                    <div class="col-auto d-flex gap-2 flex-wrap">
+                        <a href="{{ path('app_admin_images_export') }}" class="btn btn-primary">
+                            {{ ux_icon('tabler:photo-down') }}
+                            Скачать архив картинок
+                        </a>
+                        <a href="{{ path('app_admin_images_check') }}" class="btn btn-outline-primary">
+                            {{ ux_icon('tabler:photo-search') }}
+                            Проверить целостность
+                        </a>
+                    </div>
+                </div>
+                <hr class="my-3">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h4 class="mb-1">Восстановление картинок</h4>
+                        <p class="text-secondary mb-0">
+                            Загрузите zip-архив (созданный кнопкой «Скачать архив картинок»). Принимаются только
+                            изображения внутри <code>uploads/</code>; каждый файл проверяется по содержимому.
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <form method="post" action="{{ path('app_admin_images_restore') }}" enctype="multipart/form-data" class="d-flex gap-2">
+                            <input type="hidden" name="_token" value="{{ csrf_token('images-restore') }}">
+                            <input type="file" name="archive" accept=".zip" required class="form-control" style="max-width: 280px;">
+                            <button type="submit" class="btn btn-outline-danger text-nowrap">
+                                {{ ux_icon('tabler:photo-up') }}
+                                Восстановить…
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h4 class="mb-1">ER-диаграмма базы данных</h4>
+                        <p class="text-secondary mb-0">
+                            Схема таблиц и связей текущей БД, строится автоматически из структуры базы.
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ path('app_admin_er_diagram') }}" class="btn btn-primary">
+                            {{ ux_icon('tabler:schema') }}
+                            Открыть диаграмму
+                        </a>
+                    </div>
+                </div>
+                <hr class="my-3">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h4 class="mb-1">Структура страниц сайта</h4>
+                        <p class="text-secondary mb-0">
+                            Все страницы витрины одним деревом: сколько их, какие индексируются,
+                            быстрый переход на сайт и к редактированию.
+                        </p>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ path('app_admin_site_structure') }}" class="btn btn-primary">
+                            {{ ux_icon('tabler:sitemap') }}
+                            Открыть структуру
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

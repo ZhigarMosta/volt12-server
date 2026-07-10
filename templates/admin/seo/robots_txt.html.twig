@@ -1,0 +1,130 @@
+{% extends '@SyliusAdmin/shared/layout/base.html.twig' %}
+
+{% block title %}robots.txt | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container-xl my-4">
+    <div class="d-flex align-items-center mb-3 gap-3 flex-wrap">
+        <a href="{{ path('sylius_admin_dashboard') }}" class="text-secondary">
+            {{ ux_icon('tabler:arrow-left') }} Панель управления
+        </a>
+        <h3 class="mb-0">{{ ux_icon('tabler:file-settings') }} robots.txt</h3>
+        <div class="ms-auto">
+            <a href="{{ frontendUrl }}/robots.txt" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
+                {{ ux_icon('tabler:external-link') }}
+                Открыть на сайте
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ ux_icon('tabler:pencil') }} Содержимое</h3>
+                    {% if updatedAt %}
+                        <span class="ms-auto text-secondary small">Обновлено: {{ updatedAt|date('d.m.Y H:i') }}</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    {{ form_errors(form) }}
+                    {{ form_errors(form.content) }}
+                    {{ form_widget(form.content) }}
+                    <div class="d-flex align-items-center gap-2 mt-3 flex-wrap">
+                        <button type="submit" class="btn btn-primary">
+                            {{ ux_icon('tabler:device-floppy') }}
+                            Сохранить
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="robots-reset">
+                            {{ ux_icon('tabler:restore') }}
+                            Вернуть стандартное
+                        </button>
+                        <span class="text-secondary small ms-auto">Применяется на сайте в течение ~5 минут</span>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3 class="card-title">{{ ux_icon('tabler:info-circle') }} Как это работает</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-secondary mb-2">
+                        Этот текст — правила для поисковых роботов. Роботы читают их на сайте по адресу
+                        <code>/robots.txt</code>. Сохраняется текст в базу данных, никакой файл вручную
+                        выкладывать не нужно.
+                    </p>
+                    <p class="text-secondary mb-2">
+                        Кроме правил, роботам нужно знать адрес карты сайта — это строка
+                        <code>Sitemap:</code>. Вписывать её самому не обязательно: если её нет в тексте,
+                        сайт допишет её в конец автоматически. Например, вы сохранили:
+                    </p>
+                    <pre class="bg-dark-lt rounded p-2 mb-1" style="font-size: 12.5px;">User-agent: *
+Disallow: /cart</pre>
+                    <p class="text-secondary mb-1">— а робот увидит:</p>
+                    <pre class="bg-dark-lt rounded p-2 mb-2" style="font-size: 12.5px;">User-agent: *
+Disallow: /cart
+
+Sitemap: {{ frontendUrl }}/sitemap.xml  ← добавлено само</pre>
+                    <p class="text-secondary mb-0">
+                        Если написать свою строку <code>Sitemap:</code>, автоматическая не добавится —
+                        останется ваша. Стандартное содержимое уже закрывает служебные разделы: корзину,
+                        оформление заказа, личный кабинет, избранное и сравнение.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ ux_icon('tabler:list-details') }} Шпаргалка по директивам</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-vcenter card-table">
+                        <tbody>
+                            <tr>
+                                <td><code>User-agent: *</code></td>
+                                <td class="text-secondary">правила для всех роботов</td>
+                            </tr>
+                            <tr>
+                                <td><code>Disallow: /cart</code></td>
+                                <td class="text-secondary">закрыть раздел от сканирования</td>
+                            </tr>
+                            <tr>
+                                <td><code>Disallow:</code></td>
+                                <td class="text-secondary">пустое значение — разрешено всё</td>
+                            </tr>
+                            <tr>
+                                <td><code>Allow: /path</code></td>
+                                <td class="text-secondary">исключение из Disallow</td>
+                            </tr>
+                            <tr>
+                                <td><code>Sitemap: URL</code></td>
+                                <td class="text-secondary">своя карта сайта (иначе добавится автоматически)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer text-secondary small">
+                    {{ ux_icon('tabler:alert-triangle') }}
+                    <code>Disallow: /</code> (со слэшем без пути) закрывает от поисковиков <strong>весь сайт</strong> —
+                    при сохранении такого правила появится предупреждение.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('robots-reset').addEventListener('click', function () {
+        const editor = document.querySelector('[data-role="robots-editor"]');
+        if (editor && confirm('Заменить текст в редакторе стандартным содержимым? Изменение вступит в силу после нажатия «Сохранить».')) {
+            editor.value = {{ defaultContent|json_encode|raw }};
+            editor.focus();
+        }
+    });
+</script>
+{% endblock %}

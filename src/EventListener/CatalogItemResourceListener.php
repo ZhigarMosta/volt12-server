@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use App\Entity\CatalogItem;
+use App\Service\SlugGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Bundle\ResourceBundle\Event\ResourceControllerEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -12,17 +13,43 @@ class CatalogItemResourceListener
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private SlugGenerator $slugGenerator
     ) {}
 
     public function onPreCreate(ResourceControllerEvent $event): void
     {
+        $this->ensureSlug($event);
         $this->validate($event);
     }
 
     public function onPreUpdate(ResourceControllerEvent $event): void
     {
+        $this->ensureSlug($event);
         $this->validate($event);
+    }
+
+    private function ensureSlug(ResourceControllerEvent $event): void
+    {
+        $item = $event->getSubject();
+
+        if (!$item instanceof CatalogItem || $item->getSlug()) {
+            return;
+        }
+
+        $repository = $this->entityManager->getRepository(CatalogItem::class);
+
+        $slug = $this->slugGenerator->generateUnique(
+            $item->getName(),
+            function (string $candidate) use ($repository, $item): bool {
+                $existing = $repository->findOneBy(['slug' => $candidate]);
+
+                return $existing && $existing->getId() !== $item->getId();
+            },
+            'product'
+        );
+
+        $item->setSlug($slug);
     }
 
     private function validate(ResourceControllerEvent $event): void

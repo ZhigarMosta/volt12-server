@@ -1,0 +1,246 @@
+{% extends '@SyliusAdmin/shared/layout/base.html.twig' %}
+
+{% block title %}Структура сайта | {{ parent() }}{% endblock %}
+
+{% macro badge(published, noindex) %}
+    {%- if published is same as(false) -%}
+        <span class="badge bg-secondary-lt">скрыт — доступен по прямой ссылке</span>
+    {%- elseif noindex -%}
+        <span class="badge bg-yellow-lt">noindex</span>
+    {%- else -%}
+        <span class="badge bg-green-lt">индексируется</span>
+    {%- endif -%}
+{% endmacro %}
+
+{% import _self as ui %}
+
+{% block body %}
+<div class="container-xl my-4">
+    <div class="d-flex align-items-center mb-3 gap-3 flex-wrap">
+        <a href="{{ path('sylius_admin_dashboard') }}" class="text-secondary">
+            {{ ux_icon('tabler:arrow-left') }} Панель управления
+        </a>
+        <h3 class="mb-0">{{ ux_icon('tabler:sitemap') }} Структура страниц сайта</h3>
+    </div>
+
+    <div class="row row-cards mb-3">
+        <div class="col-6 col-md-2">
+            <div class="card card-sm"><div class="card-body text-center">
+                <div class="h1 mb-0">{{ counts.total }}</div>
+                <div class="text-secondary">всего страниц</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-2">
+            <div class="card card-sm"><div class="card-body text-center">
+                <div class="h1 mb-0 text-green">{{ counts.indexable }}</div>
+                <div class="text-secondary">в поиске</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-2">
+            <div class="card card-sm"><div class="card-body text-center">
+                <div class="h1 mb-0">{{ counts.catalogs }}</div>
+                <div class="text-secondary">категорий</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-2">
+            <div class="card card-sm"><div class="card-body text-center">
+                <div class="h1 mb-0">{{ counts.items }}</div>
+                <div class="text-secondary">товаров{% if counts.items_hidden %} (скрыто {{ counts.items_hidden }}){% endif %}</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-2">
+            <div class="card card-sm"><div class="card-body text-center">
+                <div class="h1 mb-0">{{ counts.services }}</div>
+                <div class="text-secondary">услуг{% if counts.services_hidden %} (скрыто {{ counts.services_hidden }}){% endif %}</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-2">
+            <div class="card card-sm"><div class="card-body text-center">
+                <div class="h1 mb-0">{{ counts.static + counts.system }}</div>
+                <div class="text-secondary">статичных и служебных</div>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex gap-2 align-items-center flex-wrap">
+            <input type="search" id="site-search" class="form-control form-control-sm" style="max-width: 320px;"
+                   placeholder="Поиск по названию или слагу…" autocomplete="off">
+            <span class="text-secondary small" id="site-search-count"></span>
+            <div class="ms-auto d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="site-expand">Развернуть всё</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="site-collapse">Свернуть всё</button>
+            </div>
+        </div>
+        <div class="card-body site-tree">
+
+            <details open>
+                <summary class="site-tree__section">{{ ux_icon('tabler:file-text') }} Статичные страницы <span class="text-secondary">({{ counts.static }})</span></summary>
+                <ul class="site-tree__list">
+                    {% for p in staticPages %}
+                        <li class="site-node" data-search="{{ (p.title ~ ' ' ~ p.path)|lower }}">
+                            <a href="{{ frontendUrl }}{{ p.path }}" target="_blank" rel="noopener">{{ p.title }}</a>
+                            <code>{{ p.path }}</code>
+                            <span class="badge bg-green-lt">индексируется</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </details>
+
+            <details open>
+                <summary class="site-tree__section">{{ ux_icon('tabler:cube') }} Каталог <span class="text-secondary">({{ counts.catalogs }} категорий, {{ counts.items }} товаров)</span></summary>
+                <ul class="site-tree__list">
+                    {% for c in catalogTree %}
+                        <li>
+                            <details>
+                                <summary class="site-node" data-search="{{ (c.name ~ ' ' ~ c.slug)|lower }}">
+                                    <a href="{{ frontendUrl }}/catalog/{{ c.slug }}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><strong>{{ c.name }}</strong></a>
+                                    <code>/catalog/{{ c.slug }}</code>
+                                    {{ ui.badge(true, c.seo_noindex) }}
+                                    <span class="text-secondary small">{{ c.items|length }} товаров</span>
+                                    <a href="{{ path('app_admin_catalog_update', {id: c.id}) }}" class="site-node__edit" title="Редактировать категорию" onclick="event.stopPropagation()">{{ ux_icon('tabler:pencil') }}</a>
+                                </summary>
+                                <ul class="site-tree__list">
+                                    {% for i in c.items %}
+                                        <li class="site-node" data-search="{{ (i.name ~ ' ' ~ i.slug)|lower }}">
+                                            <a href="{{ frontendUrl }}/product/{{ i.slug }}" target="_blank" rel="noopener">{{ i.name }}</a>
+                                            <code>/product/{{ i.slug }}</code>
+                                            {{ ui.badge(i.is_published ? true : false, i.seo_noindex) }}
+                                            <a href="{{ path('app_admin_catalog_item_update', {id: i.id}) }}" class="site-node__edit" title="Редактировать товар">{{ ux_icon('tabler:pencil') }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="text-secondary">Товаров нет</li>
+                                    {% endfor %}
+                                </ul>
+                            </details>
+                        </li>
+                    {% endfor %}
+                    {% for i in orphanItems %}
+                        <li class="site-node" data-search="{{ (i.name ~ ' ' ~ i.slug)|lower }}">
+                            <a href="{{ frontendUrl }}/product/{{ i.slug }}" target="_blank" rel="noopener">{{ i.name }}</a>
+                            <code>/product/{{ i.slug }}</code>
+                            <span class="badge bg-orange-lt">без категории</span>
+                            {{ ui.badge(i.is_published ? true : false, i.seo_noindex) }}
+                            <a href="{{ path('app_admin_catalog_item_update', {id: i.id}) }}" class="site-node__edit" title="Редактировать товар">{{ ux_icon('tabler:pencil') }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </details>
+
+            <details open>
+                <summary class="site-tree__section">{{ ux_icon('tabler:briefcase') }} Услуги <span class="text-secondary">({{ counts.services }})</span></summary>
+                <ul class="site-tree__list">
+                    {% for g in groupTree %}
+                        <li>
+                            <details>
+                                <summary class="site-node" data-search="{{ g.name|lower }}">
+                                    <strong>{{ g.name }}</strong>
+                                    <span class="text-secondary small">{{ g.services|length }} услуг — группа, отдельной страницы нет</span>
+                                    <a href="{{ path('app_admin_service_group_update', {id: g.id}) }}" class="site-node__edit" title="Редактировать группу" onclick="event.stopPropagation()">{{ ux_icon('tabler:pencil') }}</a>
+                                </summary>
+                                <ul class="site-tree__list">
+                                    {% for s in g.services %}
+                                        <li class="site-node" data-search="{{ (s.name ~ ' ' ~ s.slug)|lower }}">
+                                            <a href="{{ frontendUrl }}/services/{{ s.slug }}" target="_blank" rel="noopener">{{ s.name }}</a>
+                                            <code>/services/{{ s.slug }}</code>
+                                            {{ ui.badge(s.is_published ? true : false, s.seo_noindex) }}
+                                            <a href="{{ path('app_admin_service_update', {id: s.id}) }}" class="site-node__edit" title="Редактировать услугу">{{ ux_icon('tabler:pencil') }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="text-secondary">Услуг нет</li>
+                                    {% endfor %}
+                                </ul>
+                            </details>
+                        </li>
+                    {% endfor %}
+                    {% for s in orphanServices %}
+                        <li class="site-node" data-search="{{ (s.name ~ ' ' ~ s.slug)|lower }}">
+                            <a href="{{ frontendUrl }}/services/{{ s.slug }}" target="_blank" rel="noopener">{{ s.name }}</a>
+                            <code>/services/{{ s.slug }}</code>
+                            <span class="badge bg-orange-lt">без группы</span>
+                            {{ ui.badge(s.is_published ? true : false, s.seo_noindex) }}
+                            <a href="{{ path('app_admin_service_update', {id: s.id}) }}" class="site-node__edit" title="Редактировать услугу">{{ ux_icon('tabler:pencil') }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </details>
+
+            <details>
+                <summary class="site-tree__section">{{ ux_icon('tabler:settings') }} Служебные страницы <span class="text-secondary">({{ counts.system }}, все noindex)</span></summary>
+                <ul class="site-tree__list">
+                    {% for p in systemPages %}
+                        <li class="site-node" data-search="{{ (p.title ~ ' ' ~ p.path)|lower }}">
+                            <a href="{{ frontendUrl }}{{ p.path }}" target="_blank" rel="noopener">{{ p.title }}</a>
+                            <code>{{ p.path }}</code>
+                            <span class="badge bg-yellow-lt">noindex</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </details>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .site-tree details { margin-bottom: .5rem; }
+    .site-tree__section {
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.05rem;
+        padding: .35rem .25rem;
+    }
+    .site-tree__list {
+        list-style: none;
+        margin: .25rem 0 .5rem;
+        padding-left: 1.75rem;
+        border-left: 2px solid var(--tblr-border-color, #e6e7e9);
+    }
+    .site-tree__list > li { padding: .2rem 0; }
+    .site-node { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+    summary.site-node { cursor: pointer; }
+    .site-node code { color: var(--tblr-secondary, #6c757d); font-size: .8em; }
+    .site-node__edit { color: var(--tblr-secondary, #6c757d); opacity: 0; transition: opacity .15s; }
+    .site-node:hover .site-node__edit { opacity: 1; }
+    .site-node--hidden { display: none !important; }
+</style>
+
+<script>
+    (function () {
+        const input = document.getElementById('site-search');
+        const counter = document.getElementById('site-search-count');
+        const nodes = Array.from(document.querySelectorAll('.site-node'));
+        const allDetails = Array.from(document.querySelectorAll('.site-tree details'));
+
+        input.addEventListener('input', function () {
+            const q = this.value.trim().toLowerCase();
+            if (q === '') {
+                nodes.forEach((n) => n.closest('li')?.classList.remove('site-node--hidden'));
+                counter.textContent = '';
+                return;
+            }
+            let found = 0;
+            nodes.forEach((n) => {
+                const match = (n.dataset.search || '').includes(q);
+                const li = n.closest('li');
+                if (!li) return;
+                li.classList.toggle('site-node--hidden', !match);
+                if (match) {
+                    found++;
+                    // раскрываем родителей и показываем контейнеры совпадения
+                    let parent = li.parentElement;
+                    while (parent) {
+                        if (parent.tagName === 'DETAILS') parent.open = true;
+                        if (parent.tagName === 'LI') parent.classList.remove('site-node--hidden');
+                        parent = parent.parentElement;
+                    }
+                }
+            });
+            counter.textContent = 'найдено: ' + found;
+        });
+
+        document.getElementById('site-expand').addEventListener('click', () => allDetails.forEach((d) => { d.open = true; }));
+        document.getElementById('site-collapse').addEventListener('click', () => allDetails.forEach((d) => { d.open = false; }));
+    })();
+</script>
+{% endblock %}

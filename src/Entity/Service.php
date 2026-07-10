@@ -22,6 +22,7 @@ class Service implements ResourceInterface, TimestampableInterface
     {
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+        $this->seo = new SeoMetadata();
     }
 
     use TimestampableTrait;
@@ -66,6 +67,12 @@ class Service implements ResourceInterface, TimestampableInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $imgTitle = null;
+
+    #[ORM\Embedded(class: SeoMetadata::class, columnPrefix: 'seo_')]
+    private SeoMetadata $seo;
+
+    public function getSeo(): SeoMetadata { return $this->seo; }
+    public function setSeo(SeoMetadata $seo): void { $this->seo = $seo; }
 
     private ?File $file = null;
 

@@ -1,0 +1,211 @@
+{% extends '@SyliusAdmin/shared/layout/base.html.twig' %}
+
+{% block title %}ER-диаграмма БД | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid my-4 px-4">
+    <div class="d-flex align-items-center mb-3 gap-3 flex-wrap">
+        <a href="{{ path('sylius_admin_dashboard') }}" class="text-secondary">
+            {{ ux_icon('tabler:arrow-left') }} Панель управления
+        </a>
+        <h3 class="mb-0">{{ ux_icon('tabler:schema') }} ER-диаграмма базы данных ({{ tableCount }} таблиц)</h3>
+        <div class="ms-auto">
+            {% if withSylius %}
+                <a href="{{ path('app_admin_er_diagram') }}" class="btn btn-outline-primary btn-sm">Только таблицы приложения</a>
+            {% else %}
+                <a href="{{ path('app_admin_er_diagram', {sylius: 1}) }}" class="btn btn-outline-primary btn-sm">Показать и таблицы Sylius</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card" id="er-card">
+        <div class="card-header d-flex gap-2 flex-wrap align-items-center">
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="er-zoom-out" title="Отдалить">
+                    {{ ux_icon('tabler:zoom-out') }}
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="er-zoom-in" title="Приблизить">
+                    {{ ux_icon('tabler:zoom-in') }}
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="er-fit" title="Вписать в окно">
+                    {{ ux_icon('tabler:maximize') }} Вписать
+                </button>
+            </div>
+            <span class="text-secondary small d-none d-md-inline">
+                Колесо мыши — масштаб, перетаскивание — перемещение
+            </span>
+            <div class="ms-auto d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="er-fullscreen">
+                    {{ ux_icon('tabler:arrows-maximize') }} На весь экран
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" id="er-pdf">
+                    {{ ux_icon('tabler:file-type-pdf') }} Скачать PDF
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="er-mmd">
+                    {{ ux_icon('tabler:download') }} .mmd
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div id="er-viewport">
+                <div id="er-loading" class="text-secondary p-3">Строю диаграмму…</div>
+                <pre class="mermaid" id="er-diagram" style="visibility: hidden;">{{ mermaid }}</pre>
+            </div>
+        </div>
+    </div>
+
+    <details class="mt-3">
+        <summary class="text-secondary">Исходник диаграммы (mermaid)</summary>
+        <pre class="mt-2 p-3 bg-dark-lt rounded" id="er-source" style="max-height: 400px; overflow: auto;">{{ mermaid }}</pre>
+    </details>
+</div>
+
+<style>
+    #er-viewport {
+        height: 72vh;
+        overflow: hidden;
+        position: relative;
+        background:
+            linear-gradient(90deg, rgba(0,0,0,.035) 1px, transparent 1px),
+            linear-gradient(rgba(0,0,0,.035) 1px, transparent 1px);
+        background-size: 24px 24px;
+        background-color: #fff;
+    }
+    #er-viewport .mermaid { margin: 0; height: 100%; }
+    #er-viewport svg { cursor: grab; }
+    #er-viewport svg:active { cursor: grabbing; }
+    #er-card:fullscreen { background: #fff; }
+    #er-card:fullscreen #er-viewport { height: calc(100vh - 60px); }
+</style>
+
+<script type="module">
+    const state = { panZoom: null, pristine: null, w: 0, h: 0 };
+    const loading = document.getElementById('er-loading');
+
+    try {
+        const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+        mermaid.initialize({
+            startOnLoad: false,
+            maxTextSize: 900000,
+            theme: 'neutral',
+            er: { useMaxWidth: false },
+        });
+        await mermaid.run({ nodes: [document.getElementById('er-diagram')] });
+
+        const pre = document.getElementById('er-diagram');
+        const svg = pre.querySelector('svg');
+        const vb = svg.viewBox.baseVal;
+        state.w = Math.max(1, Math.ceil(vb.width));
+        state.h = Math.max(1, Math.ceil(vb.height));
+
+        // Чистая копия SVG в натуральном размере — из неё собирается PDF
+        const pristineClone = svg.cloneNode(true);
+        pristineClone.setAttribute('width', String(state.w));
+        pristineClone.setAttribute('height', String(state.h));
+        pristineClone.style.maxWidth = 'none';
+        state.pristine = pristineClone.outerHTML;
+
+        // Готовим отображаемый SVG под пан/зум
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '100%');
+        svg.style.maxWidth = 'none';
+        svg.style.display = 'block';
+        pre.style.visibility = 'visible';
+
+        const { default: svgPanZoom } = await import('https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/+esm');
+        state.panZoom = svgPanZoom(svg, {
+            controlIconsEnabled: false,
+            fit: true,
+            center: true,
+            minZoom: 0.05,
+            maxZoom: 30,
+            zoomScaleSensitivity: 0.25,
+        });
+        loading.remove();
+    } catch (e) {
+        loading.textContent = 'Не удалось загрузить библиотеку mermaid (нужен доступ к cdn.jsdelivr.net). Исходник диаграммы доступен ниже.';
+        document.getElementById('er-diagram')?.remove();
+    }
+
+    const refit = () => {
+        if (!state.panZoom) return;
+        state.panZoom.resize();
+        state.panZoom.fit();
+        state.panZoom.center();
+    };
+
+    document.getElementById('er-zoom-in').addEventListener('click', () => state.panZoom?.zoomIn());
+    document.getElementById('er-zoom-out').addEventListener('click', () => state.panZoom?.zoomOut());
+    document.getElementById('er-fit').addEventListener('click', refit);
+
+    document.getElementById('er-fullscreen').addEventListener('click', () => {
+        const card = document.getElementById('er-card');
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            card.requestFullscreen();
+        }
+    });
+    document.addEventListener('fullscreenchange', () => setTimeout(refit, 100));
+    window.addEventListener('resize', () => state.panZoom?.resize());
+
+    document.getElementById('er-mmd').addEventListener('click', () => {
+        const text = document.getElementById('er-source').textContent;
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'volt12-er-diagram.mmd';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    });
+
+    document.getElementById('er-pdf').addEventListener('click', async (event) => {
+        if (!state.pristine) {
+            alert('Диаграмма ещё не построена — PDF собрать не из чего.');
+            return;
+        }
+        const btn = event.currentTarget;
+        btn.disabled = true;
+
+        try {
+            // 1. SVG → картинка (инлайн-стили mermaid применяются при рендере в <img>)
+            const blob = new Blob([state.pristine], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const img = new Image();
+            await new Promise((resolve, reject) => {
+                img.onload = resolve;
+                img.onerror = () => reject(new Error('Браузер не смог отрисовать SVG.'));
+                img.src = url;
+            });
+
+            // 2. Рендер в canvas с запасом по разрешению — PDF остаётся резким при увеличении
+            const scale = Math.min(2.5, 12000 / Math.max(state.w, state.h));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(state.w * scale);
+            canvas.height = Math.round(state.h * scale);
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            URL.revokeObjectURL(url);
+
+            // 3. Canvas → PDF со страницей размером с диаграмму
+            const jspdfModule = await import('https://cdn.jsdelivr.net/npm/jspdf@2.5.2/+esm');
+            const JsPdf = jspdfModule.jsPDF ?? jspdfModule.default?.jsPDF ?? jspdfModule.default;
+            const pdf = new JsPdf({
+                orientation: state.w >= state.h ? 'landscape' : 'portrait',
+                unit: 'px',
+                format: [state.w, state.h],
+                hotfixes: ['px_scaling'],
+                compress: true,
+            });
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, state.w, state.h);
+            pdf.save('volt12-er-diagram.pdf');
+        } catch (e) {
+            alert('Не удалось собрать PDF: ' + e.message + '\nАльтернатива: печать страницы в PDF средствами браузера (Ctrl+P).');
+        } finally {
+            btn.disabled = false;
+        }
+    });
+</script>
+{% endblock %}

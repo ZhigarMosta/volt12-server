@@ -13,11 +13,14 @@ use Symfony\Component\Process\Process;
 class DatabaseBackupService
 {
     /**
-     * Единственные таблицы Sylius, которые попадают в дамп: вход в админку и
-     * история миграций. Вся остальная инфраструктура Sylius из дампа исключается.
+     * Единственные таблицы Sylius, которые попадают в дамп: вход в админку
+     * (вместе с sylius_avatar_image — на неё смотрит FK из sylius_admin_user,
+     * без неё clean-восстановление дампа падает) и история миграций.
+     * Вся остальная инфраструктура Sylius из дампа исключается.
      */
     public const KEPT_SYSTEM_TABLES = [
         'sylius_admin_user',
+        'sylius_avatar_image',
         'sylius_migrations',
     ];
 
@@ -120,7 +123,7 @@ class DatabaseBackupService
      *
      * @return string[] имена удалённых файлов
      */
-    public function rotate(int $keep = 10): array
+    public function rotate(int $keep = 14): array
     {
         $keep = max(1, $keep);
         $files = $this->listBackups();

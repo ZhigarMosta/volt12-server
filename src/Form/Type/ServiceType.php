@@ -49,15 +49,15 @@ class ServiceType extends AbstractType
             ->add('slug', TextType::class, [
                 'label' => 'Slug',
                 'constraints' => [
-                    new NotBlank(['message' => 'Укажите slug']),
                     new Length(['max' => 255]),
                     new Regex([
                         'pattern' => '/^[a-z0-9-]+$/',
                         'message' => 'Slug может содержать только маленькие латинские буквы, цифры и дефис.',
                     ]),
                 ],
-                'required' => true,
+                'required' => false,
                 'empty_data' => '',
+                'help' => 'Оставьте пустым — сгенерируется автоматически из названия.',
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Описание',
@@ -172,6 +172,9 @@ class ServiceType extends AbstractType
                 'label' => 'Title',
                 'required' => false,
                 'empty_data' => '',
+            ])
+            ->add('seo', SeoMetadataType::class, [
+                'label' => 'SEO',
             ]);
     }
 

@@ -89,6 +89,7 @@ class CatalogItemController extends AbstractController
                 'is_published' => $item->getIsPublished(),
                 'position' => $item->getPosition(),
                 'catalog_id' => $item->getCatalog()?->getId(),
+                'seo' => $item->getSeo()->toArray(),
                 'images' => $images,
                 'characteristics' => $characteristics,
                 'user_state' => $user ? [

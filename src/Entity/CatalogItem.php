@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'catalog_items')]
-#[ORM\Index(columns: ['slug'], name: 'idx_catalog_items_slug')]
+#[ORM\UniqueConstraint(name: 'idx_catalog_items_slug', columns: ['slug'])]
 #[ORM\Index(columns: ['product_code'], name: 'idx_catalog_items_product_code')]
 #[ORM\Index(columns: ['is_popular'], name: 'idx_catalog_items_is_popular')]
 #[ORM\Index(columns: ['name'], name: 'idx_catalog_items_name')]
@@ -35,6 +35,7 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
         $this->updatedAt = new \DateTime();
         $this->characteristics = new ArrayCollection();
         $this->catalogItemImages = new ArrayCollection();
+        $this->seo = new SeoMetadata();
     }
 
     use TimestampableTrait;
@@ -87,6 +88,12 @@ class CatalogItem implements ResourceInterface, TimestampableInterface
 
     #[ORM\Column(type: 'boolean')]
     private bool $is_published = false;
+
+    #[ORM\Embedded(class: SeoMetadata::class, columnPrefix: 'seo_')]
+    private SeoMetadata $seo;
+
+    public function getSeo(): SeoMetadata { return $this->seo; }
+    public function setSeo(SeoMetadata $seo): void { $this->seo = $seo; }
 
     #[ORM\OneToMany(mappedBy: 'catalogItem', targetEntity: CatalogItemCharacteristic::class)]
     #[Ignore]

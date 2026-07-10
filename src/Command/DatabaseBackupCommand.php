@@ -12,11 +12,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:db:backup',
-    description: 'Создаёт дамп БД на диск и хранит не более N последних (по умолчанию 10).',
+    description: 'Создаёт дамп БД на диск и хранит не более N последних (по умолчанию 14).',
 )]
 class DatabaseBackupCommand extends Command
 {
-    private const DEFAULT_KEEP = 10;
+    private const DEFAULT_KEEP = 14;
 
     public function __construct(
         private DatabaseBackupService $backupService,

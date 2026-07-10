@@ -16,7 +16,7 @@ use App\EventListener\CatalogImageListener;
 #[ORM\Table(name: 'catalogs')]
 #[ORM\Index(columns: ['product_code'], name: 'idx_catalogs_product_code')]
 #[ORM\Index(columns: ['is_popular'], name: 'idx_catalogs_is_popular')]
-#[ORM\Index(columns: ['slug'], name: 'idx_catalogs_slug')]
+#[ORM\UniqueConstraint(name: 'idx_catalogs_slug', columns: ['slug'])]
 #[ORM\Index(columns: ['position'], name: 'idx_position')]
 #[ORM\EntityListeners([CatalogImageListener::class])]
 class Catalog implements ResourceInterface, TimestampableInterface
@@ -33,6 +33,7 @@ class Catalog implements ResourceInterface, TimestampableInterface
         $this->characteristics = new ArrayCollection();
         $this->catalogItems = new ArrayCollection();
         $this->groups = new ArrayCollection();
+        $this->seo = new SeoMetadata();
     }
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -62,6 +63,12 @@ class Catalog implements ResourceInterface, TimestampableInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $imgTitle = '';
+
+    #[ORM\Embedded(class: SeoMetadata::class, columnPrefix: 'seo_')]
+    private SeoMetadata $seo;
+
+    public function getSeo(): SeoMetadata { return $this->seo; }
+    public function setSeo(SeoMetadata $seo): void { $this->seo = $seo; }
 
     private ?File $file = null;
 

@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use App\Entity\Catalog;
 use App\Entity\CatalogItem;
+use App\Service\SlugGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Bundle\ResourceBundle\Event\ResourceControllerEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -15,18 +16,44 @@ class CatalogResourceListener
         private EntityManagerInterface $entityManager,
         private RequestStack $requestStack,
         private CatalogImageListener $catalogImageListener,
+        private SlugGenerator $slugGenerator,
     ) {}
 
     public function onPreCreate(ResourceControllerEvent $event): void
     {
         $this->uploadImage($event);
+        $this->ensureSlug($event);
         $this->validate($event);
     }
 
     public function onPreUpdate(ResourceControllerEvent $event): void
     {
         $this->uploadImage($event);
+        $this->ensureSlug($event);
         $this->validate($event);
+    }
+
+    private function ensureSlug(ResourceControllerEvent $event): void
+    {
+        $item = $event->getSubject();
+
+        if (!$item instanceof Catalog || $item->getSlug()) {
+            return;
+        }
+
+        $repository = $this->entityManager->getRepository(Catalog::class);
+
+        $slug = $this->slugGenerator->generateUnique(
+            $item->getName(),
+            function (string $candidate) use ($repository, $item): bool {
+                $existing = $repository->findOneBy(['slug' => $candidate]);
+
+                return $existing && $existing->getId() !== $item->getId();
+            },
+            'catalog'
+        );
+
+        $item->setSlug($slug);
     }
 
     private function uploadImage(ResourceControllerEvent $event): void

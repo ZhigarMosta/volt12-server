@@ -1,0 +1,26 @@
+{% extends '@SyliusAdmin/shared/layout/base.html.twig' %}
+
+{% block title %}Проверка картинок | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container-xl my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+            <div class="mb-3">
+                <a href="{{ path('sylius_admin_dashboard') }}" class="text-secondary">
+                    {{ ux_icon('tabler:arrow-left') }} Панель управления
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ ux_icon('tabler:photo-search') }} Проверка целостности картинок</h3>
+                </div>
+                <div class="card-body">
+                    {% include 'admin/tools/_missing_images.html.twig' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

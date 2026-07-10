@@ -1,0 +1,62 @@
+            {# =============== 15. LOGS / GRAFANA =============== #}
+            <section id="logs" class="doc-section">
+                <h2 class="doc-h2">{{ ux_icon('tabler:chart-histogram') }} Логи и мониторинг: Grafana</h2>
+                <p class="doc-lead">
+                    Логи сервера (файлы <code>var/log/prod.log</code> и <code>var/log/dev.log</code>) автоматически
+                    отправляются агентом Promtail в облачный сервис <strong>Grafana Cloud (Loki)</strong>.
+                    Там их можно искать и фильтровать даже если сам сервер недоступен.
+                </p>
+
+                <h3 class="doc-h3">Как попасть в Grafana</h3>
+                <ol class="doc-steps">
+                    <li>Откройте <code>https://grafana.com</code> → «Sign in» и войдите в аккаунт организации
+                        (стек <code>stack-1628890</code>, регион EU; доступ — у владельца аккаунта Grafana Cloud).</li>
+                    <li>Внутри стека откройте раздел <strong>Explore</strong> (иконка компаса в левом меню).</li>
+                    <li>Вверху выберите источник данных <strong>Loki</strong> (grafanacloud-…-logs).</li>
+                    <li>Справа вверху задайте период времени (например, «Last 3 hours»).</li>
+                </ol>
+
+                <h3 class="doc-h3">Какие метки есть у наших логов</h3>
+                <div class="doc-table-wrap">
+                <table class="doc-table">
+                    <thead><tr><th>Метка</th><th>Значения</th><th>Что означает</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>job</code></td><td><code>volt12</code></td><td>Все логи этого проекта.</td></tr>
+                        <tr><td><code>env</code></td><td><code>prod</code> / <code>dev</code></td><td>Боевой или дев-лог.</td></tr>
+                        <tr><td><code>level</code></td><td><code>ERROR</code>, <code>WARNING</code>, <code>INFO</code>…</td><td>Уровень записи.</td></tr>
+                        <tr><td><code>channel</code></td><td><code>app</code>, <code>request</code>, <code>doctrine</code>…</td><td>Подсистема Symfony, откуда запись.</td></tr>
+                    </tbody>
+                </table>
+                </div>
+
+                <h3 class="doc-h3">Примеры запросов (строка запроса в Explore)</h3>
+                <div class="doc-table-wrap">
+                <table class="doc-table">
+                    <thead><tr><th>Запрос</th><th>Что покажет</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>{job="volt12", env="prod"}</code></td><td>Все боевые логи за период.</td></tr>
+                        <tr><td><code>{job="volt12", env="prod", level="ERROR"}</code></td><td>Только ошибки.</td></tr>
+                        <tr><td><code>{job="volt12"} |= "booking"</code></td><td>Строки, содержащие текст «booking» (поиск подстроки).</td></tr>
+                        <tr><td><code>{job="volt12"} |~ "(?i)ошибка оплаты"</code></td><td>Поиск по регулярному выражению без учёта регистра.</td></tr>
+                        <tr><td><code>{job="volt12", env="prod"} | json | context_userId="15"</code></td><td>Боевой лог — JSON: можно фильтровать по полям контекста.</td></tr>
+                        <tr><td><code>{job="volt12", level="ERROR"} != "deprecat"</code></td><td>Ошибки, исключая строки про deprecated.</td></tr>
+                    </tbody>
+                </table>
+                </div>
+                <ul class="doc-list">
+                    <li>Кнопка <strong>Live</strong> в Explore включает режим «хвоста» — записи появляются в реальном времени.</li>
+                    <li>Клик по строке лога раскрывает её поля; кнопками «+»/«−» рядом с полем можно сразу
+                        добавить его в фильтр запроса.</li>
+                    <li>Частые запросы сохраняйте звёздочкой (Saved queries), а на базе запроса можно создать
+                        алерт (Alerting) — например, на всплеск <code>level="ERROR"</code>.</li>
+                </ul>
+
+                <div class="doc-callout doc-callout--warn">
+                    <div class="doc-callout__icon">{{ ux_icon('tabler:alert-triangle') }}</div>
+                    <div>
+                        Если логи в Grafana перестали появляться — проверьте, что на сервере запущен контейнер
+                        <code>promtail</code> (<code>docker compose ps</code>). Настройки отправки — в файле
+                        <code>promtail-config.yml</code> в корне бэкенда.
+                    </div>
+                </div>
+            </section>

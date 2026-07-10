@@ -1,0 +1,101 @@
+{% extends '@SyliusAdmin/shared/layout/base.html.twig' %}
+
+{% block title %}Проверка дампа | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container-xl my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+            <div class="mb-3">
+                <a href="{{ path('sylius_admin_dashboard') }}" class="text-secondary">
+                    {{ ux_icon('tabler:arrow-left') }} Панель управления
+                </a>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        {{ ux_icon('tabler:database-search') }}
+                        Проверка дампа перед восстановлением
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-4">Файл</dt>
+                        <dd class="col-8"><code>{{ file }}</code></dd>
+                        <dt class="col-4">Дата создания</dt>
+                        <dd class="col-8">{{ mtime|date('d.m.Y H:i') }}</dd>
+                        <dt class="col-4">Размер</dt>
+                        <dd class="col-8">{{ (validation.stats.size / 1024)|number_format(0, '.', ' ') }} КБ</dd>
+                        {% if validation.stats.dump_version %}
+                            <dt class="col-4">Версия pg_dump</dt>
+                            <dd class="col-8">{{ validation.stats.dump_version }}</dd>
+                        {% endif %}
+                        <dt class="col-4">Таблиц в дампе</dt>
+                        <dd class="col-8">{{ validation.stats.tables|length }}</dd>
+                        <dt class="col-4">Строк данных</dt>
+                        <dd class="col-8">{{ validation.stats.rows|number_format(0, '.', ' ') }}</dd>
+                        <dt class="col-4">SQL-команд</dt>
+                        <dd class="col-8">{{ validation.stats.statements }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            {% if validation.ok %}
+                <div class="alert alert-success">
+                    {{ ux_icon('tabler:shield-check') }}
+                    Дамп прошёл все проверки: это plain-дамп pg_dump, содержит только разрешённые команды,
+                    работает только со схемой <code>public</code> и не создаёт объектов, которых нет в текущей БД.
+                </div>
+            {% else %}
+                <div class="alert alert-danger">
+                    {{ ux_icon('tabler:shield-x') }}
+                    <strong>Дамп не прошёл проверку — восстановление запрещено.</strong>
+                    <ul class="mb-0 mt-2">
+                        {% for e in validation.errors %}
+                            <li>{{ e }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {% for w in validation.warnings %}
+                <div class="alert alert-warning">{{ ux_icon('tabler:alert-triangle') }} {{ w }}</div>
+            {% endfor %}
+
+            {% if validation.ok %}
+                <div class="card border-danger">
+                    <div class="card-header bg-danger-lt">
+                        <h3 class="card-title">{{ ux_icon('tabler:alert-octagon') }} Восстановление</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            Текущие данные всех таблиц приложения будут <strong>полностью заменены</strong> данными из дампа.
+                            Перед восстановлением автоматически создаётся страховочный дамп текущей БД.
+                            Восстановление выполняется в одной транзакции: при любой ошибке всё откатывается.
+                        </p>
+                        <p class="text-secondary">
+                            Файлы картинок в дамп не входят — после восстановления будет показан отчёт,
+                            каким сущностям не хватает изображений.
+                        </p>
+                        <form method="post" action="{{ path('app_admin_db_restore_run', {kind: kind, stamp: stamp}) }}"
+                              onsubmit="return confirm('Точно восстановить БД из этого дампа? Текущие данные будут заменены.');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('db-restore-run') }}">
+                            <label class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="confirm" value="1" required>
+                                <span class="form-check-label">
+                                    Я понимаю, что данные будут заменены содержимым дампа «{{ file }}»
+                                </span>
+                            </label>
+                            <button type="submit" class="btn btn-danger">
+                                {{ ux_icon('tabler:database-import') }}
+                                Восстановить базу данных
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

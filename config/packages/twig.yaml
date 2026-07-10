@@ -2,6 +2,9 @@ twig:
     paths: ['%kernel.project_dir%/templates']
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
+    globals:
+        # Адрес витрины (из FRONTEND_URL) — для прямых ссылок на сайт из админки и документации
+        frontend_url: '%frontend_url%'
 
 services:
     _defaults:

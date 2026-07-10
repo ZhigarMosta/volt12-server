@@ -11,7 +11,10 @@ class CatalogRepository extends EntityRepository
     public function list(array $codes): array
     {
         return $this->createQueryBuilder('c')
-            ->select('c.id, c.name, c.slug, c.img_link, c.imgAlt, c.imgTitle, (
+            ->select('c.id, c.name, c.slug, c.img_link, c.imgAlt, c.imgTitle,
+            c.seo.metaTitle AS seo_meta_title, c.seo.metaDescription AS seo_meta_description,
+            c.seo.metaKeywords AS seo_meta_keywords, c.seo.noindex AS seo_noindex,
+            c.seo.nofollow AS seo_nofollow, c.seo.canonicalUrl AS seo_canonical_url, (
             SELECT COUNT(DISTINCT i2.id)
             FROM App\Entity\CatalogItem i2
             WHERE i2.catalog = c.id

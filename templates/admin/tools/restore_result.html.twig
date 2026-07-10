@@ -1,0 +1,50 @@
+{% extends '@SyliusAdmin/shared/layout/base.html.twig' %}
+
+{% block title %}Восстановление БД | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container-xl my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+            <div class="mb-3">
+                <a href="{{ path('sylius_admin_dashboard') }}" class="text-secondary">
+                    {{ ux_icon('tabler:arrow-left') }} Панель управления
+                </a>
+            </div>
+
+            {% if success %}
+                <div class="alert alert-success">
+                    {{ ux_icon('tabler:database-import') }}
+                    <strong>База данных восстановлена из «{{ file }}».</strong>
+                    Страховочный дамп прежнего состояния: <code>{{ report.pre_backup }}</code>
+                    (доступен в списке автодампов на панели управления).
+                </div>
+
+                {% for w in report.warnings %}
+                    <div class="alert alert-warning">
+                        {{ ux_icon('tabler:alert-triangle') }} {{ w }}
+                    </div>
+                {% endfor %}
+
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ ux_icon('tabler:photo-search') }} Проверка картинок после восстановления</h3>
+                    </div>
+                    <div class="card-body">
+                        {% include 'admin/tools/_missing_images.html.twig' %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-danger">
+                    {{ ux_icon('tabler:database-x') }}
+                    <strong>Восстановление из «{{ file }}» не выполнено.</strong>
+                    <div class="mt-2">{{ error }}</div>
+                </div>
+                <p class="text-secondary">
+                    Транзакция откачена — база данных осталась в прежнем состоянии.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

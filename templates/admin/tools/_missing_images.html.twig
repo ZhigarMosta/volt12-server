@@ -1,0 +1,37 @@
+{# Отчёт о недостающих файлах картинок: missingImages (список), totalImages (всего записей) #}
+{% if missingImages is empty %}
+    <div class="alert alert-success mb-0">
+        {{ ux_icon('tabler:photo-check') }}
+        Все картинки на месте: файлы всех {{ totalImages }} записей найдены на диске.
+    </div>
+{% else %}
+    <div class="alert alert-warning">
+        {{ ux_icon('tabler:photo-x') }}
+        Не хватает файлов: <strong>{{ missingImages|length }}</strong> из {{ totalImages }} записей с картинками.
+        Загрузите архив картинок (см. «Картинки сайта» на панели управления) или переустановите изображения вручную.
+    </div>
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th>Сущность</th>
+                    <th>Название</th>
+                    <th>ID</th>
+                    <th>Файл</th>
+                    <th>Проблема</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in missingImages %}
+                    <tr>
+                        <td>{{ m.entity }}</td>
+                        <td>{{ m.name }}</td>
+                        <td class="text-secondary">{{ m.id }}</td>
+                        <td><code>{{ m.path }}</code></td>
+                        <td class="text-secondary">{{ m.reason }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

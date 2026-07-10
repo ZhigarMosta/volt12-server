@@ -59,6 +59,13 @@ class AdminMenuListener
 
         $this->item($reviews, 'feedback_from_map', 'app_admin_feedback_from_map_index', 'Отзывы с карт');
 
+        // ===== SEO =====
+        $seo = $menu->addChild('app_seo')
+            ->setLabel('SEO')
+            ->setLabelAttribute('icon', 'tabler:world-search');
+
+        $this->item($seo, 'robots_txt', 'app_admin_robots_txt', 'robots.txt');
+
         // ===== Система =====
         $system = $menu->addChild('app_system')
             ->setLabel('Система')
@@ -66,6 +73,9 @@ class AdminMenuListener
 
         $this->item($system, 'entity_history', 'app_admin_entity_history_index', 'История изменений');
         $this->item($system, 'user_token', 'app_admin_user_token_index', 'Токены');
+        $this->item($system, 'er_diagram', 'app_admin_er_diagram', 'ER-диаграмма БД');
+        $this->item($system, 'site_structure', 'app_admin_site_structure', 'Структура сайта');
+        $this->item($system, 'images_check', 'app_admin_images_check', 'Проверка картинок');
         $this->item($system, 'docs', 'app_admin_docs', 'Документация');
     }
 

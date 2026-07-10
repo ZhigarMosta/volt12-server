@@ -50,15 +50,15 @@ class CatalogItemType extends AbstractType
             ->add('slug', TextType::class, [
                 'label' => 'Slug',
                 'constraints' => [
-                    new NotBlank(['message' => 'Укажите slug']),
                     new Length(['max' => 255]),
                     new Regex([
                         'pattern' => '/^[a-z0-9-]+$/',
                         'message' => 'Slug может содержать только маленькие латинские буквы, цифры и дефис.',
                     ]),
                 ],
-                'required' => true,
+                'required' => false,
                 'empty_data' => '',
+                'help' => 'Оставьте пустым — сгенерируется автоматически из названия.',
             ])
             ->add('price', IntegerType::class, [
                 'label' => 'Цена (RUB)',
@@ -183,6 +183,9 @@ class CatalogItemType extends AbstractType
                     'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 0",
                     'onpaste' => "let paste = (event.clipboardData || window.clipboardData).getData('text'); if(!/^\d+$/.test(paste)) { event.preventDefault(); }",
                 ],
+            ])
+            ->add('seo', SeoMetadataType::class, [
+                'label' => 'SEO',
             ]);
     }
 

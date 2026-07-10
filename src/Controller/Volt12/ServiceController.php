@@ -59,6 +59,7 @@ class ServiceController extends AbstractController
                 'img_alt' => $service->getImgAlt(),
                 'img_title' => $service->getImgTitle(),
                 'service_group_id' => $service->getServiceGroup()?->getId(),
+                'seo' => $service->getSeo()->toArray(),
             ],
             'related' => array_map(fn(Service $s) => [
                 'id' => $s->getId(),

@@ -17,6 +17,23 @@ services:
 
     App\Service\Admin\SortService:
         autowire: true
+
+    App\Service\SlugGenerator:
+        autowire: true
+
+    App\Service\SiteSettingService:
+        autowire: true
+
+    App\Service\Volt12\SitemapService:
+        autowire: true
+
+    App\Controller\Volt12\SeoController:
+        tags: [ 'controller.service_arguments' ]
+
+    App\Controller\Admin\SeoSettingsController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $frontendUrl: '%frontend_url%'
         
     App\Service\Volt12\CatalogService:
         autowire: true
@@ -276,6 +293,10 @@ services:
         tags: [ 'form.type' ]
         autowire: true
 
+    App\Form\Type\SeoMetadataType:
+        tags: [ 'form.type' ]
+        autowire: true
+
     App\Form\Type\CatalogItemImageType:
         tags: [ 'form.type' ]
         autowire: true
@@ -338,6 +359,31 @@ services:
         arguments:
             $backupDir: '%kernel.project_dir%/var/backups'
             $logger: '@logger'
+
+    App\Service\DatabaseRestoreService:
+        arguments:
+            $backupDir: '%kernel.project_dir%/var/backups'
+            $logger: '@logger'
+
+    App\Service\ImagesBackupService:
+        arguments:
+            $publicDir: '%kernel.project_dir%/public'
+            $logger: '@logger'
+
+    App\Service\ImageIntegrityService:
+        arguments:
+            $publicDir: '%kernel.project_dir%/public'
+
+    App\Controller\Admin\DatabaseRestoreController:
+        tags: [ 'controller.service_arguments' ]
+
+    App\Controller\Admin\ErDiagramController:
+        tags: [ 'controller.service_arguments' ]
+
+    App\Controller\Admin\SiteStructureController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $frontendUrl: '%frontend_url%'
 
     App\Command\DatabaseBackupCommand:
         tags: [ 'console.command' ]
