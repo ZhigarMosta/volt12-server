@@ -146,7 +146,7 @@ class CatalogItemRepository extends EntityRepository
         }
 
         if (!empty($search)) {
-            $qb->andWhere('ci.name LIKE :searchName')
+            $qb->andWhere('LOWER(ci.name) LIKE LOWER(:searchName)')
                 ->setParameter('searchName', '%' . $search . '%');
         }
 
@@ -300,7 +300,7 @@ class CatalogItemRepository extends EntityRepository
         }
 
         if (!empty($search)) {
-            $qb->andWhere('ci.name LIKE :searchName')
+            $qb->andWhere('LOWER(ci.name) LIKE LOWER(:searchName)')
                 ->setParameter('searchName', '%' . $search . '%');
         }
 

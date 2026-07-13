@@ -95,7 +95,7 @@ class ServiceRepository extends EntityRepository
         }
 
         if (!empty($search)) {
-            $qb->andWhere('s.name LIKE :search')
+            $qb->andWhere('LOWER(s.name) LIKE LOWER(:search)')
                 ->setParameter('search', '%' . $search . '%');
         }
 
