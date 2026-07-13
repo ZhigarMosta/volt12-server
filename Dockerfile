@@ -5,6 +5,8 @@ FROM php:8.3-fpm
 # libzip-dev нужен для zip
 # libicu-dev нужен для intl
 # libfreetype-dev, libjpeg62-turbo-dev, libpng-dev нужны для gd
+# postgresql-client (pg_dump/psql) нужен для app:db:backup и восстановления из дашборда;
+# клиент новее сервера (17 против postgres:15) — это ок, pg_dump поддерживает старые серверы
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libpng-dev \
@@ -14,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libonig-dev \
     libxml2-dev \
+    postgresql-client \
     unzip \
     git \
     acl \

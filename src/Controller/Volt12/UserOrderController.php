@@ -21,6 +21,10 @@ class UserOrderController extends AbstractController
         $data = $request->toArray();
         $user = $request->attributes->get('_app_user');
 
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Forbidden'], 403);
+        }
+
         $errors = $this->userOrderService->validate($data);
         if ($errors !== []) {
             return $this->json(['success' => false, 'errors' => $errors], 400);
