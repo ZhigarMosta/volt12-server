@@ -24,6 +24,16 @@ class UserOrder implements ResourceInterface, TimestampableInterface
         self::STATUS_DONE => 'Выполнен',
     ];
 
+    /** Обычное оформление через корзину. */
+    public const SOURCE_CHECKOUT = 'checkout';
+    /** Кнопка «Купить в один клик» на странице товара. */
+    public const SOURCE_QUICK = 'quick';
+
+    public const SOURCES = [
+        self::SOURCE_CHECKOUT => 'Корзина',
+        self::SOURCE_QUICK => 'Один клик',
+    ];
+
     use TimestampableTrait;
 
     #[ORM\Id]
@@ -37,6 +47,9 @@ class UserOrder implements ResourceInterface, TimestampableInterface
 
     #[ORM\Column(type: 'string', length: 32)]
     private string $status = self::STATUS_NEW;
+
+    #[ORM\Column(type: 'string', length: 32, options: ['default' => self::SOURCE_CHECKOUT])]
+    private string $source = self::SOURCE_CHECKOUT;
 
     #[ORM\Column(name: 'first_name', type: 'string', length: 255)]
     private string $firstName = '';
@@ -101,6 +114,10 @@ class UserOrder implements ResourceInterface, TimestampableInterface
     public function getStatus(): string { return $this->status; }
     public function setStatus(string $status): void { $this->status = $status; }
     public function getStatusLabel(): string { return self::STATUSES[$this->status] ?? $this->status; }
+
+    public function getSource(): string { return $this->source; }
+    public function setSource(string $source): void { $this->source = $source; }
+    public function getSourceLabel(): string { return self::SOURCES[$this->source] ?? $this->source; }
 
     public function getFirstName(): string { return $this->firstName; }
     public function setFirstName(string $firstName): void { $this->firstName = $firstName; }

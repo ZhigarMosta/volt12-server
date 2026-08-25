@@ -164,6 +164,8 @@ class UserOrderService
         return [
             'id'          => $order->getId(),
             'status'      => $order->getStatus(),
+            'source'      => $order->getSource(),
+            'source_label' => $order->getSourceLabel(),
             'first_name'  => $order->getFirstName(),
             'last_name'   => $order->getLastName(),
             'phone'       => $order->getPhone(),

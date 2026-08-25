@@ -942,11 +942,25 @@ sylius_grid:
                             'Новый': 'new'
                             'Обрабатывается': 'processing'
                             'Выполнен': 'done'
+                source:
+                    type: select
+                    label: Источник
+                    form_options:
+                        choices:
+                            'Корзина': 'checkout'
+                            'Один клик': 'quick'
             fields:
                 id:
                     type: string
                     label: '№'
                     sortable: ~
+                source:
+                    type: twig
+                    label: Источник
+                    path: .
+                    sortable: ~
+                    options:
+                        template: 'admin/grid/field/userOrderSource.html.twig'
                 user:
                     type: twig
                     label: Пользователь

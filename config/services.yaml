@@ -416,3 +416,11 @@ services:
         tags: [ 'controller.service_arguments' ]
         arguments:
             $userOrderService: '@App\Service\Volt12\UserOrderService'
+
+    App\Service\Volt12\QuickOrderService:
+        autowire: true
+
+    App\Controller\Volt12\QuickOrderController:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            $quickOrderService: '@App\Service\Volt12\QuickOrderService'

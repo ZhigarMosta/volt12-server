@@ -443,6 +443,14 @@ HTML;
         $itemsHtml = $this->buildOrderItemsHtml($order['items']);
         $changeStatusUrl = htmlspecialchars($changeStatusUrl, ENT_QUOTES);
 
+        // У заказа «в один клик» нет фамилии и адреса — клиент их не вводил,
+        // поэтому вместо пустых строк ставим прочерк и подписываем источник.
+        $buyer = trim("$firstName $lastName") ?: '—';
+        $location = implode(', ', array_filter([$city, $region, $postal])) ?: '—';
+        $address = $address !== '' ? $address : '—';
+        $sourceLabel = htmlspecialchars((string) ($order['source_label'] ?? ''), ENT_QUOTES);
+        $sourceSuffix = $sourceLabel !== '' ? " · $sourceLabel" : '';
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="ru">
@@ -461,8 +469,8 @@ HTML;
 
         <tr>
           <td style="padding:32px 36px 0;">
-            <p style="margin:0 0 4px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Покупатель</p>
-            <p style="margin:0 0 20px;font-size:16px;font-weight:600;color:#1a1a1a;">$firstName $lastName</p>
+            <p style="margin:0 0 4px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Покупатель$sourceSuffix</p>
+            <p style="margin:0 0 20px;font-size:16px;font-weight:600;color:#1a1a1a;">$buyer</p>
 
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
@@ -478,7 +486,7 @@ HTML;
               <tr>
                 <td style="padding-bottom:12px;vertical-align:top;">
                   <p style="margin:0 0 2px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Город / Регион</p>
-                  <p style="margin:0;font-size:14px;color:#333;">$city, $region, $postal</p>
+                  <p style="margin:0;font-size:14px;color:#333;">$location</p>
                 </td>
                 <td style="padding-bottom:12px;vertical-align:top;">
                   <p style="margin:0 0 2px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;">Адрес</p>
