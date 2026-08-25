@@ -33,6 +33,18 @@ class Sort
             'name' => 'Сортировка услуг',
             'noSelectEntity' => 'Сортировка зависит от группы услуг, выбирете группу и попробуйте ещё раз'
         ],
+        'catalog_item_recommendations' => [
+            'name' => 'Сортировка блока «Рекомендуемые товары»',
+            'noSelectEntity' => 'Сортировка зависит от товара, выберите товар и попробуйте ещё раз'
+        ],
+        'catalog_item_bought_together' => [
+            'name' => 'Сортировка блока «С этим товаром покупают»',
+            'noSelectEntity' => 'Сортировка зависит от товара, выберите товар и попробуйте ещё раз'
+        ],
+        'catalog_item_also_needed' => [
+            'name' => 'Сортировка блока «Вам также может понадобиться»',
+            'noSelectEntity' => 'Сортировка зависит от товара, выберите товар и попробуйте ещё раз'
+        ],
     ];
 
     public static function getModal(string $pathName, string $pathImg, bool $isSortInEditModel, string $urlSort, string $urlAllEntities, string $modalName, string $btnLabel = 'Сортировка')

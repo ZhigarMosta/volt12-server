@@ -1,0 +1,7 @@
+{% if data.linkedItem is not null %}
+    <a href="{{ path('app_admin_catalog_item_update', {'id': data.linkedItem.id}) }}"
+       style="text-decoration: none;">{{ data.linkedItem.name }}
+    </a>
+{% else %}
+    <span style="color: grey">-</span>
+{% endif %}

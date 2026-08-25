@@ -91,6 +91,18 @@ sylius_grid:
                         type: default
                         label: Картинки
                         template: "admin/grid/action/sort_catalog_item_images.html.twig"
+                    sort_catalog_item_recommendations:
+                        type: default
+                        label: Рекомендуемые
+                        template: "admin/grid/action/sort_catalog_item_recommendations.html.twig"
+                    sort_catalog_item_bought_together:
+                        type: default
+                        label: С этим покупают
+                        template: "admin/grid/action/sort_catalog_item_bought_together.html.twig"
+                    sort_catalog_item_also_needed:
+                        type: default
+                        label: Также понадобится
+                        template: "admin/grid/action/sort_catalog_item_also_needed.html.twig"
 
         app_admin_catalog:
             driver:
@@ -275,6 +287,156 @@ sylius_grid:
                     update: { type: update }
                     delete: { type: delete }
         
+        app_admin_catalog_item_recommendation:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\CatalogItemRecommendation
+            sorting:
+                position: asc
+            filters:
+                catalog_item:
+                    type: entity
+                    label: Товар
+                    options:
+                        fields: [ catalogItem ]
+                    form_options:
+                        class: App\Entity\CatalogItem
+                        choice_label: name
+                linked_item:
+                    type: entity
+                    label: Связанный товар
+                    options:
+                        fields: [ linkedItem ]
+                    form_options:
+                        class: App\Entity\CatalogItem
+                        choice_label: name
+            fields:
+                catalog_item:
+                    type: twig
+                    label: Товар
+                    path: .
+                    sortable: catalogItem.name
+                    options:
+                        template: 'admin/grid/field/catalogItem.html.twig'
+                linked_item:
+                    type: twig
+                    label: Связанный товар
+                    path: .
+                    sortable: linkedItem.name
+                    options:
+                        template: 'admin/grid/field/catalogItemLinked.html.twig'
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+
+        app_admin_catalog_item_bought_together:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\CatalogItemBoughtTogether
+            sorting:
+                position: asc
+            filters:
+                catalog_item:
+                    type: entity
+                    label: Товар
+                    options:
+                        fields: [ catalogItem ]
+                    form_options:
+                        class: App\Entity\CatalogItem
+                        choice_label: name
+                linked_item:
+                    type: entity
+                    label: Связанный товар
+                    options:
+                        fields: [ linkedItem ]
+                    form_options:
+                        class: App\Entity\CatalogItem
+                        choice_label: name
+            fields:
+                catalog_item:
+                    type: twig
+                    label: Товар
+                    path: .
+                    sortable: catalogItem.name
+                    options:
+                        template: 'admin/grid/field/catalogItem.html.twig'
+                linked_item:
+                    type: twig
+                    label: Связанный товар
+                    path: .
+                    sortable: linkedItem.name
+                    options:
+                        template: 'admin/grid/field/catalogItemLinked.html.twig'
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+
+        app_admin_catalog_item_also_needed:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: App\Entity\CatalogItemAlsoNeeded
+            sorting:
+                position: asc
+            filters:
+                catalog_item:
+                    type: entity
+                    label: Товар
+                    options:
+                        fields: [ catalogItem ]
+                    form_options:
+                        class: App\Entity\CatalogItem
+                        choice_label: name
+                linked_item:
+                    type: entity
+                    label: Связанный товар
+                    options:
+                        fields: [ linkedItem ]
+                    form_options:
+                        class: App\Entity\CatalogItem
+                        choice_label: name
+            fields:
+                catalog_item:
+                    type: twig
+                    label: Товар
+                    path: .
+                    sortable: catalogItem.name
+                    options:
+                        template: 'admin/grid/field/catalogItem.html.twig'
+                linked_item:
+                    type: twig
+                    label: Связанный товар
+                    path: .
+                    sortable: linkedItem.name
+                    options:
+                        template: 'admin/grid/field/catalogItemLinked.html.twig'
+                position:
+                    type: string
+                    label: Позиция
+                    sortable: ~
+            actions:
+                main:
+                    create: { type: create }
+                item:
+                    update: { type: update }
+                    delete: { type: delete }
+
         app_admin_catalog_group:
             driver:
                 name: doctrine/orm

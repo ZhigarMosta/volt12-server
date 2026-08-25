@@ -25,6 +25,9 @@ class AdminMenuListener
         $this->item($catalog, 'catalog_item_image', 'app_admin_catalog_item_image_index', 'Изображения продуктов');
         $this->item($catalog, 'catalog_characteristic', 'app_admin_catalog_characteristic_index', 'Характеристики каталога');
         $this->item($catalog, 'catalog_item_characteristic', 'app_admin_catalog_item_characteristic_index', 'Характеристики продукта');
+        $this->item($catalog, 'catalog_item_recommendation', 'app_admin_catalog_item_recommendation_index', 'Рекомендуемые товары');
+        $this->item($catalog, 'catalog_item_bought_together', 'app_admin_catalog_item_bought_together_index', 'С этим товаром покупают');
+        $this->item($catalog, 'catalog_item_also_needed', 'app_admin_catalog_item_also_needed_index', 'Также может понадобиться');
 
         // ===== Услуги =====
         $services = $menu->addChild('app_services')

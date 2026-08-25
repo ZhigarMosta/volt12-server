@@ -4,6 +4,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\Catalog;
 use App\Entity\CatalogCharacteristic;
+use App\Entity\CatalogItemAlsoNeeded;
+use App\Entity\CatalogItemBoughtTogether;
+use App\Entity\CatalogItemRecommendation;
 use App\Entity\CatalogGroup;
 use App\Entity\CatalogItem;
 use App\Entity\CatalogItemImage;
@@ -11,6 +14,9 @@ use App\Entity\FeedbackFromMap;
 use App\Entity\Service;
 use App\Entity\ServiceGroup;
 use App\Repository\CatalogCharacteristicRepository;
+use App\Repository\CatalogItemAlsoNeededRepository;
+use App\Repository\CatalogItemBoughtTogetherRepository;
+use App\Repository\CatalogItemRecommendationRepository;
 use App\Repository\FeedbackFromMapRepository;
 use App\Repository\ServiceGroupRepository;
 use App\Service\Admin\CrudService;
@@ -38,6 +44,9 @@ class SortController extends AbstractController
         private FeedbackFromMapRepository $feedbackFromMapRepository,
         private ServiceGroupRepository $serviceGroupRepository,
         private CatalogCharacteristicRepository $catalogCharacteristicRepository,
+        private CatalogItemRecommendationRepository $catalogItemRecommendationRepository,
+        private CatalogItemBoughtTogetherRepository $catalogItemBoughtTogetherRepository,
+        private CatalogItemAlsoNeededRepository $catalogItemAlsoNeededRepository,
         private ?LoggerInterface       $logger = null
     ) {}
     #[Route('/catalog_characteristics_by_catalog_item/{id}', name: 'admin_crud_catalog_characteristics_by_catalog_item', methods: ['GET'])]
@@ -253,6 +262,56 @@ class SortController extends AbstractController
     public function sortServiceGroups(Request $request): JsonResponse
     {
         return $this->json($this->sortService->sort(ServiceGroup::class, $request->toArray()));
+    }
+
+    // ===== Блоки «товар — товар» (рекомендуемые / с этим покупают / также может понадобиться) =====
+
+    #[Route('/all_catalog_item_recommendations_by_catalog_item_id/{id}', name: 'admin_crud_all_catalog_item_recommendations_by_catalog_item_id', methods: ['GET'])]
+    public function allRecommendationsByCatalogItem(CatalogItem $item): JsonResponse
+    {
+        return $this->json([
+            'items' => $this->crudService->transformSortCatalogItemLinks(
+                $this->catalogItemRecommendationRepository->findByOwnerOrdered($item->getId())
+            ),
+        ]);
+    }
+
+    #[Route('/sort_catalog_item_recommendations', name: 'admin_crud_sort_catalog_item_recommendations', methods: ['POST'])]
+    public function sortCatalogItemRecommendations(Request $request): JsonResponse
+    {
+        return $this->json($this->sortService->sort(CatalogItemRecommendation::class, $request->toArray()));
+    }
+
+    #[Route('/all_catalog_item_bought_together_by_catalog_item_id/{id}', name: 'admin_crud_all_catalog_item_bought_together_by_catalog_item_id', methods: ['GET'])]
+    public function allBoughtTogetherByCatalogItem(CatalogItem $item): JsonResponse
+    {
+        return $this->json([
+            'items' => $this->crudService->transformSortCatalogItemLinks(
+                $this->catalogItemBoughtTogetherRepository->findByOwnerOrdered($item->getId())
+            ),
+        ]);
+    }
+
+    #[Route('/sort_catalog_item_bought_together', name: 'admin_crud_sort_catalog_item_bought_together', methods: ['POST'])]
+    public function sortCatalogItemBoughtTogether(Request $request): JsonResponse
+    {
+        return $this->json($this->sortService->sort(CatalogItemBoughtTogether::class, $request->toArray()));
+    }
+
+    #[Route('/all_catalog_item_also_needed_by_catalog_item_id/{id}', name: 'admin_crud_all_catalog_item_also_needed_by_catalog_item_id', methods: ['GET'])]
+    public function allAlsoNeededByCatalogItem(CatalogItem $item): JsonResponse
+    {
+        return $this->json([
+            'items' => $this->crudService->transformSortCatalogItemLinks(
+                $this->catalogItemAlsoNeededRepository->findByOwnerOrdered($item->getId())
+            ),
+        ]);
+    }
+
+    #[Route('/sort_catalog_item_also_needed', name: 'admin_crud_sort_catalog_item_also_needed', methods: ['POST'])]
+    public function sortCatalogItemAlsoNeeded(Request $request): JsonResponse
+    {
+        return $this->json($this->sortService->sort(CatalogItemAlsoNeeded::class, $request->toArray()));
     }
 
 }

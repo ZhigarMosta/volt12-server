@@ -6,6 +6,10 @@ use App\Entity\CatalogItem;
 use App\Entity\User;
 use App\Provider\ProductCodeProvider;
 use App\Repository\CatalogCharacteristicRepository;
+use App\Repository\CatalogItemAlsoNeededRepository;
+use App\Repository\CatalogItemBoughtTogetherRepository;
+use App\Repository\CatalogItemLinkRepository;
+use App\Repository\CatalogItemRecommendationRepository;
 use App\Repository\CatalogItemRepository;
 use App\Service\Volt12\CatalogItemService;
 use Psr\Log\LoggerInterface;
@@ -21,6 +25,9 @@ class CatalogItemController extends AbstractController
         private CatalogItemService $catalogItemService,
         private CatalogItemRepository $catalogItemRepository,
         private CatalogCharacteristicRepository $catalogCharacteristicRepository,
+        private CatalogItemRecommendationRepository $catalogItemRecommendationRepository,
+        private CatalogItemBoughtTogetherRepository $catalogItemBoughtTogetherRepository,
+        private CatalogItemAlsoNeededRepository $catalogItemAlsoNeededRepository,
         private LoggerInterface $logger
     )
     {
@@ -61,12 +68,10 @@ class CatalogItemController extends AbstractController
             ];
         }
 
-        $related = $this->catalogItemRepository->findRelatedByName(
-            $item->getName(),
-            $item->getId(),
-            $this->productCodes(),
-            4
-        );
+        // Три блока «товар — товар», наполняются вручную в админке (порядок — по позиции связки)
+        $recommended = $this->linkedCards($this->catalogItemRecommendationRepository, $item->getId());
+        $boughtTogether = $this->linkedCards($this->catalogItemBoughtTogetherRepository, $item->getId());
+        $alsoNeeded = $this->linkedCards($this->catalogItemAlsoNeededRepository, $item->getId());
 
         $recentlyViewed = $this->catalogItemRepository->findByIds(
             $recentlyViewedIds,
@@ -98,13 +103,9 @@ class CatalogItemController extends AbstractController
                     'in_favorite' => $item->getInFavorite(),
                 ] : null,
             ],
-            'related' => array_map(fn(CatalogItem $s) => [
-                'id' => $s->getId(),
-                'name' => $s->getName(),
-                'slug' => $s->getSlug(),
-                'price' => $s->getPrice(),
-                'img_link' => $this->getFirstImageLink($s),
-            ], $related),
+            'recommended' => $recommended,
+            'bought_together' => $boughtTogether,
+            'also_needed' => $alsoNeeded,
             'recently_viewed' => array_map(fn(CatalogItem $s) => [
                 'id' => $s->getId(),
                 'name' => $s->getName(),
@@ -113,6 +114,23 @@ class CatalogItemController extends AbstractController
                 'img_link' => $this->getFirstImageLink($s),
             ], $recentlyViewed),
         ]);
+    }
+
+    /** Карточки связанных товаров одного блока в формате, едином с recently_viewed. */
+    private function linkedCards(CatalogItemLinkRepository $repository, int $ownerId): array
+    {
+        $links = $repository->findForStorefront($ownerId, $this->productCodes());
+
+        return array_map(function ($link) {
+            $item = $link->getLinkedItem();
+            return [
+                'id' => $item->getId(),
+                'name' => $item->getName(),
+                'slug' => $item->getSlug(),
+                'price' => $item->getPrice(),
+                'img_link' => $this->getFirstImageLink($item),
+            ];
+        }, $links);
     }
 
     private function getFirstImageLink(CatalogItem $item): ?string

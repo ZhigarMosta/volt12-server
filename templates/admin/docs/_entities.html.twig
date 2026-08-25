@@ -123,7 +123,7 @@
                 </div>
                 <div class="doc-callout doc-callout--info">
                     <div class="doc-callout__icon">{{ ux_icon('tabler:calendar-off') }}</div>
-                    <div>У каталога <strong>нет колонок даты создания/изменения</strong> — в отличие от большинства сущностей. Когда каталог был создан или изменён, по базе не узнать (частично выручает История изменений, <a class="doc-xref" href="#ent-history">блок 2.16</a>).</div>
+                    <div>У каталога <strong>нет колонок даты создания/изменения</strong> — в отличие от большинства сущностей. Когда каталог был создан или изменён, по базе не узнать (частично выручает История изменений, <a class="doc-xref" href="#ent-history">блок 2.17</a>).</div>
                 </div>
 
                 <h3 class="doc-h3">Нюансы CRUD</h3>
@@ -244,10 +244,10 @@
                     <li><strong>Позиция уникальна в рамках каталога</strong> — <em>«Ошибка! Позиция N уже занята товаром "…" в каталоге "…"»</em>. У товара из другого каталога может быть такая же позиция.</li>
                     <li><strong>На форме продукта нет поля картинки</strong> — изображения живут отдельной сущностью «Изображение продукта» (<a class="doc-xref" href="#ent-catalog-item-image">блок 2.4</a>): раздел меню «Изображения продуктов», а порядок галереи — кнопкой <span class="doc-badge">Сортировка картинок</span> в списке продуктов.</li>
                     <li><strong>Товар без единой картинки галереи невидим на сайте</strong>: он не попадает в списки каталога, поиск и блоки популярного. Добавление первой картинки = фактическая публикация товара (<a class="doc-xref" href="#site-visibility">блок 12.1</a>).</li>
-                    <li>Изменения записываются в <strong>Историю изменений</strong> (<a class="doc-xref" href="#ent-history">блок 2.16</a>) — блок истории виден внизу формы редактирования.</li>
+                    <li>Изменения записываются в <strong>Историю изменений</strong> (<a class="doc-xref" href="#ent-history">блок 2.17</a>) — блок истории виден внизу формы редактирования.</li>
                     <li><strong>Удаление блокируется приложением</strong>, если у товара остались характеристики или изображения галереи — сообщение перечислит, что мешает.</li>
                     <li><strong>Удаление также блокирует база данных</strong>, если товар лежит у кого-то в корзине, избранном или сравнении — в этом случае аккуратного сообщения не будет, только техническая ошибка. Сначала удалите такие записи в разделах «Корзины», «Избранное», «Сравнения».</li>
-                    <li>А вот <strong>заказы удалению не мешают</strong>: в позициях заказов ссылка на удалённый товар просто обнуляется, состав заказа сохраняет название и цену (см. <a class="doc-xref" href="#ent-user-order-item">блок 2.10</a>).</li>
+                    <li>А вот <strong>заказы удалению не мешают</strong>: в позициях заказов ссылка на удалённый товар просто обнуляется, состав заказа сохраняет название и цену (см. <a class="doc-xref" href="#ent-user-order-item">блок 2.11</a>).</li>
                 </ul>
 
                 <h3 class="doc-h3">Кнопки в разделе</h3>
@@ -387,9 +387,67 @@
                 <p>Стандартный набор: <span class="doc-badge">Создать</span>, <span class="doc-badge">Редактировать</span>, <span class="doc-badge">Удалить</span>.</p>
             </section>
 
-            {# =============== 2.7 SERVICE GROUP =============== #}
+            {# =============== 2.7 CATALOG ITEM LINKS (3 таблицы) =============== #}
+            <section id="ent-catalog-item-link" class="doc-section">
+                <h2 class="doc-h2">{{ ux_icon('tabler:arrows-exchange') }} 2.7. Связанные товары: «Рекомендуемые», «С этим покупают», «Также может понадобиться»</h2>
+                <div class="doc-meta">
+                    <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Каталог → Рекомендуемые товары / С этим товаром покупают / Также может понадобиться</span>
+                    <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблицы: <code>catalog_item_recommendations</code>, <code>catalog_item_bought_together</code>, <code>catalog_item_also_needed</code></span>
+                    <span class="doc-meta__chip doc-meta__chip--no">{{ ux_icon('tabler:clock-history') }} История: не ведётся</span>
+                </div>
+                <p>
+                    Три одинаково устроенные сущности-«связки» вида <strong>товар → товар</strong>. Каждая
+                    наполняет свой блок на странице товара витрины:
+                </p>
+                <ul class="doc-list">
+                    <li><strong>Рекомендуемые товары</strong> (<code>catalog_item_recommendations</code>) — блок «Рекомендуемые товары»;</li>
+                    <li><strong>С этим товаром покупают</strong> (<code>catalog_item_bought_together</code>) — блок «С этим товаром покупают»;</li>
+                    <li><strong>Также может понадобиться</strong> (<code>catalog_item_also_needed</code>) — блок «Вам также может понадобиться».</li>
+                </ul>
+                <p>
+                    Эти три блока заменили прежний автоматический блок «Вам может понравиться»
+                    (подбор по совпадению слов в названии). Теперь подбора нет вообще:
+                    <strong>что админ привязал — то витрина и показывает</strong>; пустой блок не выводится.
+                </p>
+
+                <h3 class="doc-h3">Структура таблицы (одинакова у всех трёх)</h3>
+                <div class="doc-table-wrap">
+                <table class="doc-table">
+                    <thead><tr><th>Колонка</th><th>Тип</th><th>Обяз.</th><th>Зачем нужна</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>id</code></td><td>целое число</td><td class="ok">✓</td><td>Номер записи (автоматически).</td></tr>
+                        <tr><td><code>catalog_item_id</code></td><td>целое число (ссылка)</td><td class="ok">✓</td><td>Товар, <u>на чьей странице</u> показывается блок.</td></tr>
+                        <tr><td><code>linked_item_id</code></td><td>целое число (ссылка)</td><td class="ok">✓</td><td>Товар, <u>который показывается</u> в блоке.</td></tr>
+                        <tr><td><code>position</code></td><td>целое число</td><td>—</td><td>Порядок карточки внутри блока (меньше — левее).</td></tr>
+                        <tr><td><code>created_at</code> / <code>updated_at</code></td><td>дата и время</td><td class="ok">✓ / —</td><td>Заполняются автоматически.</td></tr>
+                    </tbody>
+                </table>
+                </div>
+
+                <h3 class="doc-h3">Нюансы CRUD</h3>
+                <ul class="doc-list">
+                    <li><strong>Пара «товар + связанный товар» уникальна</strong> внутри каждой таблицы — повторная привязка не сохранится: <em>«Ошибка! В блоке «…» у товара "…" уже есть товар "…"»</em>. Проверка и на уровне приложения, и уникальным индексом в базе.</li>
+                    <li><strong>Товар нельзя привязать к самому себе</strong>: <em>«Ошибка! Нельзя привязать товар "…" к самому себе»</em>.</li>
+                    <li><strong>Позиция уникальна внутри блока одного товара</strong> (в трёх разных блоках и у разных товаров позиции независимы): <em>«Ошибка! Позиция N в блоке «…» у товара "…" уже занята товаром "…"»</em>.</li>
+                    <li>Один и тот же связанный товар <u>может</u> находиться сразу в нескольких блоках одного товара (например, и в «Рекомендуемых», и в «С этим покупают») — это три независимые таблицы.</li>
+                    <li>Окно сортировки у поля «Позиция» показывает связки выбранного товара — сначала выберите товар в форме.</li>
+                    <li>При удалении товара его связки (в обе стороны, во всех трёх таблицах) удаляются автоматически на уровне базы.</li>
+                    <li>Витрина показывает только <u>опубликованные</u> связанные товары с кодом «Мастер вольт 12»/«Любой»; картинка не обязательна. Скрытые связки из админки не удаляются — снова опубликуете товар, и он вернётся в блок.</li>
+                </ul>
+
+                <h3 class="doc-h3">Кнопки в разделе</h3>
+                <p>
+                    Стандартный набор: <span class="doc-badge">Создать</span>, <span class="doc-badge">Редактировать</span>,
+                    <span class="doc-badge">Удалить</span>. Кроме того, на списке «Продукты» у каждого товара есть кнопки
+                    <span class="doc-badge">Рекомендуемые</span>, <span class="doc-badge">С этим покупают</span> и
+                    <span class="doc-badge">Также понадобится</span> — открывают окно перетаскивания карточек
+                    соответствующего блока этого товара.
+                </p>
+            </section>
+
+            {# =============== 2.8 SERVICE GROUP =============== #}
             <section id="ent-service-group" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:briefcase') }} 2.7. Группа услуг (ServiceGroup)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:briefcase') }} 2.8. Группа услуг (ServiceGroup)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Услуги → Группы услуг</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>service_groups</code></span>
@@ -432,9 +490,9 @@
                 </table>
             </section>
 
-            {# =============== 2.8 SERVICE =============== #}
+            {# =============== 2.9 SERVICE =============== #}
             <section id="ent-service" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:tools') }} 2.8. Услуга (Service)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:tools') }} 2.9. Услуга (Service)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Услуги → Услуги</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>services</code></span>
@@ -490,9 +548,9 @@
                 <p>Стандартный набор: <span class="doc-badge">Создать</span>, <span class="doc-badge">Редактировать</span>, <span class="doc-badge">Удалить</span>. Сортировка услуг конкретной группы открывается кнопкой <span class="doc-badge">Услуги</span> из списка групп услуг или у поля «Позиция» на форме.</p>
             </section>
 
-            {# =============== 2.9 USER ORDER =============== #}
+            {# =============== 2.10 USER ORDER =============== #}
             <section id="ent-user-order" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:shopping-cart') }} 2.9. Заказ (UserOrder)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:shopping-cart') }} 2.10. Заказ (UserOrder)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Продажи → Заказы</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>user_orders</code></span>
@@ -500,7 +558,7 @@
                 </div>
                 <p>
                     Заказ, оформленный клиентом на сайте. Хранит контакты, адрес доставки и итоговую сумму;
-                    состав заказа лежит в отдельной сущности «Позиция заказа» (<a class="doc-xref" href="#ent-user-order-item">блок 2.10</a>).
+                    состав заказа лежит в отдельной сущности «Позиция заказа» (<a class="doc-xref" href="#ent-user-order-item">блок 2.11</a>).
                 </p>
 
                 <h3 class="doc-h3">Структура таблицы</h3>
@@ -546,9 +604,9 @@
                 </table>
             </section>
 
-            {# =============== 2.10 USER ORDER ITEM =============== #}
+            {# =============== 2.11 USER ORDER ITEM =============== #}
             <section id="ent-user-order-item" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:list-numbers') }} 2.10. Позиция заказа (UserOrderItem)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:list-numbers') }} 2.11. Позиция заказа (UserOrderItem)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Продажи → Позиции заказов</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>user_order_items</code></span>
@@ -585,9 +643,9 @@
                 </ul>
             </section>
 
-            {# =============== 2.11 CART =============== #}
+            {# =============== 2.12 CART =============== #}
             <section id="ent-cart" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:shopping-bag') }} 2.11. Корзина (Cart)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:shopping-bag') }} 2.12. Корзина (Cart)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Продажи → Корзины</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>cart</code></span>
@@ -624,9 +682,9 @@
                 <p>Стандартный набор: <span class="doc-badge">Создать</span>, <span class="doc-badge">Редактировать</span>, <span class="doc-badge">Удалить</span>.</p>
             </section>
 
-            {# =============== 2.12 USER =============== #}
+            {# =============== 2.13 USER =============== #}
             <section id="ent-user" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:users') }} 2.12. Клиент (User)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:users') }} 2.13. Клиент (User)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Клиенты → Клиенты</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>users</code></span>
@@ -676,15 +734,15 @@
                     <tbody>
                         <tr><td><span class="doc-badge">Создать</span></td><td>Форма нового клиента (не забудьте потом задать пароль!).</td></tr>
                         <tr><td><span class="doc-badge">Сменить пароль</span></td><td>Модальное окно с одним полем: новый пароль, минимум 6 символов. Смена принудительная — подтверждение старого пароля не нужно, письмо клиенту <u>не отправляется</u>; он просто не сможет войти со старым паролем.</td></tr>
-                        <tr><td><span class="doc-badge">Сессии</span></td><td>Переход в раздел «Токены» с фильтром по этому клиенту — все его сессии и коды подтверждения (<a class="doc-xref" href="#ent-user-token">блок 2.17</a>).</td></tr>
+                        <tr><td><span class="doc-badge">Сессии</span></td><td>Переход в раздел «Токены» с фильтром по этому клиенту — все его сессии и коды подтверждения (<a class="doc-xref" href="#ent-user-token">блок 2.18</a>).</td></tr>
                         <tr><td><span class="doc-badge">Редактировать</span> / <span class="doc-badge">Удалить</span></td><td>Стандартные действия (про блокировки удаления — выше).</td></tr>
                     </tbody>
                 </table>
             </section>
 
-            {# =============== 2.13 FAVORITE =============== #}
+            {# =============== 2.14 FAVORITE =============== #}
             <section id="ent-favorite" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:heart') }} 2.13. Избранное (Favorite)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:heart') }} 2.14. Избранное (Favorite)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Клиенты → Избранное</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>favorites</code></span>
@@ -719,9 +777,9 @@
                 <p>Стандартный набор: <span class="doc-badge">Создать</span>, <span class="doc-badge">Редактировать</span>, <span class="doc-badge">Удалить</span>.</p>
             </section>
 
-            {# =============== 2.14 COMPARE =============== #}
+            {# =============== 2.15 COMPARE =============== #}
             <section id="ent-compare" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:scale') }} 2.14. Сравнение (Compare)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:scale') }} 2.15. Сравнение (Compare)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Клиенты → Сравнения</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>compare</code></span>
@@ -755,9 +813,9 @@
                 <p>Стандартный набор: <span class="doc-badge">Создать</span>, <span class="doc-badge">Редактировать</span>, <span class="doc-badge">Удалить</span>.</p>
             </section>
 
-            {# =============== 2.15 FEEDBACK FROM MAP =============== #}
+            {# =============== 2.16 FEEDBACK FROM MAP =============== #}
             <section id="ent-feedback" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:star') }} 2.15. Отзыв с карты (FeedbackFromMap)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:star') }} 2.16. Отзыв с карты (FeedbackFromMap)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Отзывы → Отзывы с карт</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>feedback_from_map</code></span>
@@ -818,9 +876,9 @@
                 </table>
             </section>
 
-            {# =============== 2.16 ENTITY HISTORY =============== #}
+            {# =============== 2.17 ENTITY HISTORY =============== #}
             <section id="ent-history" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:clock-history') }} 2.16. История изменений (EntityHistory)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:clock-history') }} 2.17. История изменений (EntityHistory)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Система → История изменений</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>entity_history</code></span>
@@ -869,9 +927,9 @@
                 </table>
             </section>
 
-            {# =============== 2.17 USER TOKEN =============== #}
+            {# =============== 2.18 USER TOKEN =============== #}
             <section id="ent-user-token" class="doc-section">
-                <h2 class="doc-h2">{{ ux_icon('tabler:key') }} 2.17. Токен (UserToken)</h2>
+                <h2 class="doc-h2">{{ ux_icon('tabler:key') }} 2.18. Токен (UserToken)</h2>
                 <div class="doc-meta">
                     <span class="doc-meta__chip">{{ ux_icon('tabler:menu-2') }} Меню: Система → Токены</span>
                     <span class="doc-meta__chip">{{ ux_icon('tabler:table') }} Таблица: <code>user_tokens</code></span>

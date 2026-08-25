@@ -24,6 +24,24 @@ sylius_resource:
                 model: App\Entity\CatalogItemCharacteristic
                 form: App\Form\Type\CatalogItemCharacteristicType
                 repository: App\Repository\CatalogItemCharacteristicRepository
+        app.catalog_item_recommendation:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\CatalogItemRecommendation
+                form: App\Form\Type\CatalogItemRecommendationType
+                repository: App\Repository\CatalogItemRecommendationRepository
+        app.catalog_item_bought_together:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\CatalogItemBoughtTogether
+                form: App\Form\Type\CatalogItemBoughtTogetherType
+                repository: App\Repository\CatalogItemBoughtTogetherRepository
+        app.catalog_item_also_needed:
+            driver: doctrine/orm
+            classes:
+                model: App\Entity\CatalogItemAlsoNeeded
+                form: App\Form\Type\CatalogItemAlsoNeededType
+                repository: App\Repository\CatalogItemAlsoNeededRepository
         app.catalog_group:
             driver: doctrine/orm
             classes:

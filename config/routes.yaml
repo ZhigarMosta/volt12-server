@@ -70,6 +70,54 @@ app_admin_catalog_item_characteristic:
     type: sylius.resource
     prefix: /admin
 
+app_admin_catalog_item_recommendation:
+    resource: |
+        alias: app.catalog_item_recommendation
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_catalog_item_recommendation
+        vars:
+            all:
+                subheader: app.ui.catalog_item_recommendation
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin
+
+app_admin_catalog_item_bought_together:
+    resource: |
+        alias: app.catalog_item_bought_together
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_catalog_item_bought_together
+        vars:
+            all:
+                subheader: app.ui.catalog_item_bought_together
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin
+
+app_admin_catalog_item_also_needed:
+    resource: |
+        alias: app.catalog_item_also_needed
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        except: ['show']
+        redirect: update
+        grid: app_admin_catalog_item_also_needed
+        vars:
+            all:
+                subheader: app.ui.catalog_item_also_needed
+            index:
+                icon: 'file image outline'
+    type: sylius.resource
+    prefix: /admin
+
 app_admin_catalog_group:
     resource: |
         alias: app.catalog_group

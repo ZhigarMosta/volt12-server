@@ -56,6 +56,24 @@ class CrudService
         return $items;
     }
 
+    public function transformSortCatalogItemLinks($data): array
+    {
+        $items = [];
+        foreach ($data as $link) {
+            /* @var \App\Entity\CatalogItemLink $link */
+            $linked = $link->getLinkedItem();
+            $firstImage = $linked?->getCatalogItemImages()[0] ?? null;
+            $items[] = [
+                'id' => $link->getId(),
+                'name' => $linked?->getName() ?? '—',
+                'img' => ['imgLink' => $firstImage?->getImgLink() ?? ''],
+                'position' => $link->getPosition(),
+            ];
+        }
+        usort($items, fn($a, $b) => ($a['position'] ?? 0) <=> ($b['position'] ?? 0));
+        return $items;
+    }
+
     public function transformSortFeedback($data): array
     {
         $items = [];

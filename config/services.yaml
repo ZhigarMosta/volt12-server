@@ -156,6 +156,15 @@ services:
         tags:
             - { name: kernel.event_listener, event: app.catalog_item_characteristic.pre_create, method: onPreCreate }
             - { name: kernel.event_listener, event: app.catalog_item_characteristic.pre_update, method: onPreUpdate }
+
+    App\EventListener\CatalogItemLinkListener:
+        tags:
+            - { name: kernel.event_listener, event: app.catalog_item_recommendation.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.catalog_item_recommendation.pre_update, method: onPreUpdate }
+            - { name: kernel.event_listener, event: app.catalog_item_bought_together.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.catalog_item_bought_together.pre_update, method: onPreUpdate }
+            - { name: kernel.event_listener, event: app.catalog_item_also_needed.pre_create, method: onPreCreate }
+            - { name: kernel.event_listener, event: app.catalog_item_also_needed.pre_update, method: onPreUpdate }
     
     App\EventListener\CatalogCharacteristicDeletionListener:
         tags:
@@ -298,6 +307,18 @@ services:
         autowire: true
 
     App\Form\Type\CatalogItemImageType:
+        tags: [ 'form.type' ]
+        autowire: true
+
+    App\Form\Type\CatalogItemRecommendationType:
+        tags: [ 'form.type' ]
+        autowire: true
+
+    App\Form\Type\CatalogItemBoughtTogetherType:
+        tags: [ 'form.type' ]
+        autowire: true
+
+    App\Form\Type\CatalogItemAlsoNeededType:
         tags: [ 'form.type' ]
         autowire: true
 
