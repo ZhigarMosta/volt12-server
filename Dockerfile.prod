@@ -1,0 +1,52 @@
+# syntax=docker/dockerfile:1
+# Продакшн-образ бэкенда (Sylius/Symfony). Собирается из трёх стадий:
+# vendor -> composer-зависимости, assets -> webpack encore, runtime -> php-fpm.
+
+########################  Stage 1: PHP-зависимости  ########################
+FROM composer:2 AS vendor
+WORKDIR /app
+COPY composer.json composer.lock symfony.lock ./
+# Базовый образ composer:2 без ext-gd/exif/intl, поэтому --ignore-platform-reqs
+RUN composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-dist --ignore-platform-reqs
+COPY . .
+RUN composer dump-autoload --no-dev --classmap-authoritative --ignore-platform-reqs
+
+########################  Stage 2: webpack encore  ########################
+FROM node:20-alpine AS assets
+WORKDIR /app
+# package.json ссылается на пакеты внутри vendor/sylius (file:vendor/...)
+COPY --from=vendor /app/vendor ./vendor
+COPY package.json yarn.lock webpack.config.js .babelrc ./
+COPY assets ./assets
+RUN yarn install --frozen-lockfile --network-timeout 600000
+RUN yarn build:prod
+
+########################  Stage 3: runtime  ########################
+FROM php:8.3-fpm
+
+COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
+RUN install-php-extensions pdo_pgsql pgsql intl gd exif zip opcache \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Компиляция DI-контейнера этого Sylius-проекта не влезает в дефолтные 128M
+RUN printf 'memory_limit = 768M\n' > /usr/local/etc/php/conf.d/memory-limit.ini
+
+WORKDIR /var/www/html
+
+COPY . .
+COPY --from=vendor /app/vendor ./vendor
+# Собранные ассеты держим ОТДЕЛЬНО: public/ — это volume, который сидируется
+# только при первом создании, поэтому entrypoint копирует их туда на каждом старте.
+COPY --from=assets /app/public/build /opt/build-assets
+
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# var/ нет в git-дереве (гитигнор), создаём явно, не полагаясь на build-контекст
+RUN mkdir -p var/cache var/log var/backups public/media public/uploads public/build public/bundles config/jwt config/encryption \
+    && chown -R www-data:www-data /var/www/html/var /var/www/html/public /var/www/html/config/jwt /var/www/html/config/encryption
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["php-fpm"]
